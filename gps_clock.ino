@@ -102,7 +102,8 @@ void setup() {
   ScreenText(WHITE, 0, 10 , "Waiting for GPS");
   delay(3000);
   FillScreen(BLACK);
-
+  SetCircle(GREEN, clock_xoffset, clock_yoffset, clock_radius); // set clock
+  SetPoint(GREEN, clock_xoffset, clock_yoffset);// set clock middle
   Line.reserve(100);
   Serial.begin(9600);
 }
@@ -126,7 +127,7 @@ void loop()
     if (copy_wday != Tag[weekday() - 1]) {
       SetFilledRect(BLACK , 0, 0, 149, 100);
     }
-    if ((hour() >= 7) || (hour() <= 22)) {
+    if ((hour() > 6) && (hour() < 22)) {
       text_color = WHITE;//day color
     }
     else {
@@ -134,13 +135,10 @@ void loop()
     }
     ScreenText(text_color, 0, 10 , wday);
     ScreenText(text_color, 0, 40 , date);
-    //ScreenText(WHITE, 0, 70 , tim);
+    //ScreenText(text_color, 0, 70 , tim);
     copy_wday = Tag[weekday() - 1];
 
-    SetCircle(GREEN, clock_xoffset, clock_yoffset, clock_radius);
-    SetPoint(GREEN, clock_xoffset, clock_yoffset);
     //Sekundenzeiger
-
     hour_alfa = (270 + (30 * hour() + (0.5 * minute()))) * pi / 180;
     hour_arrow_xpos = (cos(hour_alfa) * clock_radius * 0.7) + clock_xoffset;
     hour_arrow_ypos = (sin(hour_alfa) * clock_radius * 0.7) + clock_yoffset;
@@ -270,7 +268,7 @@ unsigned long FillScreen(uint16_t color) {
 unsigned long ScreenText(uint16_t color, int xtpos, int ytpos, String text) {
   unsigned long start = micros();
   tft.setCursor(xtpos, ytpos);
-  tft.setTextColor(WHITE);
+  tft.setTextColor(color);
   tft.setTextSize(2);
   tft.println(text);
   return micros() - start;
