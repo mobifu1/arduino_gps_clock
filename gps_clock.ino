@@ -159,6 +159,7 @@ void loop()
       SetLines(BLACK, clock_xoffset, clock_yoffset, copy_min_arrow_xpos, copy_min_arrow_ypos );
     }
 
+    SetLines(BLACK, clock_xoffset, clock_yoffset, copy_sec_arrow_xpos, copy_sec_arrow_ypos );
     SetLines(RED, clock_xoffset, clock_yoffset, hour_arrow_xpos, hour_arrow_ypos );
     copy_hour_arrow_xpos = hour_arrow_xpos;
     copy_hour_arrow_ypos = hour_arrow_ypos;
@@ -167,7 +168,6 @@ void loop()
     copy_min_arrow_xpos = min_arrow_xpos;
     copy_min_arrow_ypos = min_arrow_ypos;
 
-    SetLines(BLACK, clock_xoffset, clock_yoffset, copy_sec_arrow_xpos, copy_sec_arrow_ypos );
     SetLines(GREEN, clock_xoffset, clock_yoffset, sec_arrow_xpos, sec_arrow_ypos );
     copy_sec_arrow_xpos = sec_arrow_xpos;
     copy_sec_arrow_ypos = sec_arrow_ypos;
