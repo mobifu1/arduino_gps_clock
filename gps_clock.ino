@@ -212,7 +212,11 @@ void RMC()//TIME DATE
   if (valid_sync == false) {
     SetFilledRect(BLACK , 150, 40, x_edge_right, 69); //clear sync on display
     sunrise (30, 52.5, 13.5);// start sunrise calculation when valid_sync = false
+    //int day_of_year = int(((month()-1)*30.4)+day());
+    //sunrise (day_of_year, 53.0, 10.0);//Hamburg 53,0° 10,0°
+
   }
+
   ScreenText(text_color, 150, 40 , "Sync");
   valid_sync = true;
 }//GPRMC
@@ -220,7 +224,6 @@ void RMC()//TIME DATE
 void SerialClear() {
   while (Serial.available())Serial.read();
 }
-
 //----------------------------------------------
 //--------------GPS-ROUTINEN--------------------
 //----------------------------------------------
