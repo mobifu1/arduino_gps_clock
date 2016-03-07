@@ -49,14 +49,19 @@ TimeChangeRule CET = {"", Last, Sun, Oct, 3, 60};
 Timezone CE(CEST, CET);
 TimeChangeRule *tcr;
 char *Tag[7] = {"SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SONNABEND"};
-
 String Line = "";    // a string to hold incoming data
 String text = "";
 
+//Display Edges
+int x_edge_left = 0;
+int x_edge_right;
+int y_edge_up = 0;
+int y_edge_down;
+
 //Clock-Grafik
-int clock_radius = 90;
-int clock_xoffset = 120;
-int clock_yoffset = 200;
+int clock_radius = 90;//global adjustment for the clock
+int clock_xoffset = 120;//global adjustment for the clock
+int clock_yoffset = 200;//global adjustment for the clock
 int sec_arrow_xpos = clock_xoffset;
 int sec_arrow_ypos = clock_yoffset - clock_radius;
 int min_arrow_xpos = clock_xoffset;
@@ -78,7 +83,7 @@ float hour_alfa;
 String copy_wday;
 String copy_sat;
 boolean valid_sync = false;
-uint16_t text_color;
+uint16_t text_color; // day / night color
 
 void setup() {
   tft.reset();
@@ -94,12 +99,16 @@ void setup() {
   tft.begin(identifier);
   FillScreen(BLACK);
   text = String(identifier, HEX);
-  ScreenText(WHITE, 0, 10 , "Chip:" + text);
+  ScreenText(WHITE, x_edge_left, 10 , "Chip:" + text);
   int  width = tft.width(), height = tft.height();
-  ScreenText(WHITE, 0, 40 , (String(width) + "x" + String(height) + "px")); //240x320
+  ScreenText(WHITE, x_edge_left, 40 , (String(width) + "x" + String(height) + "px")); //240x320
+  ScreenText(WHITE, x_edge_left, 70 , ("Set Display Edges:"));
+  x_edge_right = width - 1; //set display edges
+  y_edge_down =  height - 1; //set display edges
+  ScreenText(WHITE, x_edge_left, 70 , ("X:" + String(x_edge_left) + "-" + String(x_edge_right) + " Y:" + String(y_edge_up) + "-" + String(y_edge_down)));
   delay(3000);
   FillScreen(BLACK);
-  ScreenText(WHITE, 0, 10 , "Waiting for GPS");
+  ScreenText(WHITE, x_edge_left, 10 , "Waiting for GPS ((()))");
   delay(3000);
   FillScreen(BLACK);
   SetCircle(GREEN, clock_xoffset, clock_yoffset, clock_radius); // set clock
@@ -125,7 +134,7 @@ void loop()
     //sprintf(tim, "%02d:%02d:%02d", hour(), minute(), second());
 
     if (copy_wday != Tag[weekday() - 1]) {
-      SetFilledRect(BLACK , 0, 0, 149, 100);
+      SetFilledRect(BLACK , x_edge_left, y_edge_up, 149, 100);
     }
     if ((hour() > 6) && (hour() < 22)) {
       text_color = WHITE;//day color
@@ -133,9 +142,9 @@ void loop()
     else {
       text_color = BLUE;//night clolor
     }
-    ScreenText(text_color, 0, 10 , wday);
-    ScreenText(text_color, 0, 40 , date);
-    //ScreenText(text_color, 0, 70 , tim);
+    ScreenText(text_color, x_edge_left, 10 , wday);
+    ScreenText(text_color, x_edge_left, 40 , date);
+    //ScreenText(text_color, x_edge_left, 70 , tim);
     copy_wday = Tag[weekday() - 1];
 
     //Sekundenzeiger
@@ -184,7 +193,7 @@ void GGA()//FIX SAT ect.
 { //Serial.print (getparam(7)); Serial.println(" Sat");
 
   if (getparam(7) != copy_sat) {
-    SetFilledRect(BLACK , 150, 0, 239, 39);
+    SetFilledRect(BLACK , 150, y_edge_up, x_edge_right, 39);
   }
   ScreenText(text_color, 150, 10 , (getparam(7)) + " Sat");
   copy_sat = getparam(7);
@@ -201,14 +210,14 @@ void RMC()//TIME DATE
   setTime(cet);
   //Serial.println("sync");
   if (valid_sync == false) {
-    SetFilledRect(BLACK , 150, 40, 239, 69); //clear sync on display
+    SetFilledRect(BLACK , 150, 40, x_edge_right, 69); //clear sync on display
   }
   ScreenText(text_color, 150, 40 , "Sync");
   valid_sync = true;
 }//GPRMC
 
-void SerialClear()
-{ while (Serial.available())Serial.read();
+void SerialClear() {
+  while (Serial.available())Serial.read();
 }
 
 //----------------------------------------------
