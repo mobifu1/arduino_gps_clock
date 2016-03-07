@@ -199,16 +199,19 @@ void GGA() { //FIX SAT ect.
   ScreenText(text_color, 150, 10 , (getparam(7)) + " Sat");
   copy_sat = getparam(7);
 
+  int lat = getparam(2).substring(0, 2).toInt();
+  int lon = getparam(4).substring(0, 3).toInt();
+  //ScreenText(text_color, x_edge_left, 120 , String(lat) + "," + String(lon));
+
   if (valid_sync == false) {
     SetFilledRect(BLACK , 150, 40, x_edge_right, 29); //clear sync on display 69
     //sunrise (30, 52.5, 13.5);// start sunrise calculation > result: 07:52 Uhr
     int day_of_year = int(((month() - 1) * 30.4) + day());
-    sunrise (day_of_year, 53.0, 10.0);//Hamburg 53,0° 10,0°
-  }
-
-  if (getparam(6).toInt() > 0) {
-    ScreenText(text_color, 150, 40 , "Sync");
-    valid_sync = true;
+    if (lat > 0 && lon > 0) {
+      sunrise (day_of_year, lat, lon);//Hamburg 53,0° 10,0°
+      ScreenText(text_color, 150, 40 , "Sync");
+      valid_sync = true;
+    }
   }
 }//GPGGA
 
