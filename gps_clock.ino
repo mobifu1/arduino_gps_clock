@@ -189,14 +189,25 @@ void loop()
   }//second
 }//loop
 
-void GGA()//FIX SAT ect.
-{ //Serial.print (getparam(7)); Serial.println(" Sat");
+void GGA() { //FIX SAT ect.
 
   if (getparam(7) != copy_sat) {
     SetFilledRect(BLACK , 150, y_edge_up, x_edge_right, 39);
   }
   ScreenText(text_color, 150, 10 , (getparam(7)) + " Sat");
   copy_sat = getparam(7);
+
+  if (valid_sync == false) {
+    SetFilledRect(BLACK , 150, 40, x_edge_right, 69); //clear sync on display
+    //sunrise (30, 52.5, 13.5);// start sunrise calculation > result: 07:52 Uhr
+    int day_of_year = int(((month() - 1) * 30.4) + day());
+    sunrise (day_of_year, 53.0, 10.0);//Hamburg 53,0° 10,0°
+  }
+
+  if (getparam(6).toInt() > 0) {
+    ScreenText(text_color, 150, 40 , "Sync");
+    valid_sync = true;
+  }
 }//GPGGA
 
 void RMC()//TIME DATE
@@ -208,17 +219,6 @@ void RMC()//TIME DATE
           getparam(9).substring(4, 4 + 2).toInt());
   time_t cet = CE.toLocal(now(), &tcr);
   setTime(cet);
-  //Serial.println("sync");
-  if (valid_sync == false) {
-    SetFilledRect(BLACK , 150, 40, x_edge_right, 69); //clear sync on display
-    sunrise (30, 52.5, 13.5);// start sunrise calculation when valid_sync = false
-    //int day_of_year = int(((month()-1)*30.4)+day());
-    //sunrise (day_of_year, 53.0, 10.0);//Hamburg 53,0° 10,0°
-
-  }
-
-  ScreenText(text_color, 150, 40 , "Sync");
-  valid_sync = true;
 }//GPRMC
 
 void SerialClear() {
