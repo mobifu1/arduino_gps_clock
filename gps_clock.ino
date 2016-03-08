@@ -35,6 +35,7 @@
 #define MAGENTA 0xF81F
 #define YELLOW  0xFFE0
 #define WHITE   0xFFFF
+#define ORANGE  0xFBE0
 Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 // If using the shield, all control and data lines are fixed, and
 // a simpler declaration can optionally be used:
@@ -90,6 +91,9 @@ uint16_t copy_text_color;
 int int_sunrise_hour = 0;
 int int_sunrise_minute = 0;
 int copy_int_sunrise_minute;
+int int_sundown_hour = 0;
+int int_sundown_minute = 0;
+int copy_int_sundown_minute;
 
 void setup() {
   tft.reset();
@@ -142,7 +146,12 @@ void loop()
     if (copy_wday != Tag[weekday() - 1]) {
       SetFilledRect(BLACK , x_edge_left, y_edge_up, 149, 70);
     }
-    if ((hour() >= int_sunrise_hour) && (minute() >= int_sunrise_hour) && (hour() < 22 )) {
+    //Day and Night color
+    int minutes_of_day = ((hour() * 60) + minute());
+    int minutes_of_sunrise = ((int_sunrise_hour * 60) + int_sunrise_minute);
+    int minutes_of_sundown = ((int_sundown_hour * 60) + int_sundown_minute);
+
+    if ((minutes_of_day >= minutes_of_sunrise)  && (minutes_of_day <= minutes_of_sundown)) {
       text_color = WHITE;//day color
     }
     else {
@@ -205,18 +214,18 @@ void GGA() { //FIX SAT ect.
   if (getparam(7) != copy_sat) {
     SetFilledRect(BLACK , 150, y_edge_up, 89, 40);
   }
-  ScreenText(text_color, 150, 10 , (getparam(7)) + " Sat");
+  ScreenText(text_color, 150, 10 , (getparam(7).substring(0, 2)) + " Sat");
   copy_sat = getparam(7);
 
   int lat = getparam(2).substring(0, 2).toInt();
   int lon = getparam(4).substring(0, 3).toInt();
-  //ScreenText(text_color, x_edge_left, 120 , String(lat) + "," + String(lon));
+  //ScreenText(text_color, x_edge_left, 170 , String(lat) + "," + String(lon));
 
   if (valid_sync == false) {
     SetFilledRect(BLACK , 150, 40, 89, 29); //clear sync on display
-    //sunrise (30, 52.5, 13.5);// start sunrise calculation > result: 07:52 Uhr
+    //sunrise (30, 52.5, 13.5);// start sunrise calculation > result: 07:52 Uhr & 16:47 Uhr
     int day_of_year = int(((month() - 1) * 30.4) + day());
-    if (lat > 0 && lon > 0) {
+    if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
       sunrise (day_of_year, lat, lon);//Hamburg 53,0° 10,0°
       ScreenText(text_color, 150, 40 , "Sync");
       valid_sync = true;
@@ -344,10 +353,14 @@ void sunrise(int day_of_year, float latitude , float longitude) {
   float declination;
   float time_diff;
   float zeit_gleichung;
-  float local_time;
+  float local_rising_time;
+  float local_down_time;
   float sunrising;//
   float sunrise_hour;
   float sunrise_minute;
+  float sundowning;//
+  float sundown_hour;
+  float sundown_minute;
   int winter_sommer_time = 1; // 2 = 31.03.-31.10.
 
   if (month() > 3 && month() < 11) {
@@ -363,25 +376,36 @@ void sunrise(int day_of_year, float latitude , float longitude) {
   //Zeitdifferenz = 12*arccos((sin(-0.0145) - sin(0.9163)*sin(-0.30677)) / (cos(0.9163)*cos(-0.30677)))/Pi = 4.479 Stunden.
   time_diff = 12 * acos((sin(-0.0145) - sin(location) * sin(declination)) / (cos(location) * cos(declination))) / pi;
   //Sonnenaufgang um 12 - 4.479 = 7.521 Uhr Wahre Ortszeit.
+  //Sonnenuntergang um 12 + 4.479 = 16.479 Uhr Wahre Ortszeit.
   sunrising = 12 - time_diff;
+  sundowning = 12 + time_diff;
   //Zeitgleichung = -0.171*sin(0.0337*30 + 0.465) - 0.1299*sin(0.01787*30 - 0.168)
   //= -0.217 Stunden = WOZ - MOZ
   zeit_gleichung = -0.171 * sin(0.0337 * day_of_year + 0.465) - (0.1299 * sin(0.01787 * day_of_year - 0.168));
   //MOZ = WOZ + 0.217 Stunden = 7.738
-  local_time = sunrising + (-1 * zeit_gleichung);
+  local_rising_time = sunrising + (-1 * zeit_gleichung);// = 7.738
+  local_down_time = sundowning + (-1 * zeit_gleichung);// = 16,696
   //von MOZ zu MEZ:
   //für Berlin, mit +13.5° östlicher Länge (Division durch 15 erzeugt eine Zeitdifferenz in Stunden),
   //und als Zeitzone die Mitteleuropäische Zeit MEZ mit einer Korrektur von +1 Stunde (MESZ wäre +2), also:
-  //7.738 + -13.5/15 +1 = 7.838 Uhr MEZ
-  sunrise_hour = (local_time + (-1 * longitude / 15) + winter_sommer_time); //nur Vorkomma!!
+  sunrise_hour = (local_rising_time + (-1 * longitude / 15) + winter_sommer_time);// 7.738 + (-13.5/15) +1 = 7.838 Uhr MEZ
+  sundown_hour = (local_down_time + (-1 * longitude / 15) + winter_sommer_time); // 16,696 + (-13.5/15) +1 = 17.03 Uhr MEZ
   //Die Zeit 7.838 Uhr MEZ ist in Stunden. Für die Bestimmung der Anzahl Minuten nach 7 Uhr wird der nichtganzzahlige Anteil 0.838 mit 60 multipliziert: 0.838*60=50.3 Minuten
+
   sunrise_minute = sunrise_hour - int(sunrise_hour);
   sunrise_minute = sunrise_minute * 60; //nur Nachkomma!!
   int_sunrise_hour = int(sunrise_hour);
   int_sunrise_minute = int(sunrise_minute);
+
+  sundown_minute = sundown_hour - int(sundown_hour);
+  sundown_minute = sundown_minute * 60; //nur Nachkomma!!
+  int_sundown_hour = int(sundown_hour);
+  int_sundown_minute = int(sundown_minute);
+
   //Schlussendlich wird der Sonnenaufgang für Berlin auf 7 Uhr 50 bestimmt!
-  //Ein Vergleich mit CalSky.com ergibt 7 Uhr 52 für den Sonnenaufgang.
+  //Ein Vergleich mit CalSky.com ergibt 7 Uhr 52 für den Sonnenaufgang und Sonnenuntergang 16 Uhr 48.
   //Das ist OK, mit so einfachen Formeln kann man keine bessere Genauigkeit erwarten.
+
   if ((valid_sync == false) && (copy_int_sunrise_minute != int_sunrise_minute)) {
     copy_int_sunrise_minute = int_sunrise_minute;
     SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise on display
@@ -394,6 +418,20 @@ void sunrise(int day_of_year, float latitude , float longitude) {
     }
     else {
       ScreenText(text_color, x_edge_left, 70 , "Sunrise: " + String(int_sunrise_hour) + ":" + String(int_sunrise_minute));
+    }
+  }
+  if ((valid_sync == false) && (copy_int_sundown_minute != int_sundown_minute)) {
+    copy_int_sundown_minute = int_sundown_minute;
+    SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunrise on display
+    SetFilledCircle(ORANGE , 220, 305, 6);
+    SetLines(ORANGE , 210, 305, 230 , 305);
+    SetFilledRect(BLACK , 210, 290, 230, 15);
+
+    if (int_sunrise_minute < 10) {
+      ScreenText(text_color, x_edge_left, 305 , "Sunset: " + String(int_sundown_hour) + ":0" + String(int_sundown_minute));
+    }
+    else {
+      ScreenText(text_color, x_edge_left, 305 , "Sunset: " + String(int_sundown_hour) + ":" + String(int_sundown_minute));
     }
   }
   //ScreenText(text_color, x_edge_left, 120 , String(day_of_year) + "," + String(latitude) + "," + String(longitude));
