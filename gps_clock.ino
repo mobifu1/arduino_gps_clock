@@ -60,9 +60,14 @@ int y_edge_up = 0;
 int y_edge_down;
 
 //Clock-Grafik
+#define scale_Points 1  // 1 = active 
+#define scale_Circle 0  // 0 = inactive
 int clock_radius = 90;//global adjustment for the clock
+float clock_point_angle_rad = 0;
 int clock_xoffset = 120;//global adjustment for the clock
 int clock_yoffset = 195;//global adjustment for the clock
+int point_xpos = 0;
+int point_ypos = 0;
 int sec_arrow_xpos = clock_xoffset;
 int sec_arrow_ypos = clock_yoffset - clock_radius;
 int min_arrow_xpos = clock_xoffset;
@@ -77,7 +82,6 @@ int copy_min_arrow_ypos;
 int copy_hour_arrow_xpos;
 int copy_hour_arrow_ypos;
 
-//GPS-Time
 float pi = 3.14159265;
 float sec_alfa;
 float min_alfa;
@@ -123,8 +127,20 @@ void setup() {
   ScreenText(WHITE, x_edge_left, 10 , "Waiting for GPS )))");
   delay(3000);
   FillScreen(BLACK);
+
+#if scale_Circle
   SetCircle(GREEN, clock_xoffset, clock_yoffset, clock_radius); // set clock
-  SetPoint(GREEN, clock_xoffset, clock_yoffset);// set clock middle
+#endif
+
+#if scale_Points
+  for (int i = 0; i <= 11; i++) {
+    clock_point_angle_rad = 30 * i * (pi / 180);
+    point_xpos = (cos(clock_point_angle_rad) * clock_radius) + clock_xoffset;
+    point_ypos = (sin(clock_point_angle_rad) * clock_radius) + clock_yoffset;
+    SetFilledCircle(GREEN, point_xpos, point_ypos, 2);
+  }
+#endif
+
   Line.reserve(100);
   Serial.begin(9600);
 }
@@ -153,10 +169,10 @@ void loop()
     int minutes_of_sundown = ((int_sundown_hour * 60) + int_sundown_minute);
 
     if ((minutes_of_day >= minutes_of_sunrise)  && (minutes_of_day <= minutes_of_sundown)) {
-      text_color = WHITE;//define day color
+      text_color = WHITE;//day color
     }
     else {
-      text_color = BLUE;//define night clolor
+      text_color = BLUE;//night clolor
     }
     if (copy_text_color != text_color) {
       valid_sync = false;//refreshh color sunrise text
@@ -348,7 +364,6 @@ unsigned long SetCircle(uint16_t color , int xcpos, int ycpos, int radius) {
   tft.drawCircle(xcpos, ycpos, radius, color);
   return micros() - start;
 }
-
 unsigned long SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius) {
   unsigned long start, t;
   tft.fillCircle(xcpos, ycpos, radius, color);
