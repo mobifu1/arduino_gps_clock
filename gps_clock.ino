@@ -62,7 +62,7 @@ int y_edge_down;
 //Clock-Grafik
 int clock_radius = 90;//global adjustment for the clock
 int clock_xoffset = 120;//global adjustment for the clock
-int clock_yoffset = 200;//global adjustment for the clock
+int clock_yoffset = 195;//global adjustment for the clock
 int sec_arrow_xpos = clock_xoffset;
 int sec_arrow_ypos = clock_yoffset - clock_radius;
 int min_arrow_xpos = clock_xoffset;
@@ -84,6 +84,7 @@ float hour_alfa;
 String copy_wday;
 String copy_sat;
 boolean valid_sync = false;
+boolean valid_signal = false;
 uint16_t text_color; // day / night color
 uint16_t copy_text_color;
 
@@ -213,28 +214,14 @@ void GGA() { //FIX SAT ect.
 
   if (getparam(7) != copy_sat) {
     SetFilledRect(BLACK , 150, y_edge_up, 89, 40);
-  }
-  ScreenText(text_color, 150, 10 , (getparam(7).substring(0, 2)) + " Sat");
-  copy_sat = getparam(7);
-
-  int lat = getparam(2).substring(0, 2).toInt();
-  int lon = getparam(4).substring(0, 3).toInt();
-  //ScreenText(text_color, x_edge_left, 170 , String(lat) + "," + String(lon));
-
-  if (valid_sync == false) {
-    SetFilledRect(BLACK , 150, 40, 89, 29); //clear sync on display
-    //sunrise (30, 52.5, 13.5);// start sunrise calculation > result: 07:52 Uhr & 16:47 Uhr
-    int day_of_year = int(((month() - 1) * 30.4) + day());
-    if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
-      sunrise (day_of_year, lat, lon);//Hamburg 53,0° 10,0°
-      ScreenText(text_color, 150, 40 , "Sync");
-      valid_sync = true;
-    }
+    ScreenText(text_color, 150, 10 , (getparam(7).substring(0, 2)) + " Sat");
+    copy_sat = getparam(7);
   }
 }//GPGGA
 
-void RMC()//TIME DATE
-{ setTime(getparam(1).substring(0, 0 + 2).toInt(),
+void RMC() { //TIME DATE
+
+  setTime(getparam(1).substring(0, 0 + 2).toInt(),
           getparam(1).substring(2, 2 + 2).toInt(),
           getparam(1).substring(4, 4 + 2).toInt(),
           getparam(9).substring(0, 0 + 2).toInt(),
@@ -242,6 +229,29 @@ void RMC()//TIME DATE
           getparam(9).substring(4, 4 + 2).toInt());
   time_t cet = CE.toLocal(now(), &tcr);
   setTime(cet);
+
+  if (getparam(2) == "A") { //valid GPS-signal  A/V
+    valid_signal = true;
+  }
+  else {
+    valid_signal = false;
+  }
+
+  int lat = getparam(3).substring(0, 2).toInt();
+  int lon = getparam(5).substring(0, 3).toInt();
+
+  if (valid_sync == false) {
+    SetFilledRect(BLACK , 150, 40, 89, 29); //clear sync on display
+    //sunrise (30, 52.5, 13.5);// start sunrise calculation > result: 07:52 Uhr & 16:47 Uhr
+    int day_of_year = int(((month() - 1) * 30.4) + day());
+    if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
+      if (valid_signal = true) {
+        sunrise (day_of_year, lat, lon);//Hamburg 53,0° 10,0°
+        ScreenText(text_color, 150, 40 , "Sync");
+        valid_sync = true;
+      }
+    }
+  }
 }//GPRMC
 
 void SerialClear() {
@@ -406,8 +416,7 @@ void sunrise(int day_of_year, float latitude , float longitude) {
   //Ein Vergleich mit CalSky.com ergibt 7 Uhr 52 für den Sonnenaufgang und Sonnenuntergang 16 Uhr 48.
   //Das ist OK, mit so einfachen Formeln kann man keine bessere Genauigkeit erwarten.
 
-  if ((valid_sync == false) && (copy_int_sunrise_minute != int_sunrise_minute)) {
-    copy_int_sunrise_minute = int_sunrise_minute;
+  if (valid_sync == false) {
     SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise on display
     SetFilledCircle(YELLOW , 220, 80, 6);
     SetLines(YELLOW , 210, 80, 230 , 80);
@@ -420,8 +429,7 @@ void sunrise(int day_of_year, float latitude , float longitude) {
       ScreenText(text_color, x_edge_left, 70 , "Sunrise: " + String(int_sunrise_hour) + ":" + String(int_sunrise_minute));
     }
   }
-  if ((valid_sync == false) && (copy_int_sundown_minute != int_sundown_minute)) {
-    copy_int_sundown_minute = int_sundown_minute;
+  if (valid_sync == false)  {
     SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunrise on display
     SetFilledCircle(ORANGE , 220, 305, 6);
     SetLines(ORANGE , 210, 305, 230 , 305);
