@@ -131,7 +131,6 @@ void setup() {
 void loop()
 { static int os = -1;
 
-  if (!(os % 3))if (getline("$GPGGA"))GGA();
   if (!(os % 4))if (getline("$GPRMC"))RMC();
   SerialClear();
 
@@ -210,15 +209,6 @@ void loop()
   }//second
 }//loop
 
-void GGA() { //FIX SAT ect.
-
-  if (getparam(7) != copy_sat) {
-    SetFilledRect(BLACK , 150, y_edge_up, 89, 40);
-    ScreenText(text_color, 150, 10 , (getparam(7).substring(0, 2)) + " Sat");
-    copy_sat = getparam(7);
-  }
-}//GPGGA
-
 void RMC() { //TIME DATE
 
   setTime(getparam(1).substring(0, 0 + 2).toInt(),
@@ -231,9 +221,17 @@ void RMC() { //TIME DATE
   setTime(cet);
 
   if (getparam(2) == "A") { //valid GPS-signal  A/V
+    SetRect(text_color , 150, 15, 10, 10);
+    SetRect(text_color , 160, 15, 10, 10);
+    SetLines(text_color, 170, 20, 176, 20);
+    SetCircle(text_color , 180, 20, 4);
+    SetLines(text_color, 184, 20, 190, 20);
+    SetRect(text_color , 190, 15, 10, 10);
+    SetRect(text_color , 200, 15, 10, 10);
     valid_signal = true;
   }
   else {
+    SetFilledRect(BLACK , 150, y_edge_up, 89, 40);
     valid_signal = false;
   }
 
@@ -258,7 +256,7 @@ void SerialClear() {
   while (Serial.available())Serial.read();
 }
 //----------------------------------------------
-//--------------RS232-ROUTINEN--------------------
+//--------------RS232-ROUTINEN------------------
 //----------------------------------------------
 //String Line="";
 
