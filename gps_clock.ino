@@ -77,6 +77,7 @@ int copy_min_arrow_ypos;
 int copy_hour_arrow_xpos;
 int copy_hour_arrow_ypos;
 
+//GPS-Time
 float pi = 3.14159265;
 float sec_alfa;
 float min_alfa;
@@ -152,10 +153,10 @@ void loop()
     int minutes_of_sundown = ((int_sundown_hour * 60) + int_sundown_minute);
 
     if ((minutes_of_day >= minutes_of_sunrise)  && (minutes_of_day <= minutes_of_sundown)) {
-      text_color = WHITE;//day color
+      text_color = WHITE;//define day color
     }
     else {
-      text_color = BLUE;//night clolor
+      text_color = BLUE;//define night clolor
     }
     if (copy_text_color != text_color) {
       valid_sync = false;//refreshh color sunrise text
@@ -347,6 +348,7 @@ unsigned long SetCircle(uint16_t color , int xcpos, int ycpos, int radius) {
   tft.drawCircle(xcpos, ycpos, radius, color);
   return micros() - start;
 }
+
 unsigned long SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius) {
   unsigned long start, t;
   tft.fillCircle(xcpos, ycpos, radius, color);
