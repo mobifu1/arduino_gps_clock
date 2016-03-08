@@ -84,7 +84,11 @@ String copy_wday;
 String copy_sat;
 boolean valid_sync = false;
 uint16_t text_color; // day / night color
+uint16_t copy_text_color;
+
 //Sunrise
+int int_sunrise_hour = 0;
+int int_sunrise_minute = 0;
 int copy_int_sunrise_minute;
 
 void setup() {
@@ -136,17 +140,22 @@ void loop()
     //sprintf(tim, "%02d:%02d:%02d", hour(), minute(), second());
 
     if (copy_wday != Tag[weekday() - 1]) {
-      SetFilledRect(BLACK , x_edge_left, y_edge_up, 149, 69);//100
+      SetFilledRect(BLACK , x_edge_left, y_edge_up, 149, 70);
     }
-    if ((hour() > 6) && (hour() < 22)) {
+    if ((hour() >= int_sunrise_hour) && (minute() >= int_sunrise_hour) && (hour() < 22 )) {
       text_color = WHITE;//day color
     }
     else {
       text_color = BLUE;//night clolor
     }
+    if (copy_text_color != text_color) {
+      valid_sync = false;//refreshh color sunrise text
+      copy_text_color = text_color;
+    }
+
     ScreenText(text_color, x_edge_left, 10 , wday);
     ScreenText(text_color, x_edge_left, 40 , date);
-    //ScreenText(text_color, x_edge_left, 70 , tim);
+    //ScreenText(text_color, x_edge_left, 120 , tim);
     copy_wday = Tag[weekday() - 1];
 
     //Sekundenzeiger
@@ -194,7 +203,7 @@ void loop()
 void GGA() { //FIX SAT ect.
 
   if (getparam(7) != copy_sat) {
-    SetFilledRect(BLACK , 150, y_edge_up, x_edge_right, 29);
+    SetFilledRect(BLACK , 150, y_edge_up, 89, 40);
   }
   ScreenText(text_color, 150, 10 , (getparam(7)) + " Sat");
   copy_sat = getparam(7);
@@ -204,7 +213,7 @@ void GGA() { //FIX SAT ect.
   //ScreenText(text_color, x_edge_left, 120 , String(lat) + "," + String(lon));
 
   if (valid_sync == false) {
-    SetFilledRect(BLACK , 150, 40, x_edge_right, 29); //clear sync on display 69
+    SetFilledRect(BLACK , 150, 40, 89, 29); //clear sync on display
     //sunrise (30, 52.5, 13.5);// start sunrise calculation > result: 07:52 Uhr
     int day_of_year = int(((month() - 1) * 30.4) + day());
     if (lat > 0 && lon > 0) {
@@ -230,7 +239,7 @@ void SerialClear() {
   while (Serial.available())Serial.read();
 }
 //----------------------------------------------
-//--------------GPS-ROUTINEN--------------------
+//--------------RS232-ROUTINEN--------------------
 //----------------------------------------------
 //String Line="";
 
@@ -304,15 +313,15 @@ unsigned long SetPoint(uint16_t color, int xppos, int yppos) {
   return micros() - start;
 }
 
-unsigned long SetRect(uint16_t color , int xr1pos, int yr1pos, int xr2pos, int yr2pos) {
+unsigned long SetRect(uint16_t color , int xr1pos, int yr1pos, int xr2width, int yr2hight) {
   unsigned long start, t;
-  tft.drawRect(xr1pos, yr1pos, xr2pos, yr2pos, color);
+  tft.drawRect(xr1pos, yr1pos, xr2width, yr2hight, color);
   return micros() - start;
 }
 
-unsigned long SetFilledRect(uint16_t color , int xr1pos, int yr1pos, int xr2pos, int yr2pos) {
+unsigned long SetFilledRect(uint16_t color , int xr1pos, int yr1pos, int xr2width, int yr2hight) {
   unsigned long start, t;
-  tft.fillRect(xr1pos, yr1pos, xr2pos, yr2pos, color);
+  tft.fillRect(xr1pos, yr1pos, xr2width, yr2hight, color);
   return micros() - start;
 }
 
@@ -368,14 +377,14 @@ void sunrise(int day_of_year, float latitude , float longitude) {
   //Die Zeit 7.838 Uhr MEZ ist in Stunden. Für die Bestimmung der Anzahl Minuten nach 7 Uhr wird der nichtganzzahlige Anteil 0.838 mit 60 multipliziert: 0.838*60=50.3 Minuten
   sunrise_minute = sunrise_hour - int(sunrise_hour);
   sunrise_minute = sunrise_minute * 60; //nur Nachkomma!!
-  int int_sunrise_hour = int(sunrise_hour);
-  int int_sunrise_minute = int(sunrise_minute);
+  int_sunrise_hour = int(sunrise_hour);
+  int_sunrise_minute = int(sunrise_minute);
   //Schlussendlich wird der Sonnenaufgang für Berlin auf 7 Uhr 50 bestimmt!
   //Ein Vergleich mit CalSky.com ergibt 7 Uhr 52 für den Sonnenaufgang.
   //Das ist OK, mit so einfachen Formeln kann man keine bessere Genauigkeit erwarten.
   if ((valid_sync == false) && (copy_int_sunrise_minute != int_sunrise_minute)) {
     copy_int_sunrise_minute = int_sunrise_minute;
-    SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 20); //clear sunrise on display
+    SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise on display
     SetFilledCircle(YELLOW , 220, 80, 6);
     SetLines(YELLOW , 210, 80, 230 , 80);
     SetFilledRect(BLACK , 210, 81, 230, 20);
