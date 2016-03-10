@@ -53,19 +53,19 @@ char *Tag[7] = {"SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREI
 String Line = "";    // a string to hold incoming data
 String text = "";
 
-//Display Edges
+//Display Edges calculate
 int x_edge_left = 0;
 int x_edge_right;
 int y_edge_up = 0;
 int y_edge_down;
 
 //Clock-Grafik
-#define scale_Points 1  // 1 = active 
-#define scale_Circle 0  // 0 = inactive
-int clock_radius = 90;//global adjustment for the clock
+#define scale_Points 1  // 1 = active  / every 30° a point
+#define scale_Circle 0  // 0 = inactive / full circle
+const int clock_radius = 90;//global adjustment for the clock, default 90
+const int clock_xoffset = 120;//global adjustment for the clock, default 120
+const int clock_yoffset = 195;//global adjustment for the clock, default 195
 float clock_point_angle_rad = 0;
-int clock_xoffset = 120;//global adjustment for the clock
-int clock_yoffset = 195;//global adjustment for the clock
 int point_xpos = 0;
 int point_ypos = 0;
 int sec_arrow_xpos = clock_xoffset;
@@ -101,7 +101,7 @@ int int_sundown_hour = 0;
 int int_sundown_minute = 0;
 int copy_int_sundown_minute;
 
-//Sommer Winter Time switch Calender 10 years
+//Sommer Winter Time switch Calender 12 years
 const int calender[12][7] = {
   {2016, 3, 27, 2, 10, 30, 3}, // 27.03.2016 > 02:00 Uhr
   {2017, 3, 26, 2, 10, 29, 3},
