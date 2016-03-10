@@ -87,6 +87,7 @@ float sec_alfa;
 float min_alfa;
 float hour_alfa;
 String copy_wday;
+String copy_day;
 String copy_sat;
 boolean valid_sync = false;
 boolean valid_signal = false;
@@ -163,8 +164,10 @@ void loop()
     sprintf(date, "%02d.%02d.%04d", day(), month(), year());
     //sprintf(tim, "%02d:%02d:%02d", hour(), minute(), second());
 
-    if (copy_wday != Tag[weekday() - 1]) {
-      SetFilledRect(BLACK , x_edge_left, y_edge_up, 149, 70);
+    if (copy_wday != Tag[weekday() - 1] || copy_day != date) {
+      SetFilledRect(BLACK , x_edge_left, y_edge_up, 149, 69);
+      copy_wday = Tag[weekday() - 1];
+      copy_day = date;
     }
     //Day and Night color
     int minutes_of_day = ((hour() * 60) + minute());
@@ -185,7 +188,6 @@ void loop()
     ScreenText(text_color, x_edge_left, 10 , wday);
     ScreenText(text_color, x_edge_left, 40 , date);
     //ScreenText(text_color, x_edge_left, 120 , tim);
-    copy_wday = Tag[weekday() - 1];
 
     //Sekundenzeiger
     hour_alfa = (270 + (30 * hour() + (0.5 * minute()))) * pi / 180;
