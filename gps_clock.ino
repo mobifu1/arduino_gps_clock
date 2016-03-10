@@ -100,23 +100,7 @@ int copy_int_sunrise_minute;
 int int_sundown_hour = 0;
 int int_sundown_minute = 0;
 int copy_int_sundown_minute;
-
-//Sommer Winter Time switch Calender 12 years
-const int calender[12][7] = {
-  {2016, 3, 27, 2, 10, 30, 3}, // 27.03.2016 > 02:00 Uhr
-  {2017, 3, 26, 2, 10, 29, 3},
-  {2018, 3, 25, 2, 10, 28, 3},
-  {2019, 3, 31, 2, 10, 27, 3},
-  {2020, 3, 29, 2, 10, 25, 3},
-  {2021, 3, 28, 2, 10, 31, 3},
-  {2022, 3, 27, 2, 10, 30, 3},
-  {2023, 3, 26, 2, 10, 29, 3},
-  {2024, 3, 31, 2, 10, 27, 3},
-  {2025, 3, 30, 2, 10, 26, 3},
-  {2026, 3, 29, 2, 10, 25, 3},
-  {2027, 3, 28, 2, 10, 31, 3},
-};
-int sommer_winter_time = 1; // add hour 1=winter  2=sommer
+int daylightsavingtime = 1; // add hour 1=winter  2=sommer
 //#########################################################################
 //#########################################################################
 void setup() {
@@ -194,7 +178,7 @@ void loop()
       text_color = BLUE;//night clolor
     }
     if (copy_text_color != text_color) {
-      valid_sync = false;//refreshh color sunrise text
+      valid_sync = false;//refresh color sunrise text
       copy_text_color = text_color;
     }
 
@@ -255,6 +239,13 @@ void RMC() { //TIME DATE
           getparam(9).substring(4, 4 + 2).toInt());
   time_t cet = CE.toLocal(now(), &tcr);
   setTime(cet);
+
+  if (CE.locIsDST(cet)) { //ask for DST=Daylight saving time
+    daylightsavingtime = 2; //true = 2 hour
+  }
+  else {
+    daylightsavingtime = 1;//fasle = 1 hour
+  }
 
   if (getparam(2) == "A") { //valid GPS-signal  A/V
     SetRect(text_color , 150, 15, 10, 10);
@@ -406,7 +397,6 @@ void sunrise(int day_of_year, float latitude , float longitude) {
   float sundown_hour;
   float sundown_minute;
 
-  calc_sommer_time();
   //Es soll der Sonnenaufgang für Berlin am 30. Januar bestimmt werden.
   //30. Januar bedeutet T = 30    Berlin liegt auf  13.5° Ost, 52.5° Nord
   //Berlin = Pi * 52.5° / 180 = 52.5°/57.29578 = 0.9163 rad (Pi=3.14159)
@@ -429,8 +419,8 @@ void sunrise(int day_of_year, float latitude , float longitude) {
   //von MOZ zu MEZ:
   //für Berlin, mit +13.5° östlicher Länge (Division durch 15 erzeugt eine Zeitdifferenz in Stunden),
   //und als Zeitzone die Mitteleuropäische Zeit MEZ mit einer Korrektur von +1 Stunde (MESZ wäre +2), also:
-  sunrise_hour = (local_rising_time + (-1 * longitude / 15) + sommer_winter_time);// 7.738 + (-13.5/15) +1 = 7.838 Uhr MEZ
-  sundown_hour = (local_down_time + (-1 * longitude / 15) + sommer_winter_time); // 16,696 + (-13.5/15) +1 = 17.03 Uhr MEZ
+  sunrise_hour = (local_rising_time + (-1 * longitude / 15) + daylightsavingtime);// 7.738 + (-13.5/15) +1 = 7.838 Uhr MEZ
+  sundown_hour = (local_down_time + (-1 * longitude / 15) + daylightsavingtime); // 16,696 + (-13.5/15) +1 = 17.03 Uhr MEZ
   //Die Zeit 7.838 Uhr MEZ ist in Stunden. Für die Bestimmung der Anzahl Minuten nach 7 Uhr wird der nichtganzzahlige Anteil 0.838 mit 60 multipliziert: 0.838*60=50.3 Minuten
 
   sunrise_minute = sunrise_hour - int(sunrise_hour);
@@ -475,28 +465,4 @@ void sunrise(int day_of_year, float latitude , float longitude) {
   }
   //ScreenText(text_color, x_edge_left, 120 , String(day_of_year) + "," + String(latitude) + "," + String(longitude));
   //ScreenText(text_color, x_edge_left, 160 , String(location) + "," + String(declination)+ "," + String(time_diff)+ "," + String(zeit_gleichung)+ "," + String(local_time)+ "," + String(sunrising)+ "," + String(sunrise_hour) + "," + String(sunrise_minute));
-}
-//----------------------------------------------
-//--------------Calender Sommer Wintertime------
-//----------------------------------------------
-void calc_sommer_time() {
-
-  unsigned long minute_of_year1;
-  unsigned long minute_of_year2;
-  unsigned long minute_of_year3;
-
-  for (int i = 0; i < 12 ; i++) {
-    if (year() == calender[i][0]) {
-      minute_of_year1 = ((month() * 30 * 1440) + (day() * 1440) + (hour() * 60) + minute());
-      minute_of_year2 = ((calender[i][1] * 30 * 1440) + (calender[i][2] * 1440) + (calender[i][3] * 60));
-      minute_of_year3 = ((calender[i][4] * 30 * 1440) + (calender[i][5] * 1440) + (calender[i][6] * 60));
-
-      if ((minute_of_year1 >= minute_of_year2) && (minute_of_year1 < minute_of_year3)) {
-        sommer_winter_time = 2;
-      }
-      else {
-        sommer_winter_time = 1;
-      }
-    }
-  }
 }
