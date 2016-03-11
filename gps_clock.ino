@@ -185,9 +185,9 @@ void loop()
       copy_text_color = text_color;
     }
 
-    ScreenText(text_color, x_edge_left, 10 , wday);
-    ScreenText(text_color, x_edge_left, 40 , date);
-    //ScreenText(text_color, x_edge_left, 120 , tim);
+    ScreenText(text_color, x_edge_left + 10, 10 , wday);
+    ScreenText(text_color, x_edge_left + 10, 40 , date);
+    //ScreenText(text_color, x_edge_left + 10, 120 , tim);
 
     //Sekundenzeiger
     hour_alfa = (270 + (30 * hour() + (0.5 * minute()))) * pi / 180;
@@ -446,10 +446,10 @@ void sunrise(int day_of_year, float latitude , float longitude) {
     SetFilledRect(BLACK , 210, 81, 230, 20);
 
     if (int_sunrise_minute < 10) {
-      ScreenText(text_color, x_edge_left, 70 , "Sunrise: " + String(int_sunrise_hour) + ":0" + String(int_sunrise_minute));
+      ScreenText(text_color, x_edge_left + 10, 70 , "Sunrise: " + String(int_sunrise_hour) + ":0" + String(int_sunrise_minute));
     }
     else {
-      ScreenText(text_color, x_edge_left, 70 , "Sunrise: " + String(int_sunrise_hour) + ":" + String(int_sunrise_minute));
+      ScreenText(text_color, x_edge_left + 10, 70 , "Sunrise: " + String(int_sunrise_hour) + ":" + String(int_sunrise_minute));
     }
   }
   if (valid_sync == false)  {
@@ -459,12 +459,12 @@ void sunrise(int day_of_year, float latitude , float longitude) {
     SetFilledRect(BLACK , 210, 290, 230, 15);
 
     if (int_sunrise_minute < 10) {
-      ScreenText(text_color, x_edge_left, 305 , "Sunset: " + String(int_sundown_hour) + ":0" + String(int_sundown_minute));
+      ScreenText(text_color, x_edge_left + 10, 305 , "Sunset: " + String(int_sundown_hour) + ":0" + String(int_sundown_minute));
     }
     else {
-      ScreenText(text_color, x_edge_left, 305 , "Sunset: " + String(int_sundown_hour) + ":" + String(int_sundown_minute));
+      ScreenText(text_color, x_edge_left + 10, 305 , "Sunset: " + String(int_sundown_hour) + ":" + String(int_sundown_minute));
     }
   }
-  //ScreenText(text_color, x_edge_left, 120 , String(day_of_year) + "," + String(latitude) + "," + String(longitude));
-  //ScreenText(text_color, x_edge_left, 160 , String(location) + "," + String(declination)+ "," + String(time_diff)+ "," + String(zeit_gleichung)+ "," + String(local_time)+ "," + String(sunrising)+ "," + String(sunrise_hour) + "," + String(sunrise_minute));
+  //ScreenText(text_color, x_edge_left + 10, 120 , String(day_of_year) + "," + String(latitude) + "," + String(longitude));
+  //ScreenText(text_color, x_edge_left + 10, 160 , String(location) + "," + String(declination)+ "," + String(time_diff)+ "," + String(zeit_gleichung)+ "," + String(local_time)+ "," + String(sunrising)+ "," + String(sunrise_hour) + "," + String(sunrise_minute));
 }
