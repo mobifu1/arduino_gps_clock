@@ -49,7 +49,8 @@ TimeChangeRule CEST = {"", Last, Sun, Mar, 2, 120};
 TimeChangeRule CET = {"", Last, Sun, Oct, 3, 60};
 Timezone CE(CEST, CET);
 TimeChangeRule *tcr;
-char *Tag[7] = {"SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SONNABEND"};
+char *Tag[7] = {"Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Sonnabend"};
+//char *Tag[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 String Line = "";    // a string to hold incoming data
 String text = "";
 
