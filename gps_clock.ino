@@ -103,6 +103,24 @@ int int_sundown_hour = 0;
 int int_sundown_minute = 0;
 int copy_int_sundown_minute;
 int daylightsavingtime = 1; // add hour 1=winter  2=sommer
+
+//Moonphase
+const float moon_phase = 29.530589; //moon returns every 29,5 days
+//Moon Phase Calender 10 years
+const int moon_calender[12][2] = {
+  {2016, 24}, // first full moon, day of year
+  {2017, 12},
+  {2018, 2},
+  {2019, 21},
+  {2020, 10},
+  {2021, 28},
+  {2022, 18},
+  {2023, 7},
+  {2024, 25},
+  {2025, 13},
+  {2026, 3},
+  {2027, 22},
+};
 //#########################################################################
 //#########################################################################
 void setup() {
@@ -275,6 +293,7 @@ void RMC() { //TIME DATE
     if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
       if (valid_signal = true) {
         sunrise (day_of_year, lat, lon);//Hamburg 53,0° 10,0°
+        moon(day_of_year);
         ScreenText(text_color, 150, 40 , "Sync");
         valid_sync = true;
       }
@@ -393,10 +412,10 @@ void sunrise(int day_of_year, float latitude , float longitude) {
   float zeit_gleichung;
   float local_rising_time;
   float local_down_time;
-  float sunrising;//
+  float sunrising;
   float sunrise_hour;
   float sunrise_minute;
-  float sundowning;//
+  float sundowning;
   float sundown_hour;
   float sundown_minute;
 
@@ -468,4 +487,45 @@ void sunrise(int day_of_year, float latitude , float longitude) {
   }
   //ScreenText(text_color, x_edge_left + 10, 120 , String(day_of_year) + "," + String(latitude) + "," + String(longitude));
   //ScreenText(text_color, x_edge_left + 10, 160 , String(location) + "," + String(declination)+ "," + String(time_diff)+ "," + String(zeit_gleichung)+ "," + String(local_time)+ "," + String(sunrising)+ "," + String(sunrise_hour) + "," + String(sunrise_minute));
+}
+//----------------------------------------------
+//--------------Calculation Moon-Phases---------
+//----------------------------------------------
+void moon(int day_of_year) {
+
+  for (int i = 0; i < 12 ; i++) {
+    if (year() == moon_calender[i][0]) {
+      int int_moon_phase = round(moon_phase);
+      int days_to_next_full_moon;
+      int diff;
+
+      if (day_of_year >= moon_calender[i][1]) {
+        diff = int_moon_phase + (day_of_year - moon_calender[i][1]);//72-24= 48
+        days_to_next_full_moon = int_moon_phase - (diff % int_moon_phase); // % = Modulo Operation
+      }
+      else {
+        days_to_next_full_moon = (moon_calender[i][1] - day_of_year);
+      }
+
+      if (valid_sync == false)  {
+
+        SetFilledRect(BLACK , x_edge_left, 100, 29, 29); // clear moon icon
+
+        if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {
+          SetCircle(WHITE , x_edge_left + 13, 106, 6); // new moon
+        }
+        if ((days_to_next_full_moon > 1) && (days_to_next_full_moon < 14)) {
+          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6); // 1. half moon
+          SetFilledRect(BLACK , x_edge_left, 100, 13, 20);
+        }
+        if ((days_to_next_full_moon == 29) || (days_to_next_full_moon == 30) || (days_to_next_full_moon == 0) || (days_to_next_full_moon == 1)) {
+          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6); //full moon
+        }
+        if ((days_to_next_full_moon > 16) && (days_to_next_full_moon < 29)) {
+          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6); // 2. half moon
+          SetFilledRect(BLACK , x_edge_left + 13 , 100, 13, 20);
+        }
+      }
+    }
+  }
 }
