@@ -121,6 +121,7 @@ const int moon_calender[12][2] = {
   {2026, 3},
   {2027, 22},
 };
+String Version = "V1.01";
 //#########################################################################
 //#########################################################################
 void setup() {
@@ -145,6 +146,7 @@ void setup() {
   x_edge_right = width - 1; //set display edges
   y_edge_down =  height - 1; //set display edges
   ScreenText(WHITE, x_edge_left, 100 , ("X:" + String(x_edge_left) + "-" + String(x_edge_right) + " Y:" + String(y_edge_up) + "-" + String(y_edge_down)));
+  ScreenText(WHITE, x_edge_left, 130 , (Version));
   delay(3000);
   FillScreen(BLACK);
   ScreenText(WHITE, x_edge_left, 10 , "Waiting for GPS )))");
