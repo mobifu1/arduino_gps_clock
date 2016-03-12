@@ -515,15 +515,17 @@ void moon(int day_of_year) {
           SetCircle(WHITE , x_edge_left + 13, 106, 6); // new moon
         }
         if ((days_to_next_full_moon > 1) && (days_to_next_full_moon < 14)) {
-          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6); // 1. half moon
+          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6); // 1. half moon +
           SetFilledRect(BLACK , x_edge_left, 100, 13, 20);
+          ScreenText(text_color, x_edge_left , 100 , "+");
         }
         if ((days_to_next_full_moon == 29) || (days_to_next_full_moon == 30) || (days_to_next_full_moon == 0) || (days_to_next_full_moon == 1)) {
           SetFilledCircle(WHITE , x_edge_left + 13, 106, 6); //full moon
         }
         if ((days_to_next_full_moon > 16) && (days_to_next_full_moon < 29)) {
-          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6); // 2. half moon
-          SetFilledRect(BLACK , x_edge_left + 13 , 100, 13, 20);
+          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6); // 2. half moon -
+          SetFilledRect(BLACK , x_edge_left + 14 , 100, 13, 20);
+          ScreenText(text_color, x_edge_left + 17 , 100 , "-");
         }
       }
     }
