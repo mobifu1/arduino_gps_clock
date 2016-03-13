@@ -63,7 +63,6 @@ int y_edge_down;
 //Pin
 #define LED A5// Pin of LED
 
-
 //Clock-Grafik
 #define scale_Points 1  // 1 = active  / every 30° a point
 #define scale_Circle 0  // 0 = inactive / full circle
@@ -125,7 +124,7 @@ const int moon_calender[12][2] = {
   {2026, 3},
   {2027, 22},
 };
-String Version = "V1.02";
+String Version = "V1.02-RC";
 //#########################################################################
 //#########################################################################
 void setup() {
@@ -172,7 +171,7 @@ void setup() {
 #endif
 
   Line.reserve(100);
-  Serial.begin(9600);
+  Serial.begin(9600);//Baudrate for GPS reciever
 }
 
 void loop()
@@ -205,7 +204,7 @@ void loop()
       digitalWrite(LED, LOW);
     }
     else {
-      text_color = BLUE;//night clolor
+      text_color = BLUE;//night color
       digitalWrite(LED, HIGH);
     }
     if (copy_text_color != text_color) {
