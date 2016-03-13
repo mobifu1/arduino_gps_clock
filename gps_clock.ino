@@ -60,6 +60,10 @@ int x_edge_right;
 int y_edge_up = 0;
 int y_edge_down;
 
+//Pin
+#define LED A5// Pin of LED
+
+
 //Clock-Grafik
 #define scale_Points 1  // 1 = active  / every 30° a point
 #define scale_Circle 0  // 0 = inactive / full circle
@@ -126,6 +130,7 @@ String Version = "V1.02";
 //#########################################################################
 void setup() {
 
+  pinMode(LED, OUTPUT);
   tft.reset();
   uint16_t identifier = tft.readID();
   if (identifier == 0x9325) {
@@ -197,9 +202,11 @@ void loop()
 
     if ((minutes_of_day >= minutes_of_sunrise)  && (minutes_of_day <= minutes_of_sundown)) {
       text_color = WHITE;//day color
+      digitalWrite(LED, LOW);
     }
     else {
       text_color = BLUE;//night clolor
+      digitalWrite(LED, HIGH);
     }
     if (copy_text_color != text_color) {
       valid_sync = false;//refresh color sunrise text
