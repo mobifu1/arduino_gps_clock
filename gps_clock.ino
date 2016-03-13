@@ -121,7 +121,7 @@ const int moon_calender[12][2] = {
   {2026, 3},
   {2027, 22},
 };
-String Version = "V1.01";
+String Version = "V1.02";
 //#########################################################################
 //#########################################################################
 void setup() {
@@ -512,22 +512,19 @@ void moon(int day_of_year) {
       if (valid_sync == false)  {
 
         SetFilledRect(BLACK , x_edge_left, 100, 29, 29); // clear moon icon
-
-        if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {
-          SetCircle(WHITE , x_edge_left + 13, 106, 6); // new moon
+        if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {// new moon
+          SetCircle(WHITE , x_edge_left + 13, 106, 6);
         }
-        if ((days_to_next_full_moon > 1) && (days_to_next_full_moon < 14)) {
-          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6); // 1. half moon +
-          SetFilledRect(BLACK , x_edge_left, 100, 13, 20);
-          ScreenText(text_color, x_edge_left , 100 , "+");
+        if ((days_to_next_full_moon > 1) && (days_to_next_full_moon < 14)) {//2-13 = 1. half moon +
+          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6);//7-19
+          SetFilledRect(BLACK , x_edge_left, 100, (days_to_next_full_moon + 6), 20); //7
         }
         if ((days_to_next_full_moon == 29) || (days_to_next_full_moon == 30) || (days_to_next_full_moon == 0) || (days_to_next_full_moon == 1)) {
           SetFilledCircle(WHITE , x_edge_left + 13, 106, 6); //full moon
         }
-        if ((days_to_next_full_moon > 16) && (days_to_next_full_moon < 29)) {
-          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6); // 2. half moon -
-          SetFilledRect(BLACK , x_edge_left + 14 , 100, 13, 20);
-          ScreenText(text_color, x_edge_left + 17 , 100 , "-");
+        if ((days_to_next_full_moon > 16) && (days_to_next_full_moon < 29)) {//17-28 = 2. half moon -
+          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6);//7-19
+          SetFilledRect(BLACK , x_edge_left + (days_to_next_full_moon - 9 ) , 100, 13, 20); //23
         }
       }
     }
