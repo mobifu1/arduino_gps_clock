@@ -526,21 +526,21 @@ void moon(int day_of_year) {
 
         SetFilledRect(BLACK , x_edge_left, 100, 29, 29); // clear moon icon
         if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {// new moon
-          SetCircle(GRAY , x_edge_left + 13, 106, 7);
+          SetCircle(GRAY , x_edge_left + 13, 107, 7);
         }
         if ((days_to_next_full_moon > 1) && (days_to_next_full_moon < 14)) {//2-13 = 1. half moon +
-          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6);//7-19
+          SetFilledCircle(WHITE , x_edge_left + 13, 107, 6);//7-19
           SetFilledRect(BLACK , x_edge_left, 100, (days_to_next_full_moon + 6), 20); //7
-          SetCircle(GRAY , x_edge_left + 13, 106, 7);
+          SetCircle(GRAY , x_edge_left + 13, 107, 7);
         }
         if ((days_to_next_full_moon == 29) || (days_to_next_full_moon == 30) || (days_to_next_full_moon == 0) || (days_to_next_full_moon == 1)) {
-          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6); //full moon
-          SetCircle(GRAY , x_edge_left + 13, 106, 7);
+          SetFilledCircle(WHITE , x_edge_left + 13, 107, 6); //full moon
+          SetCircle(GRAY , x_edge_left + 13, 107, 7);
         }
         if ((days_to_next_full_moon > 16) && (days_to_next_full_moon < 29)) {//17-28 = 2. half moon -
-          SetFilledCircle(WHITE , x_edge_left + 13, 106, 6);//7-19
+          SetFilledCircle(WHITE , x_edge_left + 13, 107, 6);//7-19
           SetFilledRect(BLACK , x_edge_left + (days_to_next_full_moon - 9 ) , 100, 13, 20); //23
-          SetCircle(GRAY , x_edge_left + 13, 106, 7);
+          SetCircle(GRAY , x_edge_left + 13, 107, 7);
         }
       }
     }
