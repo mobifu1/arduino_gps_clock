@@ -36,6 +36,7 @@
 #define YELLOW  0xFFE0
 #define WHITE   0xFFFF
 #define ORANGE  0xFBE0
+#define GRAY    0x7BEF
 Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 // If using the shield, all control and data lines are fixed, and
 // a simpler declaration can optionally be used:
@@ -49,7 +50,8 @@ TimeChangeRule CEST = {"", Last, Sun, Mar, 2, 120};
 TimeChangeRule CET = {"", Last, Sun, Oct, 3, 60};
 Timezone CE(CEST, CET);
 TimeChangeRule *tcr;
-char *Tag[7] = {"Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Sonnabend"};
+//char *Tag[7] = {"Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Sonnabend"};
+char *Tag[7] = {"SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SONNABEND"};
 //char *Tag[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 String Line = "";    // a string to hold incoming data
 String text = "";
@@ -124,7 +126,7 @@ const int moon_calender[12][2] = {
   {2026, 3},
   {2027, 22},
 };
-String Version = "V1.02-RC";
+String Version = "V1.03-RC";
 //#########################################################################
 //#########################################################################
 void setup() {
@@ -172,6 +174,10 @@ void setup() {
 
   Line.reserve(100);
   Serial.begin(9600);//Baudrate for GPS reciever
+  //use serial monitor in Arduino IDE > Data via USB-Cable.
+  Serial.println("Start Software: " + Version);
+  Serial.println("Load Setup OK");
+  Serial.println("Waiting for GPS-Signal");
 }
 
 void loop()
@@ -303,6 +309,7 @@ void RMC() { //TIME DATE
         sunrise (day_of_year, lat, lon);//Hamburg 53,0° 10,0°
         moon(day_of_year);
         ScreenText(text_color, 150, 40 , "Sync");
+        Serial.println("sync");
         valid_sync = true;
       }
     }
@@ -519,18 +526,21 @@ void moon(int day_of_year) {
 
         SetFilledRect(BLACK , x_edge_left, 100, 29, 29); // clear moon icon
         if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {// new moon
-          SetCircle(WHITE , x_edge_left + 13, 106, 6);
+          SetCircle(GRAY , x_edge_left + 13, 106, 7);
         }
         if ((days_to_next_full_moon > 1) && (days_to_next_full_moon < 14)) {//2-13 = 1. half moon +
           SetFilledCircle(WHITE , x_edge_left + 13, 106, 6);//7-19
           SetFilledRect(BLACK , x_edge_left, 100, (days_to_next_full_moon + 6), 20); //7
+          SetCircle(GRAY , x_edge_left + 13, 106, 7);
         }
         if ((days_to_next_full_moon == 29) || (days_to_next_full_moon == 30) || (days_to_next_full_moon == 0) || (days_to_next_full_moon == 1)) {
           SetFilledCircle(WHITE , x_edge_left + 13, 106, 6); //full moon
+          SetCircle(GRAY , x_edge_left + 13, 106, 7);
         }
         if ((days_to_next_full_moon > 16) && (days_to_next_full_moon < 29)) {//17-28 = 2. half moon -
           SetFilledCircle(WHITE , x_edge_left + 13, 106, 6);//7-19
           SetFilledRect(BLACK , x_edge_left + (days_to_next_full_moon - 9 ) , 100, 13, 20); //23
+          SetCircle(GRAY , x_edge_left + 13, 106, 7);
         }
       }
     }
