@@ -127,7 +127,6 @@ const int moon_calender[12][2] = {
   {2027, 22},
 };
 const String sw_version = "V1.05-RC";
-const String start_software = "Start Software:";
 const String chip = "Chip:";
 const String edges = "Set Display Edges:";
 const String load_setup = "Load Setup OK";
@@ -158,7 +157,7 @@ void setup() {
   tft.begin(identifier);
   FillScreen(BLACK);
   ScreenText(WHITE, x_edge_left, 10 , (sw_version));
-  //Serial.println(start_software + sw_version);
+  //Serial.println(sw_version);
   text = String(identifier, HEX);
   ScreenText(WHITE, x_edge_left, 40 , chip + text);
   //Serial.println(chip + text);
@@ -327,7 +326,7 @@ void RMC() { //TIME DATE
         sunrise (day_of_year, lat, lon);//Hamburg 53,0° 10,0°
         moon(day_of_year);
         ScreenText(text_color, 150, 40 , sync_info);
-        Serial.println(sync_info);
+        //Serial.println(sync_info);
         valid_sync = true;
       }
     }
