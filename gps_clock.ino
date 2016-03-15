@@ -126,10 +126,23 @@ const int moon_calender[12][2] = {
   {2026, 3},
   {2027, 22},
 };
-String Version = "V1.04-RC";
+const String sw_version = "V1.05-RC";
+const String start_software = "Start Software:";
+const String chip = "Chip:";
+const String edges = "Set Display Edges:";
+const String load_setup = "Load Setup OK";
+const String wait_gps = "Waiting for GPS )))";
+const String sun_info_1 = "Sunrise: ";
+const String sun_info_2 = "Sunset: ";
+const String sync_info = "sync";
 //#########################################################################
 //#########################################################################
 void setup() {
+
+  Line.reserve(100);
+  Serial.begin(9600);//Baudrate for GPS reciever
+  //use serial monitor in Arduino IDE > Data via USB-Cable.
+  //Serial.println();
 
   pinMode(LED, OUTPUT);
   tft.reset();
@@ -144,18 +157,26 @@ void setup() {
   }
   tft.begin(identifier);
   FillScreen(BLACK);
+  ScreenText(WHITE, x_edge_left, 10 , (sw_version));
+  //Serial.println(start_software + sw_version);
   text = String(identifier, HEX);
-  ScreenText(WHITE, x_edge_left, 10 , "Chip:" + text);
+  ScreenText(WHITE, x_edge_left, 40 , chip + text);
+  //Serial.println(chip + text);
   int  width = tft.width(), height = tft.height();
-  ScreenText(WHITE, x_edge_left, 40 , (String(width) + "x" + String(height) + "px")); //240x320
-  ScreenText(WHITE, x_edge_left, 70 , ("Set Display Edges:"));
+  ScreenText(WHITE, x_edge_left, 70 , (String(width) + "x" + String(height) + "px")); //240x320
+  //Serial.println(String(width) + "x" + String(height) + "px");
+  ScreenText(WHITE, x_edge_left, 100 , (edges));
+  //Serial.println(edges);
   x_edge_right = width - 1; //set display edges
   y_edge_down =  height - 1; //set display edges
-  ScreenText(WHITE, x_edge_left, 100 , ("X:" + String(x_edge_left) + "-" + String(x_edge_right) + " Y:" + String(y_edge_up) + "-" + String(y_edge_down)));
-  ScreenText(WHITE, x_edge_left, 130 , (Version));
+  ScreenText(WHITE, x_edge_left, 130 , ("X:" + String(x_edge_left) + "-" + String(x_edge_right) + " Y:" + String(y_edge_up) + "-" + String(y_edge_down)));
+  //Serial.println("X:" + String(x_edge_left) + "-" + String(x_edge_right) + " Y:" + String(y_edge_up) + "-" + String(y_edge_down));
   delay(3000);
   FillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , "Waiting for GPS )))");
+  ScreenText(WHITE, x_edge_left, 10 , load_setup);
+  //Serial.println(load_setup);
+  ScreenText(WHITE, x_edge_left, 40 , wait_gps);
+  //Serial.println(wait_gps);
   delay(3000);
   FillScreen(BLACK);
 
@@ -172,12 +193,9 @@ void setup() {
   }
 #endif
 
-  Line.reserve(100);
-  Serial.begin(9600);//Baudrate for GPS reciever
-  //use serial monitor in Arduino IDE > Data via USB-Cable.
-  Serial.println("Start Software: " + Version);
-  Serial.println("Load Setup OK");
-  Serial.println("Waiting for GPS-Signal");
+  //config gps modul or use u-center
+  //Serial.write("");s//et baudrate
+  //Serial.write("");//save settings
 }
 
 void loop() {
@@ -308,8 +326,8 @@ void RMC() { //TIME DATE
       if (valid_signal = true) {
         sunrise (day_of_year, lat, lon);//Hamburg 53,0° 10,0°
         moon(day_of_year);
-        ScreenText(text_color, 150, 40 , "Sync");
-        Serial.println("sync");
+        ScreenText(text_color, 150, 40 , sync_info);
+        Serial.println(sync_info);
         valid_sync = true;
       }
     }
@@ -433,7 +451,7 @@ void sunrise(int day_of_year, float latitude , float longitude) {
   float sundowning;
   float sundown_hour;
   float sundown_minute;
-
+  //Serial.println(String(day_of_year) + "," + String(latitude) + "," + String(longitude));
   //Es soll der Sonnenaufgang für Berlin am 30. Januar bestimmt werden.
   //30. Januar bedeutet T = 30    Berlin liegt auf  13.5° Ost, 52.5° Nord
   //Berlin = Pi * 52.5° / 180 = 52.5°/57.29578 = 0.9163 rad (Pi=3.14159)
@@ -481,10 +499,10 @@ void sunrise(int day_of_year, float latitude , float longitude) {
     SetFilledRect(BLACK , 210, 81, 230, 20);
 
     if (int_sunrise_minute < 10) {
-      ScreenText(text_color, x_edge_left + 10, 70 , "Sunrise: " + String(int_sunrise_hour) + ":0" + String(int_sunrise_minute));
+      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(int_sunrise_hour) + ":0" + String(int_sunrise_minute));
     }
     else {
-      ScreenText(text_color, x_edge_left + 10, 70 , "Sunrise: " + String(int_sunrise_hour) + ":" + String(int_sunrise_minute));
+      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(int_sunrise_hour) + ":" + String(int_sunrise_minute));
     }
   }
   if (valid_sync == false)  {
@@ -494,13 +512,12 @@ void sunrise(int day_of_year, float latitude , float longitude) {
     SetFilledRect(BLACK , 210, 290, 230, 15);
 
     if (int_sunrise_minute < 10) {
-      ScreenText(text_color, x_edge_left + 10, 305 , "Sunset: " + String(int_sundown_hour) + ":0" + String(int_sundown_minute));
+      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(int_sundown_hour) + ":0" + String(int_sundown_minute));
     }
     else {
-      ScreenText(text_color, x_edge_left + 10, 305 , "Sunset: " + String(int_sundown_hour) + ":" + String(int_sundown_minute));
+      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(int_sundown_hour) + ":" + String(int_sundown_minute));
     }
   }
-  //Serial.println(String(day_of_year) + "," + String(latitude) + "," + String(longitude));
 }
 //----------------------------------------------
 //--------------Calculation Moon-Phases---------
