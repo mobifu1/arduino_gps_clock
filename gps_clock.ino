@@ -66,7 +66,8 @@ int y_edge_down;
 #define LED A5// Pin of LED
 
 //Clock-Grafik
-#define scale_Points 1  // 1 = active  / every 30° a point
+#define scale_min_Points 1  // 1 = active  / every 6° a point
+#define scale_hour_Points 1  // 1 = active  / every 30° a point
 #define scale_Circle 0  // 0 = inactive / full circle
 const int clock_radius = 90;//global adjustment for the clock, default 90
 const int clock_xoffset = 120;//global adjustment for the clock, default 120
@@ -179,16 +180,25 @@ void setup() {
   delay(3000);
   FillScreen(BLACK);
 
-#if scale_Circle
+#if scale_Circle//full circle
   SetCircle(GREEN, clock_xoffset, clock_yoffset, clock_radius); // set clock
 #endif
 
-#if scale_Points
+#if scale_hour_Points//every 30 degrees
   for (int i = 0; i <= 11; i++) {
     clock_point_angle_rad = 30 * i * (pi / 180);
     point_xpos = (cos(clock_point_angle_rad) * clock_radius) + clock_xoffset;
     point_ypos = (sin(clock_point_angle_rad) * clock_radius) + clock_yoffset;
     SetFilledCircle(GREEN, point_xpos, point_ypos, 2);
+  }
+#endif
+
+#if scale_min_Points//every 6 degrees
+  for (int i = 0; i <= 59; i++) {
+    clock_point_angle_rad = 6 * i * (pi / 180);
+    point_xpos = (cos(clock_point_angle_rad) * clock_radius) + clock_xoffset;
+    point_ypos = (sin(clock_point_angle_rad) * clock_radius) + clock_yoffset;
+    SetPoint(GREEN, point_xpos, point_ypos);
   }
 #endif
 
