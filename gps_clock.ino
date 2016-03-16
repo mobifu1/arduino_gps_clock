@@ -6,6 +6,7 @@
 //#define DEBUG
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_TFTLCD.h> // Hardware-specific library
+#include <TouchScreen.h>
 // The control pins for the LCD can be assigned to any digital or
 // analog pins...but we'll use the analog pins as this allows us to
 // double up the pins with the touch screen (see the TFT paint example).
@@ -41,6 +42,22 @@ Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 // If using the shield, all control and data lines are fixed, and
 // a simpler declaration can optionally be used:
 // Adafruit_TFTLCD tft;
+//Touch
+#define YP A3 // must be an analog pin, use "An" notation!
+#define XM A2 // must be an analog pin, use "An" notation!
+#define YM 9 // can be a digital pin
+#define XP 8 // can be a digital pin
+//
+#define TS_MINX 960
+#define TS_MINY 150
+#define TS_MAXX 150
+#define TS_MAXY 940
+// For better pressure precision, we need to know the resistance
+// between X+ and X- Use any multimeter to read it
+// For the one we're using, its 300 ohms across the X plate
+TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
+#define MINPRESSURE 10
+#define MAXPRESSURE 1000
 //--------------------------------------------
 //------- DATE-TIME --------------------------
 //--------------------------------------------
@@ -208,6 +225,31 @@ void setup() {
 }
 
 void loop() {
+
+  //touch screen
+  TSPoint p = ts.getPoint();
+  //if sharing pins, you'll need to fix the directions of the touchscreen pins
+  //pinMode(XP, OUTPUT);
+  pinMode(XM, OUTPUT);
+  pinMode(YP, OUTPUT);
+  //pinMode(YM, OUTPUT);
+  // we have some minimum pressure we consider 'valid'
+  // pressure of 0 means no pressing!
+  if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+    //    Serial.print("X = "); Serial.print(p.x);
+    //    Serial.print("\tY = "); Serial.print(p.y);
+    //    Serial.print("\tPressure = "); Serial.println(p.z);
+    //if (p.y < (TS_MINY - 5)) stergere();
+    // scale from 0->1023 to tft.width
+    p.x =  (map(p.x, TS_MINX, TS_MAXX, tft.width(), 0));
+    p.y =  (map(p.y, TS_MINY, TS_MAXY, tft.height(), 0));
+    //    Serial.print("("); Serial.print(p.x);
+    //    Serial.print(", "); Serial.print(p.y);
+    //    Serial.println(")");
+    if (p.x > 200 && p.x < 240 && p.y > 0 && p.y < 40) {
+      ScreenText(WHITE, x_edge_left, 150 , "Press Button");
+    }
+  }
 
   static int os = -1;
 
