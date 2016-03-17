@@ -311,7 +311,7 @@ void RMC() { //TIME DATE
   }
 
   if (getparam(2) == "A") { //valid GPS-signal  A/V
-    SetRect(text_color , 150, 15, 10, 10);
+    SetRect(text_color , 150, 15, 10, 10);//satellite grafic
     SetRect(text_color , 160, 15, 10, 10);
     SetLines(text_color, 170, 20, 176, 20);
     SetCircle(text_color , 180, 20, 4);
@@ -327,6 +327,8 @@ void RMC() { //TIME DATE
 
   int lat = getparam(3).substring(0, 2).toInt();
   int lon = getparam(5).substring(0, 3).toInt();
+  int decimal_lat = getparam(3).substring(2, 4).toInt();//decimal place
+  int decimal_lon = getparam(5).substring(3, 5).toInt();//decimal place
 
   if (valid_sync == false) {
     SetFilledRect(BLACK , 150, 40, 89, 29); //clear sync on display
@@ -334,7 +336,7 @@ void RMC() { //TIME DATE
     int day_of_year = int(((month() - 1) * 30.4) + day());
     if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
       if (valid_signal = true) {
-        sunrise (day_of_year, lat, lon);//Hamburg 53,0° 10,0°
+        sunrise (day_of_year, lat, decimal_lat, lon, decimal_lon); //Hamburg 53,0° 10,0°
         moon(day_of_year);
         ScreenText(text_color, 150, 40 , sync_info);
         //Serial.println(sync_info);
@@ -448,7 +450,7 @@ unsigned long SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius)
 //--------------Calculation Sun-Rise------------
 //----------------------------------------------
 //sunrise (30, 52.5, 13.5);
-void sunrise(int day_of_year, float latitude , float longitude) {
+void sunrise(int day_of_year, float latitude , float decimal_latitude, float longitude , float decimal_longitude) {
   float location;
   float declination;
   float time_diff;
@@ -465,6 +467,8 @@ void sunrise(int day_of_year, float latitude , float longitude) {
   //Es soll der Sonnenaufgang für Berlin am 30. Januar bestimmt werden.
   //30. Januar bedeutet T = 30    Berlin liegt auf  13.5° Ost, 52.5° Nord
   //Berlin = Pi * 52.5° / 180 = 52.5°/57.29578 = 0.9163 rad (Pi=3.14159)
+  latitude = latitude + (decimal_latitude / 100);
+  longitude = longitude + (decimal_longitude / 100);
   location = (pi * latitude / 180);
   //Deklination der Sonne = 0.4095*sin(0.016906*(30-80.086))  = -0.30677 rad = -17.58°
   //Sonnenaufgang h=-50 Bogenminuten = -0.0145 rad
