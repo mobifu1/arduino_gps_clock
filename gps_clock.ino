@@ -449,7 +449,7 @@ unsigned long SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius)
 //----------------------------------------------
 //--------------Calculation Sun-Rise------------
 //----------------------------------------------
-//sunrise (30, 52.5, 13.5);
+//sunrise (30, 52, 50, 13, 50);
 void sunrise(int day_of_year, float latitude , float decimal_latitude, float longitude , float decimal_longitude) {
   float location;
   float declination;
@@ -465,10 +465,10 @@ void sunrise(int day_of_year, float latitude , float decimal_latitude, float lon
   float sundown_minute;
   //Serial.println(String(day_of_year) + "," + String(latitude) + "," + String(longitude));
   //Es soll der Sonnenaufgang für Berlin am 30. Januar bestimmt werden.
-  //30. Januar bedeutet T = 30    Berlin liegt auf  13.5° Ost, 52.5° Nord
+  //30. Januar bedeutet T = 30    Berlin liegt auf  13.5° Ost, 52.5° Nord //Decimal
   //Berlin = Pi * 52.5° / 180 = 52.5°/57.29578 = 0.9163 rad (Pi=3.14159)
-  latitude = latitude + (decimal_latitude / 100);
-  longitude = longitude + (decimal_longitude / 100);
+  latitude = latitude + (decimal_latitude / 60);
+  longitude = longitude + (decimal_longitude / 60);
   location = (pi * latitude / 180);
   //Deklination der Sonne = 0.4095*sin(0.016906*(30-80.086))  = -0.30677 rad = -17.58°
   //Sonnenaufgang h=-50 Bogenminuten = -0.0145 rad
