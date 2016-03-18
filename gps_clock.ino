@@ -144,7 +144,7 @@ const int moon_calender[12][2] = {
   {2026, 3},
   {2027, 22},
 };
-const String sw_version = "V1.05-RC";
+const String sw_version = "V1.06-RC";
 const String chip = "Chip:";
 const String edges = "Set Display Edges:";
 const String load_setup = "Load Setup OK";
@@ -249,7 +249,7 @@ void loop() {
     if (p.x > 200 && p.x < 240 && p.y > 0 && p.y < 40) {
       delay(300);
       if (show_data == false) {
-        show_data = true;
+        show_data = true;//show GPS-position in raw format
       }
       else {
         show_data = false;
@@ -359,7 +359,7 @@ void RMC() { //TIME DATE
     daylightsavingtime = 1;//false = 1 hour
   }
 
-  if (show_data == true) {
+  if (show_data == true) {//show GPS-Position in the middle of clock
     SetFilledRect(BLACK , x_edge_left + 50, 170, 150, 60);
     ScreenText(text_color, x_edge_left + 50, 170 , "N" + getparam(3));
     ScreenText(text_color, x_edge_left + 50, 200 , "E" + getparam(5));
