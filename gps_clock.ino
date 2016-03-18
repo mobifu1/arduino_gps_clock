@@ -469,6 +469,8 @@ void sunrise(int day_of_year, float latitude , float decimal_latitude, float lon
   //Berlin = Pi * 52.5° / 180 = 52.5°/57.29578 = 0.9163 rad (Pi=3.14159)
   latitude = latitude + (decimal_latitude / 60);
   longitude = longitude + (decimal_longitude / 60);
+  //Serial.println("N" + String(latitude));
+  //Serial.println("E" + String(longitude));
   location = (pi * latitude / 180);
   //Deklination der Sonne = 0.4095*sin(0.016906*(30-80.086))  = -0.30677 rad = -17.58°
   //Sonnenaufgang h=-50 Bogenminuten = -0.0145 rad
