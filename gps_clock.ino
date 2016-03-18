@@ -152,6 +152,8 @@ const String wait_gps = "Waiting for GPS )))";
 const String sun_info_1 = "Sunrise: ";
 const String sun_info_2 = "Sunset: ";
 const String sync_info = "sync";
+
+boolean show_data = false;
 //#########################################################################
 //#########################################################################
 void setup() {
@@ -239,15 +241,20 @@ void loop() {
     //    Serial.print("X = "); Serial.print(p.x);
     //    Serial.print("\tY = "); Serial.print(p.y);
     //    Serial.print("\tPressure = "); Serial.println(p.z);
-    //if (p.y < (TS_MINY - 5)) stergere();
     // scale from 0->1023 to tft.width
     p.x =  (map(p.x, TS_MINX, TS_MAXX, tft.width(), 0));
     p.y =  (map(p.y, TS_MINY, TS_MAXY, tft.height(), 0));
     //    Serial.print("("); Serial.print(p.x);
     //    Serial.print(", "); Serial.print(p.y);
-    //    Serial.println(")");
     if (p.x > 200 && p.x < 240 && p.y > 0 && p.y < 40) {
-      ScreenText(WHITE, x_edge_left, 150 , "Press Button");
+      delay(300);
+      if (show_data == false) {
+        show_data = true;
+      }
+      else {
+        show_data = false;
+        SetFilledRect(BLACK , x_edge_left + 50, 170, 150, 60);
+      }
     }
   }
 
@@ -349,7 +356,13 @@ void RMC() { //TIME DATE
     daylightsavingtime = 2; //true = 2 hour
   }
   else {
-    daylightsavingtime = 1;//fasle = 1 hour
+    daylightsavingtime = 1;//false = 1 hour
+  }
+
+  if (show_data == true) {
+    SetFilledRect(BLACK , x_edge_left + 50, 170, 150, 60);
+    ScreenText(text_color, x_edge_left + 50, 170 , "N" + getparam(3));
+    ScreenText(text_color, x_edge_left + 50, 200 , "E" + getparam(5));
   }
 
   if (getparam(2) == "A") { //valid GPS-signal  A/V
