@@ -388,12 +388,14 @@ void RMC() { //TIME DATE
       int decimal_lat = getparam(3).substring(2, 4).toInt();//decimal place
       int decimal_lon = getparam(5).substring(3, 5).toInt();//decimal place
       int day_of_year = int(((month() - 1) * 30.4) + day());
-      //sunrise (30, 52, 50, 13, 50);// start sunrise calculation > result: 07:52 Uhr & 16:47 Uhr
-      sunrise (day_of_year, lat, decimal_lat, lon, decimal_lon); //Hamburg 53,5° 10,0°
-      moon(day_of_year);
-      ScreenText(text_color, 150, 40 , sync_info);
-      valid_sync = true;
-      //Serial.println(sync_info);
+      if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
+        //sunrise (30, 52, 50, 13, 50);// start sunrise calculation > result: 07:52 Uhr & 16:47 Uhr
+        sunrise (day_of_year, lat, decimal_lat, lon, decimal_lon); //Hamburg 53,5° 10,0°
+        moon(day_of_year);
+        ScreenText(text_color, 150, 40 , sync_info);
+        valid_sync = true;
+        //Serial.println(sync_info);
+      }
     }
   }
 }//GPRMC
@@ -501,7 +503,7 @@ unsigned long SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius)
 //----------------------------------------------
 //--------------Calculation Sun-Rise------------
 //----------------------------------------------
-//sunrise (30, 52, 50, 13, 50);
+//sunrise (30, 52, 50, 13, 50);//Berlin
 void sunrise(int day_of_year, float latitude , float decimal_latitude, float longitude , float decimal_longitude) {
   float location;
   float declination;
@@ -560,31 +562,28 @@ void sunrise(int day_of_year, float latitude , float decimal_latitude, float lon
   //Ein Vergleich mit CalSky.com ergibt 7 Uhr 52 für den Sonnenaufgang und Sonnenuntergang 16 Uhr 48.
   //Das ist OK, mit so einfachen Formeln kann man keine bessere Genauigkeit erwarten.
 
-  if (valid_sync == false) {
-    SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
-    SetFilledCircle(YELLOW , 220, 80, 6);
-    SetLines(YELLOW , 210, 80, 230 , 80);
-    SetFilledRect(BLACK , 210, 81, 230, 20);
+  SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
+  SetFilledCircle(YELLOW , 220, 80, 6);
+  SetLines(YELLOW , 210, 80, 230 , 80);
+  SetFilledRect(BLACK , 210, 81, 230, 20);
 
-    if (int_sunrise_minute < 10) {
-      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(int_sunrise_hour) + ":0" + String(int_sunrise_minute));
-    }
-    else {
-      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(int_sunrise_hour) + ":" + String(int_sunrise_minute));
-    }
+  if (int_sunrise_minute < 10) {
+    ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(int_sunrise_hour) + ":0" + String(int_sunrise_minute));
   }
-  if (valid_sync == false)  {
-    SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
-    SetFilledCircle(ORANGE , 220, 305, 6);
-    SetLines(ORANGE , 210, 305, 230 , 305);
-    SetFilledRect(BLACK , 210, 290, 230, 15);
+  else {
+    ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(int_sunrise_hour) + ":" + String(int_sunrise_minute));
+  }
 
-    if (int_sunrise_minute < 10) {
-      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(int_sundown_hour) + ":0" + String(int_sundown_minute));
-    }
-    else {
-      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(int_sundown_hour) + ":" + String(int_sundown_minute));
-    }
+  SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
+  SetFilledCircle(ORANGE , 220, 305, 6);
+  SetLines(ORANGE , 210, 305, 230 , 305);
+  SetFilledRect(BLACK , 210, 290, 230, 15);
+
+  if (int_sunrise_minute < 10) {
+    ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(int_sundown_hour) + ":0" + String(int_sundown_minute));
+  }
+  else {
+    ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(int_sundown_hour) + ":" + String(int_sundown_minute));
   }
 }
 //----------------------------------------------
@@ -607,26 +606,24 @@ void moon(int day_of_year) {
         days_to_next_full_moon = (moon_calender[i][1] - day_of_year);
       }
       //Serial.println(String(days_to_next_full_moon) + " = days_to_next_full_moon");
-      if (valid_sync == false)  {
 
-        SetFilledRect(BLACK , x_edge_left, 100, 29, 29); // clear moon icon
-        if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {// new moon
-          SetCircle(GRAY , x_edge_left + 17, 107, 7);
-        }
-        if ((days_to_next_full_moon > 1) && (days_to_next_full_moon < 14)) {//day 2-13 = 1. half moon +
-          SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
-          SetFilledRect(BLACK , x_edge_left, 100, (days_to_next_full_moon + 10), 20); //12-23 /19
-          SetCircle(GRAY , x_edge_left + 17, 107, 7);
-        }
-        if ((days_to_next_full_moon == 29) || (days_to_next_full_moon == 30) || (days_to_next_full_moon == 0) || (days_to_next_full_moon == 1)) {
-          SetFilledCircle(WHITE , x_edge_left + 17, 107, 6); //full moon
-          SetCircle(GRAY , x_edge_left + 17, 107, 7);
-        }
-        if ((days_to_next_full_moon > 16) && (days_to_next_full_moon < 29)) {//day 17-28 = 2. half moon -
-          SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
-          SetFilledRect(BLACK , x_edge_left + (days_to_next_full_moon - 5 ) , 100, 13, 20); //12-23
-          SetCircle(GRAY , x_edge_left + 17, 107, 7);
-        }
+      SetFilledRect(BLACK , x_edge_left, 100, 29, 29); // clear moon icon
+      if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {// new moon
+        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+      }
+      if ((days_to_next_full_moon > 1) && (days_to_next_full_moon < 14)) {//day 2-13 = 1. half moon +
+        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
+        SetFilledRect(BLACK , x_edge_left, 100, (days_to_next_full_moon + 10), 20); //12-23 /19
+        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+      }
+      if ((days_to_next_full_moon == 29) || (days_to_next_full_moon == 30) || (days_to_next_full_moon == 0) || (days_to_next_full_moon == 1)) {
+        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6); //full moon
+        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+      }
+      if ((days_to_next_full_moon > 16) && (days_to_next_full_moon < 29)) {//day 17-28 = 2. half moon -
+        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
+        SetFilledRect(BLACK , x_edge_left + (days_to_next_full_moon - 5 ) , 100, 13, 20); //12-23
+        SetCircle(GRAY , x_edge_left + 17, 107, 7);
       }
     }
   }
