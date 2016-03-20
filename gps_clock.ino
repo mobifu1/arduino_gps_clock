@@ -253,7 +253,7 @@ void loop() {
       }
       else {
         show_data = false;
-        SetFilledRect(BLACK , x_edge_left + 50, 170, 150, 60);
+        SetFilledCircle(BLACK , clock_xoffset, clock_yoffset, (clock_radius * 0.9)); //clear GPS-Position
       }
     }
   }
