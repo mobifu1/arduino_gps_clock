@@ -144,7 +144,7 @@ const int moon_calender[12][2] = {
   {2026, 3},
   {2027, 22},
 };
-const String sw_version = "V1.06-RC";
+const String sw_version = "V1.07-RC";
 const String chip = "Chip:";
 const String edges = "Set Display Edges:";
 const String load_setup = "Load Setup OK";
@@ -153,7 +153,7 @@ const String sun_info_1 = "Sunrise: ";
 const String sun_info_2 = "Sunset: ";
 const String sync_info = "sync";
 
-boolean show_data = false;
+boolean show_data = false;//for touch
 //#########################################################################
 //#########################################################################
 void setup() {
@@ -376,27 +376,24 @@ void RMC() { //TIME DATE
     valid_signal = true;
   }
   else {
-    SetFilledRect(BLACK , 150, y_edge_up, 89, 40);
+    SetFilledRect(BLACK , 150, y_edge_up, 89, 40);//clear sat grafic
     valid_signal = false;
   }
 
-  int lat = getparam(3).substring(0, 2).toInt();
-  int lon = getparam(5).substring(0, 3).toInt();
-  int decimal_lat = getparam(3).substring(2, 4).toInt();//decimal place
-  int decimal_lon = getparam(5).substring(3, 5).toInt();//decimal place
-
   if (valid_sync == false) {
     SetFilledRect(BLACK , 150, 40, 89, 29); //clear sync on display
-    //sunrise (30, 52.5, 13.5);// start sunrise calculation > result: 07:52 Uhr & 16:47 Uhr
-    int day_of_year = int(((month() - 1) * 30.4) + day());
-    if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
-      if (valid_signal = true) {
-        sunrise (day_of_year, lat, decimal_lat, lon, decimal_lon); //Hamburg 53,0° 10,0°
-        moon(day_of_year);
-        ScreenText(text_color, 150, 40 , sync_info);
-        //Serial.println(sync_info);
-        valid_sync = true;
-      }
+    if (valid_signal = true) {
+      int lat = getparam(3).substring(0, 2).toInt();
+      int lon = getparam(5).substring(0, 3).toInt();
+      int decimal_lat = getparam(3).substring(2, 4).toInt();//decimal place
+      int decimal_lon = getparam(5).substring(3, 5).toInt();//decimal place
+      int day_of_year = int(((month() - 1) * 30.4) + day());
+      //sunrise (30, 52, 50, 13, 50);// start sunrise calculation > result: 07:52 Uhr & 16:47 Uhr
+      sunrise (day_of_year, lat, decimal_lat, lon, decimal_lon); //Hamburg 53,5° 10,0°
+      moon(day_of_year);
+      ScreenText(text_color, 150, 40 , sync_info);
+      valid_sync = true;
+      //Serial.println(sync_info);
     }
   }
 }//GPRMC
@@ -564,7 +561,7 @@ void sunrise(int day_of_year, float latitude , float decimal_latitude, float lon
   //Das ist OK, mit so einfachen Formeln kann man keine bessere Genauigkeit erwarten.
 
   if (valid_sync == false) {
-    SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise on display
+    SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
     SetFilledCircle(YELLOW , 220, 80, 6);
     SetLines(YELLOW , 210, 80, 230 , 80);
     SetFilledRect(BLACK , 210, 81, 230, 20);
@@ -577,7 +574,7 @@ void sunrise(int day_of_year, float latitude , float decimal_latitude, float lon
     }
   }
   if (valid_sync == false)  {
-    SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunrise on display
+    SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
     SetFilledCircle(ORANGE , 220, 305, 6);
     SetLines(ORANGE , 210, 305, 230 , 305);
     SetFilledRect(BLACK , 210, 290, 230, 15);
