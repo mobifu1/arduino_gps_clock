@@ -200,7 +200,7 @@ void setup() {
   FillScreen(BLACK);
 
 #if scale_Circle//full circle
-  SetCircle(GREEN, clock_xoffset, clock_yoffset, clock_radius); // set clock
+  SetCircle(CYAN, clock_xoffset, clock_yoffset, clock_radius); // set clock
 #endif
 
 #if scale_hour_Points//every 30 degrees
@@ -208,7 +208,7 @@ void setup() {
     clock_point_angle_rad = 30 * i * (pi / 180);
     point_xpos = (cos(clock_point_angle_rad) * clock_radius) + clock_xoffset;
     point_ypos = (sin(clock_point_angle_rad) * clock_radius) + clock_yoffset;
-    SetFilledCircle(GREEN, point_xpos, point_ypos, 2);
+    SetFilledCircle(CYAN, point_xpos, point_ypos, 2);
   }
 #endif
 
@@ -217,7 +217,7 @@ void setup() {
     clock_point_angle_rad = 6 * i * (pi / 180);
     point_xpos = (cos(clock_point_angle_rad) * clock_radius) + clock_xoffset;
     point_ypos = (sin(clock_point_angle_rad) * clock_radius) + clock_yoffset;
-    SetPoint(GREEN, point_xpos, point_ypos);
+    SetPoint(CYAN, point_xpos, point_ypos);
   }
 #endif
 
@@ -329,7 +329,7 @@ void loop() {
     copy_min_arrow_xpos = min_arrow_xpos;
     copy_min_arrow_ypos = min_arrow_ypos;
 
-    SetLines(GREEN, clock_xoffset, clock_yoffset, sec_arrow_xpos, sec_arrow_ypos );
+    SetLines(CYAN, clock_xoffset, clock_yoffset, sec_arrow_xpos, sec_arrow_ypos );
     copy_sec_arrow_xpos = sec_arrow_xpos;
     copy_sec_arrow_ypos = sec_arrow_ypos;
 
