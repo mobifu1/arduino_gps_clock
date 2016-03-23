@@ -363,6 +363,7 @@ void RMC() { //TIME DATE
     SetFilledRect(BLACK , x_edge_left + 50, 170, 150, 60);
     ScreenText(text_color, x_edge_left + 50, 170 , "N" + getparam(3));
     ScreenText(text_color, x_edge_left + 50, 200 , "E" + getparam(5));
+    //ScreenText(text_color, x_edge_left + 80, 230 , "");
   }
 
   if (getparam(2) == "A") { //valid GPS-signal  A/V
