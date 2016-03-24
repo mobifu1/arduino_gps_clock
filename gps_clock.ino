@@ -71,7 +71,6 @@ TimeChangeRule *tcr;
 char *Tag[7] = {"SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SONNABEND"};
 //char *Tag[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 String Line = "";    // a string to hold incoming data
-String text = "";
 
 //Display Edges calculate
 int x_edge_left = 0;
@@ -85,7 +84,6 @@ int y_edge_down;
 //Clock-Grafik
 #define scale_min_Points 1  // 1 = active  / every 6° a point
 #define scale_hour_Points 1  // 1 = active  / every 30° a point
-#define scale_Circle 0  // 0 = inactive / full circle
 const int clock_radius = 90;//global adjustment for the clock, default 90
 const int clock_xoffset = 120;//global adjustment for the clock, default 120
 const int clock_yoffset = 195;//global adjustment for the clock, default 195
@@ -129,6 +127,7 @@ int daylightsavingtime = 1; // add hour 1=winter  2=sommer
 
 //Moonphase
 const float moon_phase = 29.530589; //moon returns every 29,5 days
+int toFM; // days to Full Moon
 //Moon Phase Calender 10 years
 const int moon_calender[12][2] = {
   {2016, 24}, // first full moon, day of year
@@ -144,7 +143,7 @@ const int moon_calender[12][2] = {
   {2026, 3},
   {2027, 22},
 };
-const String sw_version = "V1.07-RC";
+const String sw_version = "V1.08-RC";
 const String chip = "Chip:";
 const String edges = "Set Display Edges:";
 const String load_setup = "Load Setup OK";
@@ -178,8 +177,7 @@ void setup() {
   FillScreen(BLACK);
   ScreenText(WHITE, x_edge_left, 10 , (sw_version));
   //Serial.println(sw_version);
-  text = String(identifier, HEX);
-  ScreenText(WHITE, x_edge_left, 40 , chip + text);
+  ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
   int  width = tft.width(), height = tft.height();
   ScreenText(WHITE, x_edge_left, 70 , (String(width) + "x" + String(height) + "px")); //240x320
@@ -198,10 +196,6 @@ void setup() {
   //Serial.println(wait_gps);
   delay(3000);
   FillScreen(BLACK);
-
-#if scale_Circle//full circle
-  SetCircle(CYAN, clock_xoffset, clock_yoffset, clock_radius); // set clock
-#endif
 
 #if scale_hour_Points//every 30 degrees
   for (int i = 0; i <= 11; i++) {
@@ -363,7 +357,7 @@ void RMC() { //TIME DATE
     SetFilledRect(BLACK , x_edge_left + 50, 170, 150, 60);
     ScreenText(text_color, x_edge_left + 50, 170 , "N" + getparam(3));
     ScreenText(text_color, x_edge_left + 50, 200 , "E" + getparam(5));
-    //ScreenText(text_color, x_edge_left + 80, 230 , "");
+    ScreenText(text_color, x_edge_left + 80, 230 , String(toFM) + " toFM");
   }
 
   if (getparam(2) == "A") { //valid GPS-signal  A/V
@@ -607,7 +601,7 @@ void moon(int day_of_year) {
         days_to_next_full_moon = (moon_calender[i][1] - day_of_year);
       }
       //Serial.println(String(days_to_next_full_moon) + " = days_to_next_full_moon");
-
+      toFM = days_to_next_full_moon;
       SetFilledRect(BLACK , x_edge_left, 100, 29, 29); // clear moon icon
       if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {// new moon
         SetCircle(GRAY , x_edge_left + 17, 107, 7);
