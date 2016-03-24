@@ -124,10 +124,10 @@ int int_sundown_hour = 0;
 int int_sundown_minute = 0;
 int copy_int_sundown_minute;
 int daylightsavingtime = 1; // add hour 1=winter  2=sommer
+int sun_decl;//declination of sun
 
 //Moonphase
 const float moon_phase = 29.530589; //moon returns every 29,5 days
-int toFM; // days to Full Moon
 //Moon Phase Calender 10 years
 const int moon_calender[12][2] = {
   {2016, 24}, // first full moon, day of year
@@ -143,7 +143,7 @@ const int moon_calender[12][2] = {
   {2026, 3},
   {2027, 22},
 };
-const String sw_version = "V1.08-RC";
+const String sw_version = "V1.09-RC";
 const String chip = "Chip:";
 const String edges = "Set Display Edges:";
 const String load_setup = "Load Setup OK";
@@ -354,10 +354,10 @@ void RMC() { //TIME DATE
   }
 
   if (show_data == true) {//show GPS-Position in the middle of clock
-    SetFilledRect(BLACK , x_edge_left + 50, 170, 150, 60);
+    SetFilledCircle(BLACK , clock_xoffset, clock_yoffset, (clock_radius * 0.9));
     ScreenText(text_color, x_edge_left + 50, 170 , "N" + getparam(3));
     ScreenText(text_color, x_edge_left + 50, 200 , "E" + getparam(5));
-    ScreenText(text_color, x_edge_left + 80, 230 , String(toFM) + " toFM");
+    ScreenText(text_color, x_edge_left + 70, 230 , String(sun_decl) + "' DECL");//Declination Sun, Range:-23,5°-0°-23,5°
   }
 
   if (getparam(2) == "A") { //valid GPS-signal  A/V
@@ -524,6 +524,7 @@ void sunrise(int day_of_year, float latitude , float decimal_latitude, float lon
   //Deklination der Sonne = 0.4095*sin(0.016906*(30-80.086))  = -0.30677 rad = -17.58°
   //Sonnenaufgang h=-50 Bogenminuten = -0.0145 rad
   declination = 0.4095 * sin(0.016906 * (day_of_year - 80.086));
+  sun_decl = int(declination * 180 / pi);//show declination of sun in display ,Range:-23,5°-0°-23,5°
   //Zeitdifferenz = 12*arccos((sin(-0.0145) - sin(0.9163)*sin(-0.30677)) / (cos(0.9163)*cos(-0.30677)))/Pi = 4.479 Stunden.
   time_diff = 12 * acos((sin(-0.0145) - sin(location) * sin(declination)) / (cos(location) * cos(declination))) / pi;
   //Sonnenaufgang um 12 - 4.479 = 7.521 Uhr Wahre Ortszeit.
@@ -601,7 +602,6 @@ void moon(int day_of_year) {
         days_to_next_full_moon = (moon_calender[i][1] - day_of_year);
       }
       //Serial.println(String(days_to_next_full_moon) + " = days_to_next_full_moon");
-      toFM = days_to_next_full_moon;
       SetFilledRect(BLACK , x_edge_left, 100, 29, 29); // clear moon icon
       if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {// new moon
         SetCircle(GRAY , x_edge_left + 17, 107, 7);
