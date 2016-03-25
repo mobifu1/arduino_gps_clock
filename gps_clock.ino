@@ -575,7 +575,7 @@ void sunrise(int day_of_year, float latitude , float decimal_latitude, float lon
   SetLines(ORANGE , 210, 305, 230 , 305);
   SetFilledRect(BLACK , 210, 290, 230, 15);
 
-  if (int_sunrise_minute < 10) {
+  if (int_sundown_minute < 10) {
     ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(int_sundown_hour) + ":0" + String(int_sundown_minute));
   }
   else {
