@@ -6,4 +6,4 @@ calculation of sunrise & sunset by own gps-position, calculation of moon phases
 
 switch to day & night color by sun phases
 
-![Steampunk Clock](arduino_gps_clock/steampunk clock.JPG "Steampunk Clock")
+![Steampunk Clock](https://github.com/mobifu1/arduino_gps_clock/blob/master/steampunk%20clock.JPG "Steampunk Clock")
