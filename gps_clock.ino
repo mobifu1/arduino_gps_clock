@@ -6,7 +6,7 @@
 //#define DEBUG
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_TFTLCD.h> // Hardware-specific library
-#include <TouchScreen.h>
+//#include <TouchScreen.h>
 // The control pins for the LCD can be assigned to any digital or
 // analog pins...but we'll use the analog pins as this allows us to
 // double up the pins with the touch screen (see the TFT paint example).
@@ -43,21 +43,21 @@ Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 // a simpler declaration can optionally be used:
 // Adafruit_TFTLCD tft;
 //Touch
-#define YP A3 // must be an analog pin, use "An" notation!
-#define XM A2 // must be an analog pin, use "An" notation!
-#define YM 9 // can be a digital pin
-#define XP 8 // can be a digital pin
-//
-#define TS_MINX 960
-#define TS_MINY 150
-#define TS_MAXX 150
-#define TS_MAXY 940
+//#define YP A3 // must be an analog pin, use "An" notation!
+//#define XM A2 // must be an analog pin, use "An" notation!
+//#define YM 9 // can be a digital pin
+//#define XP 8 // can be a digital pin
+////
+//#define TS_MINX 960
+//#define TS_MINY 150
+//#define TS_MAXX 150
+//#define TS_MAXY 940
 // For better pressure precision, we need to know the resistance
 // between X+ and X- Use any multimeter to read it
 // For the one we're using, its 300 ohms across the X plate
-TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
-#define MINPRESSURE 10
-#define MAXPRESSURE 1000
+//TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
+//#define MINPRESSURE 10
+//#define MAXPRESSURE 1000
 //--------------------------------------------
 //------- DATE-TIME --------------------------
 //--------------------------------------------
@@ -117,33 +117,34 @@ uint16_t text_color; // day / night color
 uint16_t copy_text_color;
 
 //Sunrise
-int int_sunrise_hour = 0;
-int int_sunrise_minute = 0;
-int copy_int_sunrise_minute;
-int int_sundown_hour = 0;
-int int_sundown_minute = 0;
-int copy_int_sundown_minute;
-int daylightsavingtime = 1; // add hour 1=winter  2=sommer
-int sun_elevation;//elevation of sun
+#include <sundata.h>
+byte sunrise_hour = 0;
+byte sunrise_minute = 0;
+byte copy_sunrise_minute;
+byte sundown_hour = 0;
+byte sundown_minute = 0;
+byte copy_sundown_minute;
+byte daylightsavingtime = 1; // add hour 1=winter  2=sommer
+//byte sun_elevation;//elevation of sun
 
-//Moonphase
-const float moon_phase = 29.530589; //moon returns every 29,5 days
-//Moon Phase Calender 10 years
-const int moon_calender[12][2] = {
-  {2016, 24}, // first full moon, day of year
-  {2017, 12},
-  {2018, 2},
-  {2019, 21},
-  {2020, 10},
-  {2021, 28},
-  {2022, 18},
-  {2023, 7},
-  {2024, 25},
-  {2025, 13},
-  {2026, 3},
-  {2027, 22},
-};
-const String sw_version = "V1.1-R";
+////Moonphase
+//const float moon_phase = 29.530589; //moon returns every 29,5 days
+////Moon Phase Calender 10 years
+//const int moon_calender[12][2] = {
+//  {2016, 24}, // first full moon, day of year
+//  {2017, 12},
+//  {2018, 2},
+//  {2019, 21},
+//  {2020, 10},
+//  {2021, 28},
+//  {2022, 18},
+//  {2023, 7},
+//  {2024, 25},
+//  {2025, 13},
+//  {2026, 3},
+//  {2027, 22},
+//};
+const String sw_version = "V1.2-Beta";
 const String chip = "Chip:";
 const String edges = "Set Display Edges:";
 const String load_setup = "Load Setup OK";
@@ -152,7 +153,7 @@ const String sun_info_1 = "Sunrise: ";
 const String sun_info_2 = "Sunset: ";
 const String sync_info = "sync";
 
-boolean show_data = false;//for touch
+//boolean show_data = false;//for touch
 //#########################################################################
 //#########################################################################
 void setup() {
@@ -222,35 +223,35 @@ void setup() {
 
 void loop() {
 
-  //touch screen
-  TSPoint p = ts.getPoint();
-  //if sharing pins, you'll need to fix the directions of the touchscreen pins
-  //pinMode(XP, OUTPUT);
-  pinMode(XM, OUTPUT);
-  pinMode(YP, OUTPUT);
-  //pinMode(YM, OUTPUT);
-  // we have some minimum pressure we consider 'valid'
-  // pressure of 0 means no pressing!
-  if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
-    //    Serial.print("X = "); Serial.print(p.x);
-    //    Serial.print("\tY = "); Serial.print(p.y);
-    //    Serial.print("\tPressure = "); Serial.println(p.z);
-    // scale from 0->1023 to tft.width
-    p.x =  (map(p.x, TS_MINX, TS_MAXX, tft.width(), 0));
-    p.y =  (map(p.y, TS_MINY, TS_MAXY, tft.height(), 0));
-    //    Serial.print("("); Serial.print(p.x);
-    //    Serial.print(", "); Serial.print(p.y);
-    if (p.x > 200 && p.x < 240 && p.y > 0 && p.y < 40) {
-      delay(300);
-      if (show_data == false) {
-        show_data = true;//show GPS-position in raw format
-      }
-      else {
-        show_data = false;
-        SetFilledCircle(BLACK , clock_xoffset, clock_yoffset, (clock_radius * 0.9)); //clear GPS-Position
-      }
-    }
-  }
+  //  //touch screen
+  //  TSPoint p = ts.getPoint();
+  //  //if sharing pins, you'll need to fix the directions of the touchscreen pins
+  //  //pinMode(XP, OUTPUT);
+  //  pinMode(XM, OUTPUT);
+  //  pinMode(YP, OUTPUT);
+  //  //pinMode(YM, OUTPUT);
+  //  // we have some minimum pressure we consider 'valid'
+  //  // pressure of 0 means no pressing!
+  //  if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+  //    //    Serial.print("X = "); Serial.print(p.x);
+  //    //    Serial.print("\tY = "); Serial.print(p.y);
+  //    //    Serial.print("\tPressure = "); Serial.println(p.z);
+  //    // scale from 0->1023 to tft.width
+  //    p.x =  (map(p.x, TS_MINX, TS_MAXX, tft.width(), 0));
+  //    p.y =  (map(p.y, TS_MINY, TS_MAXY, tft.height(), 0));
+  //    //    Serial.print("("); Serial.print(p.x);
+  //    //    Serial.print(", "); Serial.print(p.y);
+  //    if (p.x > 200 && p.x < 240 && p.y > 0 && p.y < 40) {
+  //      delay(300);
+  //      if (show_data == false) {
+  //        show_data = true;//show GPS-position in raw format
+  //      }
+  //      else {
+  //        show_data = false;
+  //        SetFilledCircle(BLACK , clock_xoffset, clock_yoffset, (clock_radius * 0.9)); //clear GPS-Position
+  //      }
+  //    }
+  //  }
 
   static int os = -1;
 
@@ -273,8 +274,8 @@ void loop() {
     }
     //Day and Night color
     int minutes_of_day = ((hour() * 60) + minute());
-    int minutes_of_sunrise = ((int_sunrise_hour * 60) + int_sunrise_minute);
-    int minutes_of_sundown = ((int_sundown_hour * 60) + int_sundown_minute);
+    int minutes_of_sunrise = ((sunrise_hour * 60) + sunrise_minute);
+    int minutes_of_sundown = ((sundown_hour * 60) + sundown_minute);
 
     if ((minutes_of_day >= minutes_of_sunrise)  && (minutes_of_day <= minutes_of_sundown)) {
       text_color = WHITE;//day color
@@ -353,12 +354,12 @@ void RMC() { //TIME DATE
     daylightsavingtime = 1;//false = 1 hour
   }
 
-  if (show_data == true) {//show GPS-Position in the middle of clock
-    SetFilledCircle(BLACK , clock_xoffset, clock_yoffset, (clock_radius * 0.9));
-    ScreenText(text_color, x_edge_left + 50, 170 , "N" + getparam(3));
-    ScreenText(text_color, x_edge_left + 50, 200 , "E" + getparam(5));
-    ScreenText(text_color, x_edge_left + 70, 230 , String(sun_elevation) + "' Elev");//Declination Sun, Range:-23,5°-0°-23,5°
-  }
+  //  if (show_data == true) {//show GPS-Position in the middle of clock
+  //    SetFilledCircle(BLACK , clock_xoffset, clock_yoffset, (clock_radius * 0.9));
+  //    ScreenText(text_color, x_edge_left + 50, 170 , "N" + getparam(3));
+  //    ScreenText(text_color, x_edge_left + 50, 200 , "E" + getparam(5));
+  //    ScreenText(text_color, x_edge_left + 70, 230 , String(sun_elevation) + "' Elev");//Declination Sun, Range:-23,5°-0°-23,5°
+  //  }
 
   if (getparam(2) == "A") { //valid GPS-signal  A/V
     SetRect(text_color , 150, 15, 10, 10);//satellite grafic
@@ -382,11 +383,12 @@ void RMC() { //TIME DATE
       int lon = getparam(5).substring(0, 3).toInt();
       int decimal_lat = getparam(3).substring(2, 4).toInt();//decimal place
       int decimal_lon = getparam(5).substring(3, 5).toInt();//decimal place
-      int day_of_year = int(((month() - 1) * 30.4) + day());
+      //int day_of_year = int(((month() - 1) * 30.4) + day());
       if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
         //sunrise (30, 52, 50, 13, 50);// start sunrise calculation > result: 07:52 Uhr & 16:47 Uhr
-        sunrise (day_of_year, lat, decimal_lat, lon, decimal_lon); //Hamburg 53,5° 10,0°
-        moon(day_of_year);
+        //sunrise (day_of_year, lat, decimal_lat, lon, decimal_lon); //Hamburg 53,5° 10,0°
+        sunrise (lat, decimal_lat, lon, decimal_lon, daylightsavingtime);
+        //moon(day_of_year);
         ScreenText(text_color, 150, 40 , sync_info);
         valid_sync = true;
         //Serial.println(sync_info);
@@ -498,128 +500,92 @@ unsigned long SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius)
 //----------------------------------------------
 //--------------Calculation Sun-Rise------------
 //----------------------------------------------
-//sunrise (30, 52, 50, 13, 50);//Berlin
-void sunrise(int day_of_year, float latitude , float decimal_latitude, float longitude , float decimal_longitude) {
-  float location;
-  float declination;
-  float time_diff;
-  float zeit_gleichung;
-  float local_rising_time;
-  float local_down_time;
-  float sunrising;
-  float sunrise_hour;
-  float sunrise_minute;
-  float sundowning;
-  float sundown_hour;
-  float sundown_minute;
-  //Serial.println(String(day_of_year) + "," + String(latitude) + "," + String(longitude));
-  //Es soll der Sonnenaufgang für Berlin am 30. Januar bestimmt werden.
-  //30. Januar bedeutet T = 30    Berlin liegt auf  13.5° Ost, 52.5° Nord //Decimal
-  //Berlin = Pi * 52.5° / 180 = 52.5°/57.29578 = 0.9163 rad (Pi=3.14159)
-  latitude = latitude + (decimal_latitude / 60);
-  longitude = longitude + (decimal_longitude / 60);
-  //Serial.println("N" + String(latitude));
-  //Serial.println("E" + String(longitude));
-  location = (pi * latitude / 180);
-  //Deklination der Sonne = 0.4095*sin(0.016906*(30-80.086))  = -0.30677 rad = -17.58°
-  //Sonnenaufgang h=-50 Bogenminuten = -0.0145 rad
-  declination = 0.4095 * sin(0.016906 * (day_of_year - 80.086));
-  sun_elevation = 90 - latitude + int(declination * 180 / pi); //show declination of sun in display ,Range:-23,5°-0°-23,5°
-  //Zeitdifferenz = 12*arccos((sin(-0.0145) - sin(0.9163)*sin(-0.30677)) / (cos(0.9163)*cos(-0.30677)))/Pi = 4.479 Stunden.
-  time_diff = 12 * acos((sin(-0.0145) - sin(location) * sin(declination)) / (cos(location) * cos(declination))) / pi;
-  //Sonnenaufgang um 12 - 4.479 = 7.521 Uhr Wahre Ortszeit.
-  //Sonnenuntergang um 12 + 4.479 = 16.479 Uhr Wahre Ortszeit.
-  sunrising = 12 - time_diff;
-  sundowning = 12 + time_diff;
-  //Zeitgleichung = -0.171*sin(0.0337*30 + 0.465) - 0.1299*sin(0.01787*30 - 0.168)
-  //= -0.217 Stunden = WOZ - MOZ
-  zeit_gleichung = -0.171 * sin(0.0337 * day_of_year + 0.465) - (0.1299 * sin(0.01787 * day_of_year - 0.168));
-  //MOZ = WOZ + 0.217 Stunden = 7.738
-  local_rising_time = sunrising + (-1 * zeit_gleichung);// = 7.738
-  local_down_time = sundowning + (-1 * zeit_gleichung);// = 16,696
-  //von MOZ zu MEZ:
-  //für Berlin, mit +13.5° östlicher Länge (Division durch 15 erzeugt eine Zeitdifferenz in Stunden),
-  //und als Zeitzone die Mitteleuropäische Zeit MEZ mit einer Korrektur von +1 Stunde (MESZ wäre +2), also:
-  sunrise_hour = (local_rising_time + (-1 * longitude / 15) + daylightsavingtime);// 7.738 + (-13.5/15) +1 = 7.838 Uhr MEZ
-  sundown_hour = (local_down_time + (-1 * longitude / 15) + daylightsavingtime); // 16,696 + (-13.5/15) +1 = 17.03 Uhr MEZ
-  //Die Zeit 7.838 Uhr MEZ ist in Stunden. Für die Bestimmung der Anzahl Minuten nach 7 Uhr wird der nichtganzzahlige Anteil 0.838 mit 60 multipliziert: 0.838*60=50.3 Minuten
+void sunrise(byte latitude , byte decimal_latitude, byte longitude, byte decimal_longitude, byte daylightsavingtime) {
 
-  sunrise_minute = sunrise_hour - int(sunrise_hour);
-  sunrise_minute = sunrise_minute * 60; //nur Nachkomma!!
-  int_sunrise_hour = int(sunrise_hour);
-  int_sunrise_minute = int(sunrise_minute);
+  //sundata test=sundata(35.5,25.2,2);                       //creat test object with latitude and longtitude declared in degrees and time difference from Greenwhich
+  sundata test = sundata(latitude, longitude, daylightsavingtime);
+  //test.time(2013, 4,1 , 8, 30,0);                          //insert year, month, day, hour, minutes and seconds
+  test.time( year(), month(), day(), hour(), minute(), second());
+  test.calculations();                                     //update calculations for last inserted time
+  //float el_rad=test.elevation_rad();                        //store sun's elevation in rads
+  //float el_deg = test.elevation_deg();                      //store sun's elevation in degrees
+  //Serial.println(String(el_deg) + "Elevation");
 
-  sundown_minute = sundown_hour - int(sundown_hour);
-  sundown_minute = sundown_minute * 60; //nur Nachkomma!!
-  int_sundown_hour = int(sundown_hour);
-  int_sundown_minute = int(sundown_minute);
+  //float az_rad=test.azimuth_rad();                          //store sun's azimuth in rads
+  //float az_deg = test.azimuth_deg();                        //store sun's azimuth in degrees
+  //Serial.println(String(az_deg) + "Azimuth");
 
-  //Schlussendlich wird der Sonnenaufgang für Berlin auf 7 Uhr 50 bestimmt!
-  //Ein Vergleich mit CalSky.com ergibt 7 Uhr 52 für den Sonnenaufgang und Sonnenuntergang 16 Uhr 48.
-  //Das ist OK, mit so einfachen Formeln kann man keine bessere Genauigkeit erwarten.
+  float sunrise = test.sunrise_time();                      //store sunrise time in decimal form
+  //Serial.println(String(sunrise) + "Sunrise");
 
-  SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
-  SetFilledCircle(YELLOW , 220, 80, 6);
-  SetLines(YELLOW , 210, 80, 230 , 80);
-  SetFilledRect(BLACK , 210, 81, 230, 20);
+  float sunset = test.sunset_time();                        //store sunset time in decimal form
+  //Serial.println(String(sunset) + "Sunset");
 
-  if (int_sunrise_minute < 10) {
-    ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(int_sunrise_hour) + ":0" + String(int_sunrise_minute));
-  }
-  else {
-    ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(int_sunrise_hour) + ":" + String(int_sunrise_minute));
-  }
+  //  SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
+  //  SetFilledCircle(YELLOW , 220, 80, 6);
+  //  SetLines(YELLOW , 210, 80, 230 , 80);
+  //  SetFilledRect(BLACK , 210, 81, 230, 20);
 
-  SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
-  SetFilledCircle(ORANGE , 220, 305, 6);
-  SetLines(ORANGE , 210, 305, 230 , 305);
-  SetFilledRect(BLACK , 210, 290, 230, 15);
+  ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise));
+  ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sunset));
 
-  if (int_sundown_minute < 10) {
-    ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(int_sundown_hour) + ":0" + String(int_sundown_minute));
-  }
-  else {
-    ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(int_sundown_hour) + ":" + String(int_sundown_minute));
-  }
+  //    if (int_sunrise_minute < 10) {
+  //      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(int_sunrise_hour) + ":0" + String(int_sunrise_minute));
+  //    }
+  //    else {
+  //      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(int_sunrise_hour) + ":" + String(int_sunrise_minute));
+  //    }
+  //
+  //    SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
+  //    SetFilledCircle(ORANGE , 220, 305, 6);
+  //    SetLines(ORANGE , 210, 305, 230 , 305);
+  //    SetFilledRect(BLACK , 210, 290, 230, 15);
+  //
+  //    if (int_sundown_minute < 10) {
+  //      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(int_sundown_hour) + ":0" + String(int_sundown_minute));
+  //    }
+  //    else {
+  //      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(int_sundown_hour) + ":" + String(int_sundown_minute));
+  //    }
 }
 //----------------------------------------------
 //--------------Calculation Moon-Phases---------
 //----------------------------------------------
-void moon(int day_of_year) {
+//void moon(int day_of_year) {
 
-  //Serial.println(String(day_of_year) + " = day_of_year");
-  for (int i = 0; i < 12 ; i++) {
-    if (year() == moon_calender[i][0]) {
-      int int_moon_phase = round(moon_phase);
-      int days_to_next_full_moon;
-      int diff;
-
-      if (day_of_year >= moon_calender[i][1]) {
-        diff = int_moon_phase + (day_of_year - moon_calender[i][1]);//72-24= 48
-        days_to_next_full_moon = int_moon_phase - (diff % int_moon_phase); // % = Modulo Operation
-      }
-      else {
-        days_to_next_full_moon = (moon_calender[i][1] - day_of_year);
-      }
-      //Serial.println(String(days_to_next_full_moon) + " = days_to_next_full_moon");
-      SetFilledRect(BLACK , x_edge_left, 100, 29, 29); // clear moon icon
-      if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {// new moon
-        SetCircle(GRAY , x_edge_left + 17, 107, 7);
-      }
-      if ((days_to_next_full_moon > 1) && (days_to_next_full_moon < 14)) {//day 2-13 = 1. half moon +
-        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
-        SetFilledRect(BLACK , x_edge_left, 100, (days_to_next_full_moon + 10), 20); //12-23 /19
-        SetCircle(GRAY , x_edge_left + 17, 107, 7);
-      }
-      if ((days_to_next_full_moon == 29) || (days_to_next_full_moon == 30) || (days_to_next_full_moon == 0) || (days_to_next_full_moon == 1)) {
-        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6); //full moon
-        SetCircle(GRAY , x_edge_left + 17, 107, 7);
-      }
-      if ((days_to_next_full_moon > 16) && (days_to_next_full_moon < 29)) {//day 17-28 = 2. half moon -
-        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
-        SetFilledRect(BLACK , x_edge_left + (days_to_next_full_moon - 5 ) , 100, 13, 20); //12-23
-        SetCircle(GRAY , x_edge_left + 17, 107, 7);
-      }
-    }
-  }
-}
+//  //Serial.println(String(day_of_year) + " = day_of_year");
+//  for (int i = 0; i < 12 ; i++) {
+//    if (year() == moon_calender[i][0]) {
+//      int int_moon_phase = round(moon_phase);
+//      int days_to_next_full_moon;
+//      int diff;
+//
+//      if (day_of_year >= moon_calender[i][1]) {
+//        diff = int_moon_phase + (day_of_year - moon_calender[i][1]);//72-24= 48
+//        days_to_next_full_moon = int_moon_phase - (diff % int_moon_phase); // % = Modulo Operation
+//      }
+//      else {
+//        days_to_next_full_moon = (moon_calender[i][1] - day_of_year);
+//      }
+//      //Serial.println(String(days_to_next_full_moon) + " = days_to_next_full_moon");
+//      SetFilledRect(BLACK , x_edge_left, 100, 29, 29); // clear moon icon
+//      if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {// new moon
+//        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+//      }
+//      if ((days_to_next_full_moon > 1) && (days_to_next_full_moon < 14)) {//day 2-13 = 1. half moon +
+//        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
+//        SetFilledRect(BLACK , x_edge_left, 100, (days_to_next_full_moon + 10), 20); //12-23 /19
+//        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+//      }
+//      if ((days_to_next_full_moon == 29) || (days_to_next_full_moon == 30) || (days_to_next_full_moon == 0) || (days_to_next_full_moon == 1)) {
+//        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6); //full moon
+//        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+//      }
+//      if ((days_to_next_full_moon > 16) && (days_to_next_full_moon < 29)) {//day 17-28 = 2. half moon -
+//        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
+//        SetFilledRect(BLACK , x_edge_left + (days_to_next_full_moon - 5 ) , 100, 13, 20); //12-23
+//        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+//      }
+//    }
+//  }
+//}
