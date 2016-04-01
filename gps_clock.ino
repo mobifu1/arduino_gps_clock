@@ -107,10 +107,8 @@ int day_of_year;
 #include <sundata.h>
 byte sunrise_hour = 0;
 byte sunrise_minute = 0;
-byte copy_sunrise_minute;
 byte sundown_hour = 0;
 byte sundown_minute = 0;
-byte copy_sundown_minute;
 byte daylightsavingtime = 1; // add hour 1=winter  2=sommer
 int copy_sun_point_xpos;
 int copy_sun_point_ypos;
@@ -465,11 +463,9 @@ void sunrise( float latitude , float decimal_latitude, float longitude , float d
   latitude = latitude + (decimal_latitude / 60);
   longitude = longitude + (decimal_longitude / 60);
 
-  //sundata sun = sundata(53.5, 10.0, 2);                   //creat test object with latitude and longtitude declared in degrees and time difference from Greenwhich
-  sundata sun = sundata(latitude, longitude, daylightsavingtime);
-  //sun.time(2016, 4, 1 , 19, 56, 0);                        //insert year, month, day, hour, minutes and seconds
-  sun.time( year(), month(), day(), hour(), minute(), second());
-  sun.calculations();                                     //update calculations for last inserted time
+  sundata sun = sundata(latitude, longitude, daylightsavingtime);//creat test object with latitude and longtitude declared in degrees and time difference from Greenwhich
+  sun.time( year(), month(), day(), hour(), minute(), second());//insert year, month, day, hour, minutes and seconds
+  sun.calculations();                                           //update calculations for last inserted time
 
   //float el_rad=sun.elevation_rad();                        //store sun's elevation in rads
   float el_deg = sun.elevation_deg();                      //store sun's elevation in degrees
@@ -491,53 +487,52 @@ void sunrise( float latitude , float decimal_latitude, float longitude , float d
   sundown_minute = byte((sunset - sundown_hour) * 60);
 
   //sun position on the clock scale
-  point_xpos = (cos(az_rad + 4.712) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
-  point_ypos = (sin(az_rad + 4.712) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_yoffset;
-  copy_sun_point_xpos = point_xpos;
-  copy_sun_point_ypos = point_ypos;
+  int sun_point_xpos = int(cos(az_rad + 4.712) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
+  int sun_point_ypos = int(sin(az_rad + 4.712) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_yoffset;
 
   SetFilledCircle(BLACK, copy_sun_point_xpos, copy_sun_point_ypos, 2);//clear sun icon
-  SetCircle(GRAY, clock_xoffset, clock_yoffset, clock_radius / 2); //horizantal line
+  SetCircle(GRAY, clock_xoffset, clock_yoffset, clock_radius / 2); //horizon
 
   if (daylight == true) {
-    SetFilledCircle(YELLOW, point_xpos, point_ypos, 2);// Day color
+    if (el_deg < 5) {
+      SetFilledCircle(ORANGE, sun_point_xpos, sun_point_ypos, 2);// Day color 1
+    }
+    else {
+      SetFilledCircle(YELLOW, sun_point_xpos, sun_point_ypos, 2);// Day color 2
+    }
   }
   else {
-    SetFilledCircle(GRAY, point_xpos, point_ypos, 2);//Night color
+    SetFilledCircle(BLUE, sun_point_xpos, sun_point_ypos, 2);//Night color
   }
-  copy_sun_point_xpos = point_xpos;
-  copy_sun_point_ypos = point_ypos;
+  copy_sun_point_xpos = sun_point_xpos;
+  copy_sun_point_ypos = sun_point_ypos;
 
+  if (valid_sync == false) {
 
-  //if () {
+    SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
+    SetFilledCircle(YELLOW , 220, 80, 6);
+    SetLines(YELLOW , 210, 80, 230 , 80);
+    SetFilledRect(BLACK , 210, 81, 230, 20);
 
-  copy_sunrise_minute = sunrise_minute;
-  copy_sundown_minute = sundown_minute;
+    if (sunrise_minute < 10) {
+      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise_hour) + ":0" + String(sunrise_minute));
+    }
+    else {
+      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise_hour) + ":" + String(sunrise_minute));
+    }
 
-  SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
-  SetFilledCircle(YELLOW , 220, 80, 6);
-  SetLines(YELLOW , 210, 80, 230 , 80);
-  SetFilledRect(BLACK , 210, 81, 230, 20);
+    SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
+    SetFilledCircle(ORANGE , 220, 305, 6);
+    SetLines(ORANGE , 210, 305, 230 , 305);
+    SetFilledRect(BLACK , 210, 290, 230, 15);
 
-  if (sunrise_minute < 10) {
-    ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise_hour) + ":0" + String(sunrise_minute));
+    if (sundown_minute < 10) {
+      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sundown_hour) + ":0" + String(sundown_minute));
+    }
+    else {
+      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sundown_hour) + ":" + String(sundown_minute));
+    }
   }
-  else {
-    ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise_hour) + ":" + String(sunrise_minute));
-  }
-
-  SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
-  SetFilledCircle(ORANGE , 220, 305, 6);
-  SetLines(ORANGE , 210, 305, 230 , 305);
-  SetFilledRect(BLACK , 210, 290, 230, 15);
-
-  if (sundown_minute < 10) {
-    ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sundown_hour) + ":0" + String(sundown_minute));
-  }
-  else {
-    ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sundown_hour) + ":" + String(sundown_minute));
-  }
-  //}
 }
 //----------------------------------------------
 //--------------Calculation Moon-Phases---------
