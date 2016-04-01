@@ -105,11 +105,11 @@ int day_of_year;
 
 //Sunrise
 #include <sundata.h>
-byte sunrise_hour = 0;
-byte sunrise_minute = 0;
-byte sundown_hour = 0;
-byte sundown_minute = 0;
-byte daylightsavingtime = 1; // add hour 1=winter  2=sommer
+int sunrise_hour = 0;
+int sunrise_minute = 0;
+int sundown_hour = 0;
+int sundown_minute = 0;
+int daylightsavingtime = 1; // add hour 1=winter  2=sommer
 int copy_sun_point_xpos;
 int copy_sun_point_ypos;
 boolean daylight;
@@ -458,12 +458,12 @@ unsigned long SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius)
 //----------------------------------------------
 //--------------Calculation Sun-Rise------------
 //----------------------------------------------
-void sunrise( float latitude , float decimal_latitude, float longitude , float decimal_longitude, byte daylightsavingtime) {
+void sunrise( float latitude , float decimal_latitude, float longitude , float decimal_longitude, int daylightsavingtime) {
 
   latitude = latitude + (decimal_latitude / 60);
   longitude = longitude + (decimal_longitude / 60);
 
-  sundata sun = sundata(latitude, longitude, daylightsavingtime);//creat test object with latitude and longtitude declared in degrees and time difference from Greenwhich
+  sundata sun = sundata(latitude, longitude, daylightsavingtime);//creat object with latitude and longtitude declared in degrees and time difference from Greenwhich
   sun.time( year(), month(), day(), hour(), minute(), second());//insert year, month, day, hour, minutes and seconds
   sun.calculations();                                           //update calculations for last inserted time
 
@@ -477,18 +477,17 @@ void sunrise( float latitude , float decimal_latitude, float longitude , float d
 
   float sunrise = sun.sunrise_time();                      //store sunrise time in decimal form
   //Serial.println(String(sunrise) + "Sunrise");
-  sunrise_hour = byte(sunrise);
-  sunrise_minute = byte((sunrise - sunrise_hour) * 60);
-
+  sunrise_hour = int(sunrise);
+  sunrise_minute = int((sunrise - sunrise_hour) * 60);
 
   float sunset = sun.sunset_time();                        //store sunset time in decimal form
   //Serial.println(String(sunset) + "Sunset");
-  sundown_hour = byte(sunset);
-  sundown_minute = byte((sunset - sundown_hour) * 60);
+  sundown_hour = int(sunset);
+  sundown_minute = int((sunset - sundown_hour) * 60);
 
   //sun position on the clock scale
-  int sun_point_xpos = int(cos(az_rad + 4.712) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
-  int sun_point_ypos = int(sin(az_rad + 4.712) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_yoffset;
+  int sun_point_xpos = int(cos(az_rad + 4.712388) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
+  int sun_point_ypos = int(sin(az_rad + 4.712388) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_yoffset;
 
   SetFilledCircle(BLACK, copy_sun_point_xpos, copy_sun_point_ypos, 2);//clear sun icon
   SetCircle(GRAY, clock_xoffset, clock_yoffset, clock_radius / 2); //horizon
