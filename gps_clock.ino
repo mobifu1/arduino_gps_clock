@@ -4,10 +4,8 @@
 // IMPORTANT: Adafruit_TFTLCD LIBRARY MUST BE SPECIFICALLY
 // CONFIGURED FOR EITHER THE TFT SHIELD OR THE BREAKOUT BOARD.
 // SEE RELEVANT COMMENTS IN Adafruit_TFTLCD.h FOR SETUP.
-//#define DEBUG
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_TFTLCD.h> // Hardware-specific library
-//#include <TouchScreen.h>
 // The control pins for the LCD can be assigned to any digital or
 // analog pins...but we'll use the analog pins as this allows us to
 // double up the pins with the touch screen (see the TFT paint example).
@@ -43,22 +41,6 @@ Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 // If using the shield, all control and data lines are fixed, and
 // a simpler declaration can optionally be used:
 // Adafruit_TFTLCD tft;
-//Touch
-//#define YP A3 // must be an analog pin, use "An" notation!
-//#define XM A2 // must be an analog pin, use "An" notation!
-//#define YM 9 // can be a digital pin
-//#define XP 8 // can be a digital pin
-////
-//#define TS_MINX 960
-//#define TS_MINY 150
-//#define TS_MAXX 150
-//#define TS_MAXY 940
-// For better pressure precision, we need to know the resistance
-// between X+ and X- Use any multimeter to read it
-// For the one we're using, its 300 ohms across the X plate
-//TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
-//#define MINPRESSURE 10
-//#define MAXPRESSURE 1000
 //--------------------------------------------
 //------- DATE-TIME --------------------------
 //--------------------------------------------
@@ -88,7 +70,6 @@ int y_edge_down;
 const int clock_radius = 90;//global adjustment for the clock, default 90
 const int clock_xoffset = 120;//global adjustment for the clock, default 120
 const int clock_yoffset = 195;//global adjustment for the clock, default 195
-float clock_point_angle_rad = 0;
 int point_xpos = 0;
 int point_ypos = 0;
 int sec_arrow_xpos = clock_xoffset;
@@ -106,9 +87,7 @@ int copy_hour_arrow_xpos;
 int copy_hour_arrow_ypos;
 
 const float pi = 3.14159265;
-float sec_alfa;
-float min_alfa;
-float hour_alfa;
+float alfa;
 String copy_wday;
 String copy_day;
 String copy_sat;
@@ -116,6 +95,13 @@ boolean valid_sync = false;
 boolean valid_signal = false;
 uint16_t text_color; // day / night color
 uint16_t copy_text_color;
+
+//GPS Position
+int lat ;
+int lon;
+int decimal_lat;//decimal place
+int decimal_lon;//decimal place
+int day_of_year;
 
 //Sunrise
 #include <sundata.h>
@@ -126,25 +112,26 @@ byte sundown_hour = 0;
 byte sundown_minute = 0;
 byte copy_sundown_minute;
 byte daylightsavingtime = 1; // add hour 1=winter  2=sommer
-//byte sun_elevation;//elevation of sun
+int copy_sun_point_xpos;
+int copy_sun_point_ypos;
 
 ////Moonphase
-//const float moon_phase = 29.530589; //moon returns every 29,5 days
-////Moon Phase Calender 10 years
-//const int moon_calender[12][2] = {
-//  {2016, 24}, // first full moon, day of year
-//  {2017, 12},
-//  {2018, 2},
-//  {2019, 21},
-//  {2020, 10},
-//  {2021, 28},
-//  {2022, 18},
-//  {2023, 7},
-//  {2024, 25},
-//  {2025, 13},
-//  {2026, 3},
-//  {2027, 22},
-//};
+const float moon_phase = 29.530589; //moon returns every 29,5 days
+//Moon Phase Calender 10 years
+const int moon_calender[12][2] = {
+  {2016, 24}, // first full moon, day of year
+  {2017, 12},
+  {2018, 2},
+  {2019, 21},
+  {2020, 10},
+  {2021, 28},
+  {2022, 18},
+  {2023, 7},
+  {2024, 25},
+  {2025, 13},
+  {2026, 3},
+  {2027, 22},
+};
 const String sw_version = "V1.2-Beta";
 const String chip = "Chip:";
 const String edges = "Set Display Edges:";
@@ -154,7 +141,6 @@ const String sun_info_1 = "Sunrise: ";
 const String sun_info_2 = "Sunset: ";
 const String sync_info = "sync";
 
-//boolean show_data = false;//for touch
 //#########################################################################
 //#########################################################################
 void setup() {
@@ -179,40 +165,40 @@ void setup() {
   FillScreen(BLACK);
   ScreenText(WHITE, x_edge_left, 10 , (sw_version));
   //Serial.println(sw_version);
-  ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
+  //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
   int  width = tft.width(), height = tft.height();
-  ScreenText(WHITE, x_edge_left, 70 , (String(width) + "x" + String(height) + "px")); //240x320
+  //ScreenText(WHITE, x_edge_left, 70 , (String(width) + "px" + String(height) + "px")); //240x320
   //Serial.println(String(width) + "x" + String(height) + "px");
-  ScreenText(WHITE, x_edge_left, 100 , (edges));
+  //ScreenText(WHITE, x_edge_left, 100 , (edges));
   //Serial.println(edges);
   x_edge_right = width - 1; //set display edges
   y_edge_down =  height - 1; //set display edges
-  ScreenText(WHITE, x_edge_left, 130 , ("X:" + String(x_edge_left) + "-" + String(x_edge_right) + " Y:" + String(y_edge_up) + "-" + String(y_edge_down)));
+  //ScreenText(WHITE, x_edge_left, 130 , ("X:" + String(x_edge_left) + "-" + String(x_edge_right) + " Y:" + String(y_edge_up) + "-" + String(y_edge_down)));
   //Serial.println("X:" + String(x_edge_left) + "-" + String(x_edge_right) + " Y:" + String(y_edge_up) + "-" + String(y_edge_down));
-  delay(3000);
-  FillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , load_setup);
+  //delay(3000);
+  //FillScreen(BLACK);
+  //ScreenText(WHITE, x_edge_left, 10 , load_setup);
   //Serial.println(load_setup);
-  ScreenText(WHITE, x_edge_left, 40 , wait_gps);
+  //ScreenText(WHITE, x_edge_left, 40 , wait_gps);
   //Serial.println(wait_gps);
   delay(3000);
   FillScreen(BLACK);
 
 #if scale_hour_Points//every 30 degrees
   for (int i = 0; i <= 11; i++) {
-    clock_point_angle_rad = 30 * i * (pi / 180);
-    point_xpos = (cos(clock_point_angle_rad) * clock_radius) + clock_xoffset;
-    point_ypos = (sin(clock_point_angle_rad) * clock_radius) + clock_yoffset;
+    alfa = 30 * i * (pi / 180);
+    point_xpos = (cos(alfa) * clock_radius) + clock_xoffset;
+    point_ypos = (sin(alfa) * clock_radius) + clock_yoffset;
     SetFilledCircle(CYAN, point_xpos, point_ypos, 2);
   }
 #endif
 
 #if scale_min_Points//every 6 degrees
   for (int i = 0; i <= 59; i++) {
-    clock_point_angle_rad = 6 * i * (pi / 180);
-    point_xpos = (cos(clock_point_angle_rad) * clock_radius) + clock_xoffset;
-    point_ypos = (sin(clock_point_angle_rad) * clock_radius) + clock_yoffset;
+    alfa = 6 * i * (pi / 180);
+    point_xpos = (cos(alfa) * clock_radius) + clock_xoffset;
+    point_ypos = (sin(alfa) * clock_radius) + clock_yoffset;
     SetPoint(CYAN, point_xpos, point_ypos);
   }
 #endif
@@ -223,36 +209,6 @@ void setup() {
 }
 
 void loop() {
-
-  //  //touch screen
-  //  TSPoint p = ts.getPoint();
-  //  //if sharing pins, you'll need to fix the directions of the touchscreen pins
-  //  //pinMode(XP, OUTPUT);
-  //  pinMode(XM, OUTPUT);
-  //  pinMode(YP, OUTPUT);
-  //  //pinMode(YM, OUTPUT);
-  //  // we have some minimum pressure we consider 'valid'
-  //  // pressure of 0 means no pressing!
-  //  if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
-  //    //    Serial.print("X = "); Serial.print(p.x);
-  //    //    Serial.print("\tY = "); Serial.print(p.y);
-  //    //    Serial.print("\tPressure = "); Serial.println(p.z);
-  //    // scale from 0->1023 to tft.width
-  //    p.x =  (map(p.x, TS_MINX, TS_MAXX, tft.width(), 0));
-  //    p.y =  (map(p.y, TS_MINY, TS_MAXY, tft.height(), 0));
-  //    //    Serial.print("("); Serial.print(p.x);
-  //    //    Serial.print(", "); Serial.print(p.y);
-  //    if (p.x > 200 && p.x < 240 && p.y > 0 && p.y < 40) {
-  //      delay(300);
-  //      if (show_data == false) {
-  //        show_data = true;//show GPS-position in raw format
-  //      }
-  //      else {
-  //        show_data = false;
-  //        SetFilledCircle(BLACK , clock_xoffset, clock_yoffset, (clock_radius * 0.9)); //clear GPS-Position
-  //      }
-  //    }
-  //  }
 
   static int os = -1;
 
@@ -296,17 +252,17 @@ void loop() {
     //ScreenText(text_color, x_edge_left + 10, 120 , tim);
 
     //Sekundenzeiger
-    hour_alfa = (270 + (30 * hour() + (0.5 * minute()))) * pi / 180;
-    hour_arrow_xpos = (cos(hour_alfa) * clock_radius * 0.7) + clock_xoffset;
-    hour_arrow_ypos = (sin(hour_alfa) * clock_radius * 0.7) + clock_yoffset;
+    alfa = (270 + (30 * hour() + (0.5 * minute()))) * pi / 180;
+    hour_arrow_xpos = (cos(alfa) * clock_radius * 0.7) + clock_xoffset;
+    hour_arrow_ypos = (sin(alfa) * clock_radius * 0.7) + clock_yoffset;
 
-    min_alfa = (270 + (6 * minute())) * pi / 180;
-    min_arrow_xpos = (cos(min_alfa) * clock_radius * 0.9) + clock_xoffset;
-    min_arrow_ypos = (sin(min_alfa) * clock_radius * 0.9) + clock_yoffset;
+    alfa = (270 + (6 * minute())) * pi / 180;
+    min_arrow_xpos = (cos(alfa) * clock_radius * 0.9) + clock_xoffset;
+    min_arrow_ypos = (sin(alfa) * clock_radius * 0.9) + clock_yoffset;
 
-    sec_alfa = (270 + (6 * second())) * pi / 180;
-    sec_arrow_xpos = (cos(sec_alfa) * clock_radius * 0.9) + clock_xoffset;
-    sec_arrow_ypos = (sin(sec_alfa) * clock_radius * 0.9) + clock_yoffset;
+    alfa = (270 + (6 * second())) * pi / 180;
+    sec_arrow_xpos = (cos(alfa) * clock_radius * 0.9) + clock_xoffset;
+    sec_arrow_ypos = (sin(alfa) * clock_radius * 0.9) + clock_yoffset;
 
     if ((copy_hour_arrow_xpos != hour_arrow_xpos) || (copy_hour_arrow_ypos != hour_arrow_ypos)) {
       SetLines(BLACK, clock_xoffset, clock_yoffset, copy_hour_arrow_xpos, copy_hour_arrow_ypos );
@@ -329,8 +285,7 @@ void loop() {
     copy_sec_arrow_xpos = sec_arrow_xpos;
     copy_sec_arrow_ypos = sec_arrow_ypos;
 
-    //if ((minute() == 59) && (second() == 59)) {
-    if (second() == 59) {
+    if ((minute() == 59) && (second() == 59)) {
       valid_sync = false;
     }
 
@@ -356,13 +311,6 @@ void RMC() { //TIME DATE
     daylightsavingtime = 1;//false = 1 hour
   }
 
-  //  if (show_data == true) {//show GPS-Position in the middle of clock
-  //    SetFilledCircle(BLACK , clock_xoffset, clock_yoffset, (clock_radius * 0.9));
-  //    ScreenText(text_color, x_edge_left + 50, 170 , "N" + getparam(3));
-  //    ScreenText(text_color, x_edge_left + 50, 200 , "E" + getparam(5));
-  //    ScreenText(text_color, x_edge_left + 70, 230 , String(sun_elevation) + "' Elev");//Declination Sun, Range:-23,5°-0°-23,5°
-  //  }
-
   if (getparam(2) == "A") { //valid GPS-signal  A/V
     SetRect(text_color , 150, 15, 10, 10);//satellite grafic
     SetRect(text_color , 160, 15, 10, 10);
@@ -381,18 +329,25 @@ void RMC() { //TIME DATE
   if (valid_sync == false) {
     SetFilledRect(BLACK , 150, 40, 89, 29); //clear sync on display
     if (valid_signal = true) {
-      int lat = getparam(3).substring(0, 2).toInt();
-      int lon = getparam(5).substring(0, 3).toInt();
-      int decimal_lat = getparam(3).substring(2, 4).toInt();//decimal place
-      int decimal_lon = getparam(5).substring(3, 5).toInt();//decimal place
-      //int day_of_year = int(((month() - 1) * 30.4) + day());
+      lat = getparam(3).substring(0, 2).toInt();
+      lon = getparam(5).substring(0, 3).toInt();
+      decimal_lat = getparam(3).substring(2, 4).toInt();//decimal place
+      decimal_lon = getparam(5).substring(3, 5).toInt();//decimal place
+      day_of_year = int(((month() - 1) * 30.4) + day());
       if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
-        //sunrise (day_of_year, lat, decimal_lat, lon, decimal_lon); //Hamburg 53,5° 10,0°
-        sunrise (lat, decimal_lat, lon, decimal_lon, daylightsavingtime);
-        //moon(day_of_year);
+        sunrise (lat, decimal_lat, lon, decimal_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
+        moon(day_of_year);
         ScreenText(text_color, 150, 40 , sync_info);
         valid_sync = true;
         //Serial.println(sync_info);
+      }
+    }
+  }
+
+  if (second() == 59) {//Nachbessern hier
+    if (valid_signal = true) {
+      if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
+        sunrise (lat, decimal_lat, lon, decimal_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
       }
     }
   }
@@ -506,85 +461,117 @@ void sunrise( float latitude , float decimal_latitude, float longitude , float d
   latitude = latitude + (decimal_latitude / 60);
   longitude = longitude + (decimal_longitude / 60);
 
-  //sundata test=sundata(35.5,25.2,2);                       //creat test object with latitude and longtitude declared in degrees and time difference from Greenwhich
+  //sundata sun = sundata(53.5, 10.0, 2);                   //creat test object with latitude and longtitude declared in degrees and time difference from Greenwhich
   sundata sun = sundata(latitude, longitude, daylightsavingtime);
-  //test.time(2013, 4,1 , 8, 30,0);                          //insert year, month, day, hour, minutes and seconds
+  //sun.time(2016, 4, 1 , 19, 56, 0);                        //insert year, month, day, hour, minutes and seconds
   sun.time( year(), month(), day(), hour(), minute(), second());
   sun.calculations();                                     //update calculations for last inserted time
 
   //float el_rad=sun.elevation_rad();                        //store sun's elevation in rads
   float el_deg = sun.elevation_deg();                      //store sun's elevation in degrees
-  Serial.println(String(el_deg) + "Elevation");
+  //Serial.println(String(el_deg) + "Elevation");
 
   float az_rad = sun.azimuth_rad();                        //store sun's azimuth in rads
-  float az_deg = sun.azimuth_deg();                        //store sun's azimuth in degrees
-  Serial.println(String(az_deg) + "Azimuth");
+  //float az_deg = sun.azimuth_deg();                        //store sun's azimuth in degrees
+  //Serial.println(String(az_deg) + "Azimuth");
 
   float sunrise = sun.sunrise_time();                      //store sunrise time in decimal form
-  Serial.println(String(sunrise) + "Sunrise");
+  //Serial.println(String(sunrise) + "Sunrise");
+  sunrise_hour = byte(sunrise);
+  sunrise_minute = byte((sunrise - sunrise_hour) * 60);
+
 
   float sunset = sun.sunset_time();                        //store sunset time in decimal form
-  Serial.println(String(sunset) + "Sunset");
+  //Serial.println(String(sunset) + "Sunset");
+  sundown_hour = byte(sunset);
+  sundown_minute = byte((sunset - sundown_hour) * 60);
 
   //sun position on the clock scale
-  point_xpos = (cos(az_rad) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_xoffset;//0.5 = Gain Factor
-  point_ypos = (sin(az_rad) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_yoffset;
+  point_xpos = (cos(az_rad + 4.712) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
+  point_ypos = (sin(az_rad + 4.712) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_yoffset;
+  copy_sun_point_xpos = point_xpos;
+  copy_sun_point_ypos = point_ypos;
 
-  SetFilledCircle(BLACK , clock_xoffset, clock_yoffset, (clock_radius * 0.9)); //clear sun position on tft
-  SetCircle(GRAY, point_xpos, point_ypos, clock_radius / 2); //horizantal line
-  SetFilledCircle(YELLOW, point_xpos, point_ypos, 2);// Day color
-  //SetFilledCircle(GRAY, point_xpos, point_ypos, 2);//Night color
+  SetFilledCircle(BLACK, copy_sun_point_xpos, copy_sun_point_ypos, 2);//clear sun icon
+  SetCircle(GRAY, clock_xoffset, clock_yoffset, clock_radius / 2); //horizantal line
 
-  SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
-  SetFilledCircle(YELLOW , 220, 80, 6);
-  SetLines(YELLOW , 210, 80, 230 , 80);
-  SetFilledRect(BLACK , 210, 81, 230, 20);
-  ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise));
+  if (el_deg > 0) {
+    SetFilledCircle(YELLOW, point_xpos, point_ypos, 2);// Day color
+  }
+  else {
+    SetFilledCircle(GRAY, point_xpos, point_ypos, 2);//Night color
+  }
+  copy_sun_point_xpos = point_xpos;
+  copy_sun_point_ypos = point_ypos;
 
-  SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
-  SetFilledCircle(ORANGE , 220, 305, 6);
-  SetLines(ORANGE , 210, 305, 230 , 305);
-  SetFilledRect(BLACK , 210, 290, 230, 15);
-  ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sunset));
+  if ((copy_sunrise_minute != sunrise_minute) || (copy_sundown_minute != sundown_minute)) {
+
+    copy_sunrise_minute = sunrise_minute;
+    copy_sundown_minute = sundown_minute;
+
+    SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
+    SetFilledCircle(YELLOW , 220, 80, 6);
+    SetLines(YELLOW , 210, 80, 230 , 80);
+    SetFilledRect(BLACK , 210, 81, 230, 20);
+
+    if (sunrise_minute < 10) {
+      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise_hour) + ":0" + String(sunrise_minute));
+    }
+    else {
+      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise_hour) + ":" + String(sunrise_minute));
+    }
+
+    SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
+    SetFilledCircle(ORANGE , 220, 305, 6);
+    SetLines(ORANGE , 210, 305, 230 , 305);
+    SetFilledRect(BLACK , 210, 290, 230, 15);
+
+    if (sundown_minute < 10) {
+      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sundown_hour) + ":0" + String(sundown_minute));
+    }
+    else {
+      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sundown_hour) + ":" + String(sundown_minute));
+    }
+  }
 }
 //----------------------------------------------
 //--------------Calculation Moon-Phases---------
 //----------------------------------------------
-//void moon(int day_of_year) {
+void moon(int day_of_year) {
 
-//  //Serial.println(String(day_of_year) + " = day_of_year");
-//  for (int i = 0; i < 12 ; i++) {
-//    if (year() == moon_calender[i][0]) {
-//      int int_moon_phase = round(moon_phase);
-//      int days_to_next_full_moon;
-//      int diff;
-//
-//      if (day_of_year >= moon_calender[i][1]) {
-//        diff = int_moon_phase + (day_of_year - moon_calender[i][1]);//72-24= 48
-//        days_to_next_full_moon = int_moon_phase - (diff % int_moon_phase); // % = Modulo Operation
-//      }
-//      else {
-//        days_to_next_full_moon = (moon_calender[i][1] - day_of_year);
-//      }
-//      //Serial.println(String(days_to_next_full_moon) + " = days_to_next_full_moon");
-//      SetFilledRect(BLACK , x_edge_left, 100, 29, 29); // clear moon icon
-//      if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {// new moon
-//        SetCircle(GRAY , x_edge_left + 17, 107, 7);
-//      }
-//      if ((days_to_next_full_moon > 1) && (days_to_next_full_moon < 14)) {//day 2-13 = 1. half moon +
-//        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
-//        SetFilledRect(BLACK , x_edge_left, 100, (days_to_next_full_moon + 10), 20); //12-23 /19
-//        SetCircle(GRAY , x_edge_left + 17, 107, 7);
-//      }
-//      if ((days_to_next_full_moon == 29) || (days_to_next_full_moon == 30) || (days_to_next_full_moon == 0) || (days_to_next_full_moon == 1)) {
-//        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6); //full moon
-//        SetCircle(GRAY , x_edge_left + 17, 107, 7);
-//      }
-//      if ((days_to_next_full_moon > 16) && (days_to_next_full_moon < 29)) {//day 17-28 = 2. half moon -
-//        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
-//        SetFilledRect(BLACK , x_edge_left + (days_to_next_full_moon - 5 ) , 100, 13, 20); //12-23
-//        SetCircle(GRAY , x_edge_left + 17, 107, 7);
-//      }
-//    }
-//  }
-//}
+  //Serial.println(String(day_of_year) + " = day_of_year");
+  for (int i = 0; i < 12 ; i++) {
+    if (year() == moon_calender[i][0]) {
+      int int_moon_phase = round(moon_phase);
+      int days_to_next_full_moon;
+      int diff;
+
+      if (day_of_year >= moon_calender[i][1]) {
+        diff = int_moon_phase + (day_of_year - moon_calender[i][1]);//72-24= 48
+        days_to_next_full_moon = int_moon_phase - (diff % int_moon_phase); // % = Modulo Operation
+      }
+      else {
+        days_to_next_full_moon = (moon_calender[i][1] - day_of_year);
+      }
+      //Serial.println(String(days_to_next_full_moon) + " = days_to_next_full_moon");
+      SetFilledRect(BLACK , x_edge_left, 100, 29, 29); // clear moon icon
+      if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {// new moon
+        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+      }
+      if ((days_to_next_full_moon > 1) && (days_to_next_full_moon < 14)) {//day 2-13 = 1. half moon +
+        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
+        SetFilledRect(BLACK , x_edge_left, 100, (days_to_next_full_moon + 10), 20); //12-23 /19
+        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+      }
+      if ((days_to_next_full_moon == 29) || (days_to_next_full_moon == 30) || (days_to_next_full_moon == 0) || (days_to_next_full_moon == 1)) {
+        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6); //full moon
+        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+      }
+      if ((days_to_next_full_moon > 16) && (days_to_next_full_moon < 29)) {//day 17-28 = 2. half moon -
+        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
+        SetFilledRect(BLACK , x_edge_left + (days_to_next_full_moon - 5 ) , 100, 13, 20); //12-23
+        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+      }
+    }
+  }
+}
