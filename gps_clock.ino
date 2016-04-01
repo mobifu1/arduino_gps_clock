@@ -1,4 +1,5 @@
 //------- TFT DISPLAY --------------------------
+//this code is to much for the uno board
 // This sketch has been Refurbished by BUHOSOFT
 // IMPORTANT: Adafruit_TFTLCD LIBRARY MUST BE SPECIFICALLY
 // CONFIGURED FOR EITHER THE TFT SHIELD OR THE BREAKOUT BOARD.
@@ -328,7 +329,8 @@ void loop() {
     copy_sec_arrow_xpos = sec_arrow_xpos;
     copy_sec_arrow_ypos = sec_arrow_ypos;
 
-    if ((minute() == 59) && (second() == 59)) {
+    //if ((minute() == 59) && (second() == 59)) {
+    if (second() == 59) {
       valid_sync = false;
     }
 
@@ -385,7 +387,6 @@ void RMC() { //TIME DATE
       int decimal_lon = getparam(5).substring(3, 5).toInt();//decimal place
       //int day_of_year = int(((month() - 1) * 30.4) + day());
       if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
-        //sunrise (30, 52, 50, 13, 50);// start sunrise calculation > result: 07:52 Uhr & 16:47 Uhr
         //sunrise (day_of_year, lat, decimal_lat, lon, decimal_lon); //Hamburg 53,5° 10,0°
         sunrise (lat, decimal_lat, lon, decimal_lon, daylightsavingtime);
         //moon(day_of_year);
@@ -500,53 +501,51 @@ unsigned long SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius)
 //----------------------------------------------
 //--------------Calculation Sun-Rise------------
 //----------------------------------------------
-void sunrise(byte latitude , byte decimal_latitude, byte longitude, byte decimal_longitude, byte daylightsavingtime) {
+void sunrise( float latitude , float decimal_latitude, float longitude , float decimal_longitude, byte daylightsavingtime) {
+
+  latitude = latitude + (decimal_latitude / 60);
+  longitude = longitude + (decimal_longitude / 60);
 
   //sundata test=sundata(35.5,25.2,2);                       //creat test object with latitude and longtitude declared in degrees and time difference from Greenwhich
-  sundata test = sundata(latitude, longitude, daylightsavingtime);
+  sundata sun = sundata(latitude, longitude, daylightsavingtime);
   //test.time(2013, 4,1 , 8, 30,0);                          //insert year, month, day, hour, minutes and seconds
-  test.time( year(), month(), day(), hour(), minute(), second());
-  test.calculations();                                     //update calculations for last inserted time
-  //float el_rad=test.elevation_rad();                        //store sun's elevation in rads
-  //float el_deg = test.elevation_deg();                      //store sun's elevation in degrees
-  //Serial.println(String(el_deg) + "Elevation");
+  sun.time( year(), month(), day(), hour(), minute(), second());
+  sun.calculations();                                     //update calculations for last inserted time
 
-  //float az_rad=test.azimuth_rad();                          //store sun's azimuth in rads
-  //float az_deg = test.azimuth_deg();                        //store sun's azimuth in degrees
-  //Serial.println(String(az_deg) + "Azimuth");
+  //float el_rad=sun.elevation_rad();                        //store sun's elevation in rads
+  float el_deg = sun.elevation_deg();                      //store sun's elevation in degrees
+  Serial.println(String(el_deg) + "Elevation");
 
-  float sunrise = test.sunrise_time();                      //store sunrise time in decimal form
-  //Serial.println(String(sunrise) + "Sunrise");
+  float az_rad = sun.azimuth_rad();                        //store sun's azimuth in rads
+  float az_deg = sun.azimuth_deg();                        //store sun's azimuth in degrees
+  Serial.println(String(az_deg) + "Azimuth");
 
-  float sunset = test.sunset_time();                        //store sunset time in decimal form
-  //Serial.println(String(sunset) + "Sunset");
+  float sunrise = sun.sunrise_time();                      //store sunrise time in decimal form
+  Serial.println(String(sunrise) + "Sunrise");
 
-  //  SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
-  //  SetFilledCircle(YELLOW , 220, 80, 6);
-  //  SetLines(YELLOW , 210, 80, 230 , 80);
-  //  SetFilledRect(BLACK , 210, 81, 230, 20);
+  float sunset = sun.sunset_time();                        //store sunset time in decimal form
+  Serial.println(String(sunset) + "Sunset");
 
+  //sun position on the clock scale
+  point_xpos = (cos(az_rad) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_xoffset;//0.5 = Gain Factor
+  point_ypos = (sin(az_rad) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_yoffset;
+
+  SetFilledCircle(BLACK , clock_xoffset, clock_yoffset, (clock_radius * 0.9)); //clear sun position on tft
+  SetCircle(GRAY, point_xpos, point_ypos, clock_radius / 2); //horizantal line
+  SetFilledCircle(YELLOW, point_xpos, point_ypos, 2);// Day color
+  //SetFilledCircle(GRAY, point_xpos, point_ypos, 2);//Night color
+
+  SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
+  SetFilledCircle(YELLOW , 220, 80, 6);
+  SetLines(YELLOW , 210, 80, 230 , 80);
+  SetFilledRect(BLACK , 210, 81, 230, 20);
   ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise));
-  ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sunset));
 
-  //    if (int_sunrise_minute < 10) {
-  //      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(int_sunrise_hour) + ":0" + String(int_sunrise_minute));
-  //    }
-  //    else {
-  //      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(int_sunrise_hour) + ":" + String(int_sunrise_minute));
-  //    }
-  //
-  //    SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
-  //    SetFilledCircle(ORANGE , 220, 305, 6);
-  //    SetLines(ORANGE , 210, 305, 230 , 305);
-  //    SetFilledRect(BLACK , 210, 290, 230, 15);
-  //
-  //    if (int_sundown_minute < 10) {
-  //      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(int_sundown_hour) + ":0" + String(int_sundown_minute));
-  //    }
-  //    else {
-  //      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(int_sundown_hour) + ":" + String(int_sundown_minute));
-  //    }
+  SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
+  SetFilledCircle(ORANGE , 220, 305, 6);
+  SetLines(ORANGE , 210, 305, 230 , 305);
+  SetFilledRect(BLACK , 210, 290, 230, 15);
+  ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sunset));
 }
 //----------------------------------------------
 //--------------Calculation Moon-Phases---------
