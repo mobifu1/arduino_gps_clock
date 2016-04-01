@@ -114,6 +114,7 @@ byte copy_sundown_minute;
 byte daylightsavingtime = 1; // add hour 1=winter  2=sommer
 int copy_sun_point_xpos;
 int copy_sun_point_ypos;
+boolean daylight;
 
 ////Moonphase
 const float moon_phase = 29.530589; //moon returns every 29,5 days
@@ -237,10 +238,12 @@ void loop() {
     if ((minutes_of_day >= minutes_of_sunrise)  && (minutes_of_day <= minutes_of_sundown)) {
       text_color = WHITE;//day color
       digitalWrite(LED, LOW);
+      daylight = true;
     }
     else {
       text_color = BLUE;//night color
       digitalWrite(LED, HIGH);
+      daylight = false;
     }
     if (copy_text_color != text_color) {
       valid_sync = false;//refresh color sunrise text
@@ -287,6 +290,14 @@ void loop() {
 
     if ((minute() == 59) && (second() == 59)) {
       valid_sync = false;
+    }
+
+    if (second() == 59) {
+      if (valid_signal = true) {
+        if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
+          sunrise (lat, decimal_lat, lon, decimal_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
+        }
+      }
     }
 
     os = second();
@@ -344,13 +355,6 @@ void RMC() { //TIME DATE
     }
   }
 
-  if (second() == 59) {//Nachbessern hier
-    if (valid_signal = true) {
-      if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
-        sunrise (lat, decimal_lat, lon, decimal_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
-      }
-    }
-  }
 }//GPRMC
 
 void SerialClear() {
@@ -495,7 +499,7 @@ void sunrise( float latitude , float decimal_latitude, float longitude , float d
   SetFilledCircle(BLACK, copy_sun_point_xpos, copy_sun_point_ypos, 2);//clear sun icon
   SetCircle(GRAY, clock_xoffset, clock_yoffset, clock_radius / 2); //horizantal line
 
-  if (el_deg > 0) {
+  if (daylight == true) {
     SetFilledCircle(YELLOW, point_xpos, point_ypos, 2);// Day color
   }
   else {
@@ -504,35 +508,36 @@ void sunrise( float latitude , float decimal_latitude, float longitude , float d
   copy_sun_point_xpos = point_xpos;
   copy_sun_point_ypos = point_ypos;
 
-  if ((copy_sunrise_minute != sunrise_minute) || (copy_sundown_minute != sundown_minute)) {
 
-    copy_sunrise_minute = sunrise_minute;
-    copy_sundown_minute = sundown_minute;
+  //if () {
 
-    SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
-    SetFilledCircle(YELLOW , 220, 80, 6);
-    SetLines(YELLOW , 210, 80, 230 , 80);
-    SetFilledRect(BLACK , 210, 81, 230, 20);
+  copy_sunrise_minute = sunrise_minute;
+  copy_sundown_minute = sundown_minute;
 
-    if (sunrise_minute < 10) {
-      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise_hour) + ":0" + String(sunrise_minute));
-    }
-    else {
-      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise_hour) + ":" + String(sunrise_minute));
-    }
+  SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
+  SetFilledCircle(YELLOW , 220, 80, 6);
+  SetLines(YELLOW , 210, 80, 230 , 80);
+  SetFilledRect(BLACK , 210, 81, 230, 20);
 
-    SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
-    SetFilledCircle(ORANGE , 220, 305, 6);
-    SetLines(ORANGE , 210, 305, 230 , 305);
-    SetFilledRect(BLACK , 210, 290, 230, 15);
-
-    if (sundown_minute < 10) {
-      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sundown_hour) + ":0" + String(sundown_minute));
-    }
-    else {
-      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sundown_hour) + ":" + String(sundown_minute));
-    }
+  if (sunrise_minute < 10) {
+    ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise_hour) + ":0" + String(sunrise_minute));
   }
+  else {
+    ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise_hour) + ":" + String(sunrise_minute));
+  }
+
+  SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
+  SetFilledCircle(ORANGE , 220, 305, 6);
+  SetLines(ORANGE , 210, 305, 230 , 305);
+  SetFilledRect(BLACK , 210, 290, 230, 15);
+
+  if (sundown_minute < 10) {
+    ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sundown_hour) + ":0" + String(sundown_minute));
+  }
+  else {
+    ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sundown_hour) + ":" + String(sundown_minute));
+  }
+  //}
 }
 //----------------------------------------------
 //--------------Calculation Moon-Phases---------
