@@ -131,11 +131,11 @@ const int moon_calender[12][2] = {
   {2026, 3},
   {2027, 22},
 };
-const String sw_version = "V1.2-Beta";
-const String chip = "Chip:";
-const String edges = "Set Display Edges:";
-const String load_setup = "Load Setup OK";
-const String wait_gps = "Waiting for GPS )))";
+const String sw_version = "V1.3-Beta";
+//const String chip = "Chip:";
+//const String edges = "Set Display Edges:";
+//const String load_setup = "Load Setup OK";
+//const String wait_gps = "Waiting for GPS )))";
 const String sun_info_1 = "Sunrise: ";
 const String sun_info_2 = "Sunset: ";
 const String sync_info = "sync";
@@ -290,7 +290,7 @@ void loop() {
       valid_sync = false;
     }
 
-    if (second() == 59) {
+    if (second() == 30) {
       if (valid_signal = true) {
         if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
           sunrise (lat, decimal_lat, lon, decimal_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
