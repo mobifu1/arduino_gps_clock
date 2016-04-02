@@ -131,7 +131,7 @@ const int moon_calender[12][2] = {
   {2026, 3},
   {2027, 22},
 };
-const String sw_version = "V1.3-Beta";
+const String sw_version = "V1.4-Beta";
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
 //const String load_setup = "Load Setup OK";
@@ -476,11 +476,13 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
   //Serial.println(String(az_deg) + "Azimuth");
 
   float sunrise = sun.sunrise_time();                      //store sunrise time in decimal form
+  sunrise = (sunrise - 0.141666667); //correction factor -8,5 min > Sundata.h calculates unexact
   //Serial.println(String(sunrise) + "Sunrise");
   sunrise_hour = int(sunrise);
   sunrise_minute = int((sunrise - sunrise_hour) * 60);
 
   float sunset = sun.sunset_time();                        //store sunset time in decimal form
+  sunset = (sunset + 0.1625); //correction factor +9,75 min > Sundata.h calculates unexact
   //Serial.println(String(sunset) + "Sunset");
   sundown_hour = int(sunset);
   sundown_minute = int((sunset - sundown_hour) * 60);
@@ -509,8 +511,8 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
   if (valid_sync == false) {
 
     SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
-    SetFilledCircle(ORANGE , 220, 80, 6);
-    SetLines(ORANGE , 210, 80, 230 , 80);
+    SetFilledCircle(YELLOW , 220, 80, 6);
+    SetLines(YELLOW , 210, 80, 230 , 80);
     SetFilledRect(BLACK , 210, 81, 230, 20);
 
     if (sunrise_minute < 10) {
