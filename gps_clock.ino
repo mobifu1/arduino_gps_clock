@@ -99,8 +99,8 @@ uint16_t copy_text_color;
 //GPS Position
 int lat ;
 int lon;
-int decimal_lat;//decimal place
-int decimal_lon;//decimal place
+int minute_lat;
+int minute_lon;
 int day_of_year;
 
 //Sunrise
@@ -293,7 +293,7 @@ void loop() {
     if (second() == 30) {
       if (valid_signal = true) {
         if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
-          sunrise (lat, decimal_lat, lon, decimal_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
+          sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
         }
       }
     }
@@ -340,11 +340,11 @@ void RMC() { //TIME DATE
     if (valid_signal = true) {
       lat = getparam(3).substring(0, 2).toInt();
       lon = getparam(5).substring(0, 3).toInt();
-      decimal_lat = getparam(3).substring(2, 4).toInt();//decimal place
-      decimal_lon = getparam(5).substring(3, 5).toInt();//decimal place
+      minute_lat = getparam(3).substring(2, 4).toInt();//minute value
+      minute_lon = getparam(5).substring(3, 5).toInt();//minute value
       day_of_year = int(((month() - 1) * 30.4) + day());
       if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
-        sunrise (lat, decimal_lat, lon, decimal_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
+        sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
         moon(day_of_year);
         ScreenText(text_color, 150, 40 , sync_info);
         valid_sync = true;
@@ -458,10 +458,10 @@ unsigned long SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius)
 //----------------------------------------------
 //--------------Calculation Sun-Rise------------
 //----------------------------------------------
-void sunrise( float latitude , float decimal_latitude, float longitude , float decimal_longitude, int daylightsavingtime) {
+void sunrise( float latitude , float minute_latitude, float longitude , float minute_longitude, int daylightsavingtime) {
 
-  latitude = latitude + (decimal_latitude / 60);
-  longitude = longitude + (decimal_longitude / 60);
+  latitude = latitude + (minute_latitude / 60);
+  longitude = longitude + (minute_longitude / 60);
 
   sundata sun = sundata(latitude, longitude, daylightsavingtime);//creat object with latitude and longtitude declared in degrees and time difference from Greenwhich
   sun.time( year(), month(), day(), hour(), minute(), second());//insert year, month, day, hour, minutes and seconds
@@ -509,8 +509,8 @@ void sunrise( float latitude , float decimal_latitude, float longitude , float d
   if (valid_sync == false) {
 
     SetFilledRect(BLACK , x_edge_left, 70, x_edge_right, 29); //clear sunrise value on display
-    SetFilledCircle(YELLOW , 220, 80, 6);
-    SetLines(YELLOW , 210, 80, 230 , 80);
+    SetFilledCircle(ORANGE , 220, 80, 6);
+    SetLines(ORANGE , 210, 80, 230 , 80);
     SetFilledRect(BLACK , 210, 81, 230, 20);
 
     if (sunrise_minute < 10) {
