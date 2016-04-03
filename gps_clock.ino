@@ -498,7 +498,7 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
   SetPoint(CYAN, clock_xoffset, clock_yoffset + (clock_radius / 2) + ((90 - latitude - 23.45) * 0.5)); //Scale highest Winter elevation, 90 - lat -23.45
 
   if (daylight == true) {
-    if (el_deg < 5) {
+    if (el_deg < 4) {
       SetFilledCircle(ORANGE, sun_point_xpos, sun_point_ypos, 2);// Day color 1
     }
     else {
