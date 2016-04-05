@@ -1,5 +1,4 @@
 //------- TFT DISPLAY --------------------------
-//this code is to much for the uno board
 // This sketch has been Refurbished by BUHOSOFT
 // IMPORTANT: Adafruit_TFTLCD LIBRARY MUST BE SPECIFICALLY
 // CONFIGURED FOR EITHER THE TFT SHIELD OR THE BREAKOUT BOARD.
@@ -133,7 +132,9 @@ const int moon_calender[12][2] = {
 };
 byte const moon_x_pos = 20;//24
 byte const moon_y_pos = 114;
-byte const moon_radius = 14;
+byte const moon_radius = 15;
+int copy_moon_point_xpos;
+int copy_moon_point_ypos;
 //------------------------------------
 const String sw_version = "V1.6-Beta";
 //const String chip = "Chip:";
@@ -298,6 +299,7 @@ void loop() {
       if (valid_signal = true) {
         if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
           sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
+          moon();
         }
       }
     }
@@ -550,37 +552,47 @@ void moon() {
 
   for (int i = 0; i < 12 ; i++) {
     if (year() == moon_calender[i][0]) {
-      int int_moon_phase = int(moon_phase * 2); // * 2  gives a straight value, better for calculation = 59
+      int int_moon_phase = round(moon_phase);
       int days_to_next_full_moon;
       int diff;
 
       if (day_of_year >= moon_calender[i][1]) {
         diff = int_moon_phase + (day_of_year - moon_calender[i][1]);//72-24= 48
-        days_to_next_full_moon = int_moon_phase - ((diff * 2) % int_moon_phase); // % = Modulo Operation
+        days_to_next_full_moon = int_moon_phase - (diff % int_moon_phase); // % = Modulo Operation
       }
       else {
-        days_to_next_full_moon = ((moon_calender[i][1] - day_of_year) * 2);
+        days_to_next_full_moon = (moon_calender[i][1] - day_of_year);
       }
+//      Test for moon position:
+//      alfa = days_to_next_full_moon * 12 * (pi / 180);
+//      int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
+//      int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_yoffset;
+//      SetFilledCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear sun icon
+//      SetCircle(WHITE, moon_point_xpos, mon_point_ypos, 2);
+//      copy_moon_point_xpos = moon_point_xpos;
+//      copy_moon_point_ypos = moon_point_ypos;
 
-      SetCircle(BLACK , moon_x_pos, moon_y_pos, moon_radius); // clear moon icon
+      if (valid_sync == false) {
 
-      if ((days_to_next_full_moon = 30) || (days_to_next_full_moon = 29)); { // new moon
-        SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
-        SetPoint(GRAY, moon_x_pos, moon_y_pos);
-      }
-      if ((days_to_next_full_moon > 0) && (days_to_next_full_moon < 29)) { //day 1-13 = 1. half moon +
-        SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1)); // )
-        SetFilledCircle(BLACK , (moon_x_pos - days_to_next_full_moon - 29), moon_y_pos , moon_radius - 1); //1 to 28=28
-        SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius); //28: -1 / 1: -28
-      }
-      if ((days_to_next_full_moon == 59) || (days_to_next_full_moon == 0)) {
-        SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1)); //full moon
-        SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
-      }
-      if ((days_to_next_full_moon > 29) && (days_to_next_full_moon < 59)) {//day 15-29 = 2. half moon -
-        SetFilledCircle(WHITE , moon_x_pos, moon_y_pos , (moon_radius - 1)); // (
-        SetFilledCircle(BLACK , (moon_x_pos + days_to_next_full_moon - 29), moon_y_pos, moon_radius - 1); //30 to 58=29
-        SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);//58:29/30:+1
+        SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, moon_radius); // clear moon icon
+
+        if (days_to_next_full_moon == 15); { // new moon
+          SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
+        }
+        if ((days_to_next_full_moon > 0) && (days_to_next_full_moon < 15)) { //day 1-13 = 1. half moon +
+          SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1)); // )
+          SetFilledCircle(BLACK , (moon_x_pos + (days_to_next_full_moon * 2) - 30), moon_y_pos , moon_radius - 1);
+          SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
+        }
+        if (days_to_next_full_moon == 30) {
+          SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1)); //full moon
+          SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
+        }
+        if ((days_to_next_full_moon > 15) && (days_to_next_full_moon < 30)) {//day 16-29 = 2. half moon -
+          SetFilledCircle(WHITE , moon_x_pos, moon_y_pos , (moon_radius - 1)); // (
+          SetFilledCircle(BLACK , (moon_x_pos + (days_to_next_full_moon * 2) - 30), moon_y_pos, moon_radius - 1);
+          SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
+        }
       }
     }
   }
