@@ -563,14 +563,15 @@ void moon() {
       else {
         days_to_next_full_moon = (moon_calender[i][1] - day_of_year);
       }
-//      Test for moon position:
-//      alfa = days_to_next_full_moon * 12 * (pi / 180);
-//      int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
-//      int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_yoffset;
-//      SetFilledCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear sun icon
-//      SetCircle(WHITE, moon_point_xpos, mon_point_ypos, 2);
-//      copy_moon_point_xpos = moon_point_xpos;
-//      copy_moon_point_ypos = moon_point_ypos;
+
+      //Test for moon position:
+      //      alfa = days_to_next_full_moon * 12 * (pi / 180);
+      //      int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa + 1.570796) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
+      //      int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa + 1.570796) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_yoffset;
+      //      SetCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear sun icon
+      //      SetCircle(WHITE, moon_point_xpos, mon_point_ypos, 2);
+      //      copy_moon_point_xpos = moon_point_xpos;
+      //      copy_moon_point_ypos = moon_point_ypos;
 
       if (valid_sync == false) {
 
