@@ -114,7 +114,7 @@ int copy_sun_point_xpos;
 int copy_sun_point_ypos;
 boolean daylight;
 
-////Moonphase
+//Moonphase
 const float moon_phase = 29.530589; //moon returns every 29,5 days
 //Moon Phase Calender 10 years
 const int moon_calender[12][2] = {
@@ -131,7 +131,11 @@ const int moon_calender[12][2] = {
   {2026, 3},
   {2027, 22},
 };
-const String sw_version = "V1.5-Beta";
+byte const moon_x_pos = 20;//24
+byte const moon_y_pos = 114;
+byte const moon_radius = 14;
+//------------------------------------
+const String sw_version = "V1.6-Beta";
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
 //const String load_setup = "Load Setup OK";
@@ -342,10 +346,9 @@ void RMC() { //TIME DATE
       lon = getparam(5).substring(0, 3).toInt();
       minute_lat = getparam(3).substring(2, 4).toInt();//minute value
       minute_lon = getparam(5).substring(3, 5).toInt();//minute value
-      day_of_year = int(((month() - 1) * 30.4) + day());
       if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
         sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
-        moon(day_of_year);
+        moon();
         ScreenText(text_color, 150, 40 , sync_info);
         valid_sync = true;
         //Serial.println(sync_info);
@@ -467,6 +470,8 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
   sun.time( year(), month(), day(), hour(), minute(), second());//insert year, month, day, hour, minutes and seconds
   sun.calculations();                                           //update calculations for last inserted time
 
+  day_of_year = sun.day_of_year();
+
   //float el_rad=sun.elevation_rad();                        //store sun's elevation in rads
   float el_deg = sun.elevation_deg();                      //store sun's elevation in degrees
   //Serial.println(String(el_deg) + "Elevation");
@@ -541,40 +546,41 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
 //----------------------------------------------
 //--------------Calculation Moon-Phases---------
 //----------------------------------------------
-void moon(int day_of_year) {
+void moon() {
 
-  //Serial.println(String(day_of_year) + " = day_of_year");
   for (int i = 0; i < 12 ; i++) {
     if (year() == moon_calender[i][0]) {
-      int int_moon_phase = round(moon_phase);
+      int int_moon_phase = int(moon_phase * 2); // * 2  gives a straight value, better for calculation = 59
       int days_to_next_full_moon;
       int diff;
 
       if (day_of_year >= moon_calender[i][1]) {
         diff = int_moon_phase + (day_of_year - moon_calender[i][1]);//72-24= 48
-        days_to_next_full_moon = int_moon_phase - (diff % int_moon_phase); // % = Modulo Operation
+        days_to_next_full_moon = int_moon_phase - ((diff * 2) % int_moon_phase); // % = Modulo Operation
       }
       else {
-        days_to_next_full_moon = (moon_calender[i][1] - day_of_year);
+        days_to_next_full_moon = ((moon_calender[i][1] - day_of_year) * 2);
       }
-      //Serial.println(String(days_to_next_full_moon) + " = days_to_next_full_moon");
-      SetFilledRect(BLACK , x_edge_left, 100, 29, 29); // clear moon icon
-      if ((days_to_next_full_moon >= 14) && (days_to_next_full_moon <= 16)) {// new moon
-        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+
+      SetCircle(BLACK , moon_x_pos, moon_y_pos, moon_radius); // clear moon icon
+
+      if ((days_to_next_full_moon = 30) || (days_to_next_full_moon = 29)); { // new moon
+        SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
+        SetPoint(GRAY, moon_x_pos, moon_y_pos);
       }
-      if ((days_to_next_full_moon > 1) && (days_to_next_full_moon < 14)) {//day 2-13 = 1. half moon +
-        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
-        SetFilledRect(BLACK , x_edge_left, 100, (days_to_next_full_moon + 10), 20); //12-23 /19
-        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+      if ((days_to_next_full_moon > 0) && (days_to_next_full_moon < 29)) { //day 1-13 = 1. half moon +
+        SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1)); // )
+        SetFilledCircle(BLACK , (moon_x_pos - days_to_next_full_moon - 29), moon_y_pos , moon_radius - 1); //1 to 28=28
+        SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius); //28: -1 / 1: -28
       }
-      if ((days_to_next_full_moon == 29) || (days_to_next_full_moon == 30) || (days_to_next_full_moon == 0) || (days_to_next_full_moon == 1)) {
-        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6); //full moon
-        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+      if ((days_to_next_full_moon == 59) || (days_to_next_full_moon == 0)) {
+        SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1)); //full moon
+        SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
       }
-      if ((days_to_next_full_moon > 16) && (days_to_next_full_moon < 29)) {//day 17-28 = 2. half moon -
-        SetFilledCircle(WHITE , x_edge_left + 17, 107, 6);//11-23
-        SetFilledRect(BLACK , x_edge_left + (days_to_next_full_moon - 5 ) , 100, 13, 20); //12-23
-        SetCircle(GRAY , x_edge_left + 17, 107, 7);
+      if ((days_to_next_full_moon > 29) && (days_to_next_full_moon < 59)) {//day 15-29 = 2. half moon -
+        SetFilledCircle(WHITE , moon_x_pos, moon_y_pos , (moon_radius - 1)); // (
+        SetFilledCircle(BLACK , (moon_x_pos + days_to_next_full_moon - 29), moon_y_pos, moon_radius - 1); //30 to 58=29
+        SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);//58:29/30:+1
       }
     }
   }
