@@ -112,6 +112,8 @@ int daylightsavingtime = 1; // add hour 1=winter  2=sommer
 int copy_sun_point_xpos;
 int copy_sun_point_ypos;
 boolean daylight;
+float el_deg;
+float az_rad;
 
 //Moonphase
 const float moon_phase = 29.530589; //moon returns every 29,5 days
@@ -208,7 +210,7 @@ void setup() {
 #endif
 
   //config gps modul or use u-center
-  //Serial.write("");s//et baudrate
+  //Serial.write("");//set baudrate
   //Serial.write("");//save settings
 }
 
@@ -295,11 +297,11 @@ void loop() {
       valid_sync = false;
     }
 
-    if (second() == 31) {
+    if ((second() == 31) || (second() == 1)) {
       if (valid_signal = true) {
         if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
           sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
-          moon();
+          moon(hour(), minute());
         }
       }
     }
@@ -310,6 +312,8 @@ void loop() {
 
 void RMC() { //TIME DATE
 
+  //$GPRMC,121000,A,4735.5634,N,00739.3538,E,0.0,0.0,060416,0.4,E,A*19
+  //setTime(12, 10, 0, 6, 4, 16);
   setTime(getparam(1).substring(0, 0 + 2).toInt(),
           getparam(1).substring(2, 2 + 2).toInt(),
           getparam(1).substring(4, 4 + 2).toInt(),
@@ -350,7 +354,7 @@ void RMC() { //TIME DATE
       minute_lon = getparam(5).substring(3, 5).toInt();//minute value
       if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
         sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
-        moon();
+        moon(hour(), minute());
         ScreenText(text_color, 150, 40 , sync_info);
         valid_sync = true;
         //Serial.println(sync_info);
@@ -475,10 +479,10 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
   day_of_year = sun.day_of_year();
 
   //float el_rad=sun.elevation_rad();                        //store sun's elevation in rads
-  float el_deg = sun.elevation_deg();                      //store sun's elevation in degrees
+  el_deg = sun.elevation_deg();                      //store sun's elevation in degrees
   //Serial.println(String(el_deg) + "Elevation");
 
-  float az_rad = sun.azimuth_rad();                        //store sun's azimuth in rads
+  az_rad = sun.azimuth_rad();                        //store sun's azimuth in rads
   //float az_deg = sun.azimuth_deg();                        //store sun's azimuth in degrees
   //Serial.println(String(az_deg) + "Azimuth");
 
@@ -546,7 +550,7 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
 //----------------------------------------------
 //--------------Calculation Moon-Phases---------
 //----------------------------------------------
-void moon() {
+void moon(int now_hour, int now_minute) {
 
   for (int i = 0; i < 12 ; i++) {
     if (year() == moon_calender[i][0]) {
@@ -562,14 +566,17 @@ void moon() {
         days_to_next_full_moon = (moon_calender[i][1] - day_of_year);
       }
 
-      //Test for moon position:
-      //      alfa = days_to_next_full_moon * 12 * (pi / 180);
-      //      int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa + 1.570796) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
-      //      int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa + 1.570796) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_yoffset;
-      //      SetCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear sun icon
-      //      SetCircle(WHITE, moon_point_xpos, mon_point_ypos, 2);
-      //      copy_moon_point_xpos = moon_point_xpos;
-      //      copy_moon_point_ypos = moon_point_ypos;
+      //Test for moon position on scale:  pi=3.14159265
+      //need a solution for the moon elevation???
+      float beta = (((now_hour * 60) + now_minute) / 1440);//value from 0-1, is for fine calculation
+      alfa = ((((days_to_next_full_moon + beta) * 12) + 180) * (pi / 180));
+      int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa ) * ((clock_radius / 2) + ((90 - 53) * 0.5))) + clock_xoffset; //0.5 = Gain Factor
+      int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa ) * ((clock_radius / 2) + ((90 - 53) * 0.5))) + clock_yoffset;
+      SetCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear moon icon
+      SetCircle(WHITE, moon_point_xpos, moon_point_ypos, 2);
+      copy_moon_point_xpos = moon_point_xpos;
+      copy_moon_point_ypos = moon_point_ypos;
+      //Test end
 
       if (valid_sync == false) {
 
