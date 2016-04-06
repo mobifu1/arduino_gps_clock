@@ -136,7 +136,7 @@ byte const moon_radius = 15;
 int copy_moon_point_xpos;
 int copy_moon_point_ypos;
 //------------------------------------
-const String sw_version = "V1.6-Beta";
+const String sw_version = "V1.7-Beta";
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
 //const String load_setup = "Load Setup OK";
@@ -483,13 +483,11 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
   //Serial.println(String(az_deg) + "Azimuth");
 
   float sunrise = sun.sunrise_time();                      //store sunrise time in decimal form
-  sunrise = (sunrise - 0.141666667); //correction factor -8,5 min > Sundata.h calculates unexact
   //Serial.println(String(sunrise) + "Sunrise");
   sunrise_hour = int(sunrise);
   sunrise_minute = int((sunrise - sunrise_hour) * 60);
 
   float sunset = sun.sunset_time();                        //store sunset time in decimal form
-  sunset = (sunset + 0.1625); //correction factor +9,75 min > Sundata.h calculates unexact
   //Serial.println(String(sunset) + "Sunset");
   sundown_hour = int(sunset);
   sundown_minute = int((sunset - sundown_hour) * 60);
