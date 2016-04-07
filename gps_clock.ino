@@ -112,25 +112,24 @@ int daylightsavingtime = 1; // add hour 1=winter  2=sommer
 int copy_sun_point_xpos;
 int copy_sun_point_ypos;
 boolean daylight;
-float el_deg;
 float az_rad;
 
 //Moonphase
-const float moon_phase = 29.530589; //moon returns every 29,5 days
+const int moon_phase = 714;//29.530589 *24hours= 709; //moon returns every 29,5 days  714 is strange!!!!
 //Moon Phase Calender 10 years
 const int moon_calender[12][2] = {
-  {2016, 24}, // first full moon, day of year
-  {2017, 12},
-  {2018, 2},
-  {2019, 21},
-  {2020, 10},
-  {2021, 28},
-  {2022, 18},
-  {2023, 7},
-  {2024, 25},
-  {2025, 13},
-  {2026, 3},
-  {2027, 22},
+  {2016, 579}, // first full moon, hour of year
+  {2017, 300},
+  {2018, 51},
+  {2019, 510},
+  {2020, 260},
+  {2021, 692},
+  {2022, 433},
+  {2023, 168},
+  {2024, 619},
+  {2025, 335},
+  {2026, 83},
+  {2027, 541},
 };
 byte const moon_x_pos = 20;//24
 byte const moon_y_pos = 114;
@@ -138,7 +137,7 @@ byte const moon_radius = 15;
 int copy_moon_point_xpos;
 int copy_moon_point_ypos;
 //------------------------------------
-const String sw_version = "V1.7-Beta";
+const String sw_version = "V1.8-Beta";
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
 //const String load_setup = "Load Setup OK";
@@ -479,7 +478,7 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
   day_of_year = sun.day_of_year();
 
   //float el_rad=sun.elevation_rad();                        //store sun's elevation in rads
-  el_deg = sun.elevation_deg();                      //store sun's elevation in degrees
+  float el_deg = sun.elevation_deg();                      //store sun's elevation in degrees
   //Serial.println(String(el_deg) + "Elevation");
 
   az_rad = sun.azimuth_rad();                        //store sun's azimuth in rads
@@ -554,24 +553,25 @@ void moon(int now_hour, int now_minute) {
 
   for (int i = 0; i < 12 ; i++) {
     if (year() == moon_calender[i][0]) {
-      int int_moon_phase = round(moon_phase);
-      int days_to_next_full_moon;
+      int hour_of_year = ((day_of_year * 24) + (now_hour));//7.4.2016 11:00 > 2363
+      int hour_to_next_full_moon;
       int diff;
 
-      if (day_of_year >= moon_calender[i][1]) {
-        diff = int_moon_phase + (day_of_year - moon_calender[i][1]);//72-24= 48
-        days_to_next_full_moon = int_moon_phase - (diff % int_moon_phase); // % = Modulo Operation
+      if (hour_of_year >= moon_calender[i][1]) {
+        diff =  (hour_of_year - moon_calender[i][1]);//2363-579=1784
+        hour_to_next_full_moon = moon_phase - (diff % moon_phase); // % = Modulo Operation  1784 % 709 =368 / 709-368=341
       }
       else {
-        days_to_next_full_moon = (moon_calender[i][1] - day_of_year);
+        hour_to_next_full_moon = (moon_calender[i][1] - hour_of_year);
       }
 
+      //ScreenText(text_color, x_edge_left + 10, 150 , String(hour_to_next_full_moon));
+
       //Test for moon position on scale:  pi=3.14159265
-      //(((now_hour * 60) + now_minute) / 1440);//beta: value from 0-1, is for fine calculation
-      alfa = ((((days_to_next_full_moon + (((now_hour * 60) + now_minute) / 1440)) * 12) + 180) * (pi / 180));
-      int moon_elev = int(el_deg); //need a solution for the moon elevation???
-      int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa ) * ((clock_radius / 2) + (moon_elev * 0.5))) + clock_xoffset; //0.5 = Gain Factor
-      int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa ) * ((clock_radius / 2) + (moon_elev * 0.5))) + clock_yoffset;
+      alfa = (((hour_to_next_full_moon + now_hour) / 2) + 180) * (pi / 180);
+      //need a solution for the moon elevation???
+      int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa ) * (20)) + clock_xoffset; //0.5 = Gain Factor
+      int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa ) * (20)) + clock_yoffset;
       SetFilledCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear moon icon
       SetFilledCircle(WHITE, moon_point_xpos, moon_point_ypos, 2);
       copy_moon_point_xpos = moon_point_xpos;
@@ -582,13 +582,13 @@ void moon(int now_hour, int now_minute) {
 
         SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, moon_radius); // clear moon icon
         SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
-        SetFilledCircle(BLACK , (moon_x_pos + (days_to_next_full_moon * 2) - 30), moon_y_pos , moon_radius - 1);//Set Phases
+        SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29), moon_y_pos , (moon_radius - 1));
         SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
         //day to full moon:
-        //day 30 = full moon
-        //day 16-29 = 2. half moon -
-        //day 15 = new moon
-        //day 1-14 = 1. half moon +
+        //day 29,5 = full moon    > 709
+        //day 14,9-29,4 = 2. half moon 356-708
+        //day 14,8 = new moon     > 355
+        //day 0-14,7 = 1. half moon + 0-354
       }
     }
   }
