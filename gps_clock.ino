@@ -115,23 +115,24 @@ boolean daylight;
 float az_rad;
 
 //Moonphase
+int const moon_phase = 709;//29,5 + 24
 //Im 21. Jahrhundert werden die Extremwerte zwischen zwei Neumonden bei 29 Tagen, 19 Stunden und 47 Minuten
 //(also 6 Stunden und 36 Minuten über dem mittleren Wert, 18.12.2017 bis 17.1.2018) sowie bei 29 Tagen, 6 Stunden und 35 Minuten
 //(also 6 Stunden und 9 Minuten unter dem Mittelwert, 16.6.2053 bis 15.7.2053) liegen.
 //Moon Phase Calender 10 years
 const int moon_calender[12][3] = {
-  {2016, 579, 714}, // year,first full moon in hour of year, individual moon period in hour
-  {2017, 300, 711},
-  {2018, 51, 709},
-  {2019, 510, 706},
-  {2020, 260, 707},
-  {2021, 692, 708},
-  {2022, 433, 709},
-  {2023, 168, 709},
-  {2024, 619, 710},
-  {2025, 335, 710},
-  {2026, 83, 709},
-  {2027, 541, 709},
+  {2016, 579, 0}, // year,first full moon in hour of year, variation phase 0-360 degrees
+  {2017, 300, 0},
+  {2018, 51, 45},
+  {2019, 510, -45},
+  {2020, 260, -70},
+  {2021, 692, -90},
+  {2022, 433, -120},
+  {2023, 168, +120},
+  {2024, 619, +70},
+  {2025, 335, +30},
+  {2026, 83, +20},
+  {2027, 541, -20},
 };
 byte const moon_x_pos = 20;////moon icon big
 byte const moon_y_pos = 114;
@@ -139,7 +140,7 @@ byte const moon_radius = 15;
 int copy_moon_point_xpos;// moon small
 int copy_moon_point_ypos;
 //------------------------------------
-const String sw_version = "V1.8-Beta";
+//const String sw_version = "V1.9-Beta";
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
 //const String load_setup = "Load Setup OK";
@@ -147,7 +148,6 @@ const String sw_version = "V1.8-Beta";
 const String sun_info_1 = "Sunrise: ";
 const String sun_info_2 = "Sunset: ";
 const String sync_info = "sync";
-
 //#########################################################################
 //#########################################################################
 void setup() {
@@ -170,7 +170,7 @@ void setup() {
   }
   tft.begin(identifier);
   FillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , (sw_version));
+  //ScreenText(WHITE, x_edge_left, 10 , (sw_version));
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -555,14 +555,28 @@ void moon(int now_hour, int now_minute) {
 
   for (int i = 0; i < 12 ; i++) {
     if (year() == moon_calender[i][0]) {
-      int moon_phase = moon_calender[i][2]; //moon phase can change every year
-      int hour_of_year = ((day_of_year * 24) + (now_hour));//7.4.2016 11:00 > 2363
+      int var_phase = moon_calender[i][2]; //moon phase can change every month, +4 & -4 hours
+      int hour_of_year = (((day_of_year - 1) * 24) + (now_hour)); //7.4.2016 11:00 > 2363
       int hour_to_next_full_moon;
       int diff;
 
+      //checked: http://www.walterzorn.de/grapher/grapher.htm
+      //checked: 4 * (cos(((x * 30) + 0) * pi / 180));
+
       if (hour_of_year >= moon_calender[i][1]) {
         diff =  (hour_of_year - moon_calender[i][1]);//2363-579=1784
-        hour_to_next_full_moon = moon_phase - (diff % moon_phase); // % = Modulo Operation  1784 % 709 =368 / 709-368=341
+        if (diff >= (moon_phase + (5 * (cos((((i + 1) * 30) + var_phase) * pi / 180))))) {
+          for (int x = 0; x < 12; x++) {// % = Modulo Operation  1784 % (709+var) = 368
+            diff = (diff - moon_phase + (4 * (cos((((i + 1) * 30) + var_phase) * pi / 180))));
+            if (diff <= moon_phase) {
+              hour_to_next_full_moon = moon_phase + (4 * (cos((((i + 1) * 30) + var_phase) * pi / 180))) - diff; //709-368=341
+              break;
+            }
+          }
+        }
+        else {
+          hour_to_next_full_moon = (moon_phase + (4 * (cos((((i + 1) * 30) + var_phase) * pi / 180)))) - diff;
+        }
       }
       else {
         hour_to_next_full_moon = (moon_calender[i][1] - hour_of_year);
