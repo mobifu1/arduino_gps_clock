@@ -115,26 +115,28 @@ boolean daylight;
 float az_rad;
 
 //Moonphase
-const int moon_phase = 714;//29.530589 *24hours= 709; //moon returns every 29,5 days  714 is strange!!!!
+//Im 21. Jahrhundert werden die Extremwerte zwischen zwei Neumonden bei 29 Tagen, 19 Stunden und 47 Minuten
+//(also 6 Stunden und 36 Minuten über dem mittleren Wert, 18.12.2017 bis 17.1.2018) sowie bei 29 Tagen, 6 Stunden und 35 Minuten
+//(also 6 Stunden und 9 Minuten unter dem Mittelwert, 16.6.2053 bis 15.7.2053) liegen.
 //Moon Phase Calender 10 years
-const int moon_calender[12][2] = {
-  {2016, 579}, // first full moon, hour of year
-  {2017, 300},
-  {2018, 51},
-  {2019, 510},
-  {2020, 260},
-  {2021, 692},
-  {2022, 433},
-  {2023, 168},
-  {2024, 619},
-  {2025, 335},
-  {2026, 83},
-  {2027, 541},
+const int moon_calender[12][3] = {
+  {2016, 579, 714}, // year,first full moon in hour of year, individual moon period in hour
+  {2017, 300, 711},
+  {2018, 51, 709},
+  {2019, 510, 706},
+  {2020, 260, 707},
+  {2021, 692, 708},
+  {2022, 433, 709},
+  {2023, 168, 709},
+  {2024, 619, 710},
+  {2025, 335, 710},
+  {2026, 83, 709},
+  {2027, 541, 709},
 };
-byte const moon_x_pos = 20;//24
+byte const moon_x_pos = 20;////moon icon big
 byte const moon_y_pos = 114;
 byte const moon_radius = 15;
-int copy_moon_point_xpos;
+int copy_moon_point_xpos;// moon small
 int copy_moon_point_ypos;
 //------------------------------------
 const String sw_version = "V1.8-Beta";
@@ -553,6 +555,7 @@ void moon(int now_hour, int now_minute) {
 
   for (int i = 0; i < 12 ; i++) {
     if (year() == moon_calender[i][0]) {
+      int moon_phase = moon_calender[i][2]; //moon phase can change every year
       int hour_of_year = ((day_of_year * 24) + (now_hour));//7.4.2016 11:00 > 2363
       int hour_to_next_full_moon;
       int diff;
