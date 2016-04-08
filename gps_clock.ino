@@ -482,11 +482,13 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
 
   float sunrise = sun.sunrise_time();                      //store sunrise time in decimal form
   //Serial.println(String(sunrise) + "Sunrise");
+  //sunrise = (sunrise - 0.141666667); //correction factor -8,5 min > Sundata.h calculates unexact
   sunrise_hour = int(sunrise);
   sunrise_minute = int((sunrise - sunrise_hour) * 60);
 
   float sunset = sun.sunset_time();                        //store sunset time in decimal form
   //Serial.println(String(sunset) + "Sunset");
+  //sunset = (sunset + 0.1625); //correction factor +9,75 min > Sundata.h calculates unexact
   sundown_hour = int(sunset);
   sundown_minute = int((sunset - sundown_hour) * 60);
 
