@@ -85,7 +85,8 @@ int copy_min_arrow_ypos;
 int copy_hour_arrow_xpos;
 int copy_hour_arrow_ypos;
 
-const float pi = 3.14159265;
+//const float pi = 3.14159265;
+//pi/180=0.017453293
 float alfa;
 String copy_wday;
 String copy_day;
@@ -115,17 +116,17 @@ boolean daylight;
 float az_rad;
 
 //Moon Phase Calender 10 years
-const int moon_calender[10][15] = {
-  {2016, 555, 1267, 1981, 2695, 3407, 4117, 4825, 5531, 6237, 6942, 7647, 8353, 9060, 0}, // year,all full moons in hour of year,
-  {2017, 276, 985, 1696, 2408, 3119, 3831, 4542, 5252, 5961, 6669, 7374, 8081, 8787, 0}, //value=((day of full moon -1) *24) + hour
-  {2018, 27, 734, 1442, 2150, 2859, 3568, 4279, 4990, 5702, 6413, 7123, 7831, 8539, 9246},
-  {2019, 486, 1193, 1899, 2605, 3311, 4018, 4727, 5438, 6150, 6863, 7574, 8286, 8996, 0},
-  {2020, 236, 944, 1651, 2356, 3061, 3765, 4471, 5178, 5887, 6599, 7312, 8026, 8740, 9452},
-  {2021, 668, 1377, 2085, 2789, 3493, 4197, 4900, 5606, 6314, 7025, 7738, 8453, 9169, 0},
-  {2022, 409, 1122, 1832, 2541, 3246, 3950, 4653, 5356, 6060, 6767, 7476, 8189, 8904, 0},
-  {2023, 144, 859, 1574, 2286, 2996, 3702, 4406, 5109, 6516, 7222, 7930, 8642, 9355, 0},
-  {2024,  595, 1310, 2024, 2738, 3448, 4155, 4860, 5564, 6268, 6973, 7678, 8386, 9095, 0},
-  {2025,  311, 1023, 1736, 2450, 3163, 3874, 4583, 5290, 5996, 6702, 7406, 8112, 8819, 0},
+const int moon_calender[10][17] = {
+  {2016, 555, 1267, 1981, 2695, 3407, 4117, 4825, 5531, 6237, 6942, 7647, 8353, 9060, 0, 9, 0}, // year,all full moons in hour of year,
+  {2017, 276, 985, 1696, 2408, 3119, 3831, 4542, 5252, 5961, 6669, 7374, 8081, 8787, 0, 2, 0},  //value=((day of full moon -1) *24) + hour
+  {2018, 27, 734, 1442, 2150, 2859, 3568, 4279, 4990, 5702, 6413, 7123, 7831, 8539, 9246, 2, 8},//value of pos: 15&16 = number of moon eclipse
+  {2019, 486, 1193, 1899, 2605, 3311, 4018, 4727, 5438, 6150, 6863, 7574, 8286, 8996, 0, 1, 7},
+  {2020, 236, 944, 1651, 2356, 3061, 3765, 4471, 5178, 5887, 6599, 7312, 8026, 8740, 9452, 1, 6},
+  {2021, 668, 1377, 2085, 2789, 3493, 4197, 4900, 5606, 6314, 7025, 7738, 8453, 9169, 0, 11, 0},
+  {2022, 409, 1122, 1832, 2541, 3246, 3950, 4653, 5356, 6060, 6767, 7476, 8189, 8904, 0, 5, 0},
+  {2023, 144, 859, 1574, 2286, 2996, 3702, 4406, 5109, 6516, 7222, 7930, 8642, 9355, 0, 5, 11},
+  {2024,  595, 1310, 2024, 2738, 3448, 4155, 4860, 5564, 6268, 6973, 7678, 8386, 9095, 0, 3, 9},
+  {2025,  311, 1023, 1736, 2450, 3163, 3874, 4583, 5290, 5996, 6702, 7406, 8112, 8819, 0, 3, 9},
 };
 byte const moon_x_pos = 20;////moon icon big
 byte const moon_y_pos = 114;
@@ -133,7 +134,7 @@ byte const moon_radius = 15;
 int copy_moon_point_xpos;// moon small
 int copy_moon_point_ypos;
 //------------------------------------
-const String sw_version = "V2.0-R";
+const String sw_version = "V2.1-R";
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
 //const String load_setup = "Load Setup OK";
@@ -187,7 +188,7 @@ void setup() {
 
 #if scale_hour_Points//every 30 degrees
   for (int i = 0; i <= 11; i++) {
-    alfa = 30 * i * (pi / 180);
+    alfa = 30 * i * (0.017453293);// pi/180=0.017453293
     point_xpos = (cos(alfa) * clock_radius) + clock_xoffset;
     point_ypos = (sin(alfa) * clock_radius) + clock_yoffset;
     SetFilledCircle(CYAN, point_xpos, point_ypos, 2);
@@ -196,7 +197,7 @@ void setup() {
 
 #if scale_min_Points//every 6 degrees
   for (int i = 0; i <= 59; i++) {
-    alfa = 6 * i * (pi / 180);
+    alfa = 6 * i * (0.017453293);// pi/180=0.017453293
     point_xpos = (cos(alfa) * clock_radius) + clock_xoffset;
     point_ypos = (sin(alfa) * clock_radius) + clock_yoffset;
     SetPoint(CYAN, point_xpos, point_ypos);
@@ -254,15 +255,15 @@ void loop() {
     //ScreenText(text_color, x_edge_left + 10, 120 , tim);
 
     //Sekundenzeiger
-    alfa = (270 + (30 * hour() + (0.5 * minute()))) * pi / 180;
+    alfa = (270 + (30 * hour() + (0.5 * minute()))) * 0.017453293;// pi/180=0.017453293
     hour_arrow_xpos = (cos(alfa) * clock_radius * 0.7) + clock_xoffset;
     hour_arrow_ypos = (sin(alfa) * clock_radius * 0.7) + clock_yoffset;
 
-    alfa = (270 + (6 * minute())) * pi / 180;
+    alfa = (270 + (6 * minute())) * 0.017453293;// pi/180=0.017453293
     min_arrow_xpos = (cos(alfa) * clock_radius * 0.9) + clock_xoffset;
     min_arrow_ypos = (sin(alfa) * clock_radius * 0.9) + clock_yoffset;
 
-    alfa = (270 + (6 * second())) * pi / 180;
+    alfa = (270 + (6 * second())) * 0.017453293;// pi/180=0.017453293
     sec_arrow_xpos = (cos(alfa) * clock_radius * 0.9) + clock_xoffset;
     sec_arrow_ypos = (sin(alfa) * clock_radius * 0.9) + clock_yoffset;
 
@@ -548,6 +549,8 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
 //----------------------------------------------
 void moon(int now_hour) {
 
+  boolean mooneclipse = false;
+
   for (int i = 0; i < 12 ; i++) {
     if (year() == moon_calender[i][0]) {
       int hour_of_year = (((day_of_year - 1) * 24) + (now_hour)); //7.4.2016 11:00 > 2363
@@ -556,14 +559,15 @@ void moon(int now_hour) {
       for (int x = 1; x < 15; x++) {
         if  (hour_of_year <= moon_calender[i][x]) {
           hour_to_next_full_moon = moon_calender[i][x] - hour_of_year ;
+          if (x == moon_calender[i][15] || x == moon_calender[i][16]) {//max. 2 eclipses per year
+            mooneclipse = true;//next fullmoon is a moon eclipse
+          }
           break;
         }
       }
 
-      //ScreenText(text_color, x_edge_left + 10, 150 , String(hour_to_next_full_moon));
-
-      //Test for moon position on scale:  pi=3.14159265
-      alfa = (((hour_to_next_full_moon + now_hour) / 2) + 180) * (pi / 180);// now_minute unterbringen!!!
+      //Test for moon position on scale:
+      alfa = (((hour_to_next_full_moon + now_hour) / 2) + 180) * (0.017453293);// pi/180=0.017453293
       //need a solution for the moon elevation???
       int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa ) * (20)) + clock_xoffset; //0.5 = Gain Factor
       int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa ) * (20)) + clock_yoffset;
@@ -576,7 +580,14 @@ void moon(int now_hour) {
       if (valid_sync == false) {
 
         SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, moon_radius); // clear moon icon
-        SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
+
+        if ((mooneclipse == true) && (hour_to_next_full_moon < 16)) {// indication 16 hours before eclipse
+          SetFilledCircle(RED , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
+        }
+        else {
+          SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
+        }
+
         SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29), moon_y_pos , (moon_radius - 1));
         SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
         //day to full moon:
