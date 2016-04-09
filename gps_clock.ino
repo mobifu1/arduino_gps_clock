@@ -119,7 +119,7 @@ float az_rad;
 const int moon_calender[10][17] = {
   {2016, 555, 1267, 1981, 2695, 3407, 4117, 4825, 5531, 6237, 6942, 7647, 8353, 9060, 0, 9, 0}, // year,all full moons in hour of year,
   {2017, 276, 985, 1696, 2408, 3119, 3831, 4542, 5252, 5961, 6669, 7374, 8081, 8787, 0, 2, 0},  //value=((day of full moon -1) *24) + hour
-  {2018, 27, 734, 1442, 2150, 2859, 3568, 4279, 4990, 5702, 6413, 7123, 7831, 8539, 9246, 2, 8},//value of pos: 15&16 = number of moon eclipse
+  {2018, 27, 734, 1442, 2150, 2859, 3568, 4279, 4990, 5702, 6413, 7123, 7831, 8539, 9246, 2, 8},//value of pos: 15&16 = number of moon eclipse in year
   {2019, 486, 1193, 1899, 2605, 3311, 4018, 4727, 5438, 6150, 6863, 7574, 8286, 8996, 0, 1, 7},
   {2020, 236, 944, 1651, 2356, 3061, 3765, 4471, 5178, 5887, 6599, 7312, 8026, 8740, 9452, 1, 6},
   {2021, 668, 1377, 2085, 2789, 3493, 4197, 4900, 5606, 6314, 7025, 7738, 8453, 9169, 0, 11, 0},
@@ -134,14 +134,10 @@ byte const moon_radius = 15;
 int copy_moon_point_xpos;// moon small
 int copy_moon_point_ypos;
 //------------------------------------
-const String sw_version = "V2.1-R";
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
 //const String load_setup = "Load Setup OK";
 //const String wait_gps = "Waiting for GPS )))";
-const String sun_info_1 = "Sunrise: ";
-const String sun_info_2 = "Sunset: ";
-const String sync_info = "sync";
 //#########################################################################
 //#########################################################################
 void setup() {
@@ -164,7 +160,7 @@ void setup() {
   }
   tft.begin(identifier);
   FillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , (sw_version));
+  ScreenText(WHITE, x_edge_left, 10 , "V2.1-R");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -350,7 +346,7 @@ void RMC() { //TIME DATE
       if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
         sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
         moon(hour());
-        ScreenText(text_color, 150, 40 , sync_info);
+        ScreenText(text_color, 150, 40 , "sync");
         valid_sync = true;
         //Serial.println(sync_info);
       }
@@ -525,10 +521,10 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
     SetFilledRect(BLACK , 210, 81, 230, 20);
 
     if (sunrise_minute < 10) {
-      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise_hour) + ":0" + String(sunrise_minute));
+      ScreenText(text_color, x_edge_left + 10, 70 , "Sunrise: " + String(sunrise_hour) + ":0" + String(sunrise_minute));
     }
     else {
-      ScreenText(text_color, x_edge_left + 10, 70 , sun_info_1 + String(sunrise_hour) + ":" + String(sunrise_minute));
+      ScreenText(text_color, x_edge_left + 10, 70 , "Sunrise: " + String(sunrise_hour) + ":" + String(sunrise_minute));
     }
 
     SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
@@ -537,10 +533,10 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
     SetFilledRect(BLACK , 210, 290, 230, 15);
 
     if (sundown_minute < 10) {
-      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sundown_hour) + ":0" + String(sundown_minute));
+      ScreenText(text_color, x_edge_left + 10, 305 , "Sunset: " + String(sundown_hour) + ":0" + String(sundown_minute));
     }
     else {
-      ScreenText(text_color, x_edge_left + 10, 305 , sun_info_2 + String(sundown_hour) + ":" + String(sundown_minute));
+      ScreenText(text_color, x_edge_left + 10, 305 , "Sunset: " + String(sundown_hour) + ":" + String(sundown_minute));
     }
   }
 }
@@ -578,11 +574,11 @@ void moon(int now_hour) {
       //Test end
 
       if (valid_sync == false) {
-
         SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, moon_radius); // clear moon icon
-
-        if ((mooneclipse == true) && (hour_to_next_full_moon < 16)) {// indication 16 hours before eclipse
-          SetFilledCircle(RED , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
+        if (mooneclipse == true) {
+          if ( (hour_to_next_full_moon < 11) || (hour_to_next_full_moon > 704)) { // indication 10 hours before and after eclipse
+            SetFilledCircle(RED , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
+          }
         }
         else {
           SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
