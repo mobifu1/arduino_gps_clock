@@ -8,4 +8,4 @@ calculation of moon phases & moon azimut
 
 switch to day & night color by sun phases
 
-![Steampunk Clock](https://github.com/mobifu1/arduino_gps_clock/blob/master/steampunk%20clock.JPG "Steampunk Clock")
+![Steampunk Clock](https://github.com/mobifu1/arduino_gps_clock/blob/master/steampunk%20clock-1.jpg "Steampunk Clock")
