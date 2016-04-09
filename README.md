@@ -2,7 +2,9 @@
 
 analog clock refreshed by gps-signal on tft display
 
-calculation of sunrise & sunset by own gps-position, calculation of moon phases
+calculation of sunrise & sunset / azimut & elevation by own gps-position
+
+calculation of moon phases & moon azimut
 
 switch to day & night color by sun phases
 
