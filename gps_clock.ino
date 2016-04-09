@@ -160,7 +160,7 @@ void setup() {
   }
   tft.begin(identifier);
   FillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , "V2.1-R");
+  ScreenText(WHITE, x_edge_left, 10 , "V2.2-R");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
