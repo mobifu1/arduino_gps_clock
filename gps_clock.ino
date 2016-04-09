@@ -160,7 +160,7 @@ void setup() {
   }
   tft.begin(identifier);
   FillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , "V2.2-R");
+  ScreenText(WHITE, x_edge_left, 10 , "V2.3-R");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -575,10 +575,8 @@ void moon(int now_hour) {
 
       if (valid_sync == false) {
         SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, moon_radius); // clear moon icon
-        if (mooneclipse == true) {
-          if ( (hour_to_next_full_moon < 11) || (hour_to_next_full_moon > 704)) { // indication 10 hours before and after eclipse
-            SetFilledCircle(RED , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
-          }
+        if ((mooneclipse == true) && (hour_to_next_full_moon < 11)) { // indication 10 hours before and after eclipse
+          SetFilledCircle(RED , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
         }
         else {
           SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
