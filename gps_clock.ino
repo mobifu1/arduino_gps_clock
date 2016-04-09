@@ -160,7 +160,7 @@ void setup() {
   }
   tft.begin(identifier);
   FillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , "V2.3-R");
+  ScreenText(WHITE, x_edge_left, 10 , "V2.4-Beta");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -584,6 +584,10 @@ void moon(int now_hour) {
 
         SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29), moon_y_pos , (moon_radius - 1));
         SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
+
+        if (hour_to_next_full_moon == 0) {
+          SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, (2));//full moon indicator
+        }
         //day to full moon:
         //day 29,5 = full moon    > 709
         //day 14,9-29,4 = 2. half moon 356-708
