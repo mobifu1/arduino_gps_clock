@@ -570,7 +570,7 @@ void moon(int now_hour) {
         }
 
         SetFilledCircle(moon_color , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
-        SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29), moon_y_pos , (moon_radius - 1));
+        SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29), moon_y_pos , (moon_radius - 1));// set silluette
         SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
 
         if (hour_to_next_full_moon == 0) {
@@ -585,4 +585,4 @@ void moon(int now_hour) {
     }
     break;
   }
-}
+}//problem: blue big moon, leading zero not working sunrise time
