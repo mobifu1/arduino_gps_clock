@@ -160,7 +160,7 @@ void setup() {
   }
   tft.begin(identifier);
   FillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , "V2.4-R");
+  ScreenText(WHITE, x_edge_left, 10 , 2, "V2.5-Beta");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -246,8 +246,8 @@ void loop() {
       copy_text_color = text_color;
     }
 
-    ScreenText(text_color, x_edge_left + 10, 10 , wday);
-    ScreenText(text_color, x_edge_left + 10, 40 , date);
+    ScreenText(text_color, x_edge_left + 10, 10 , 2, wday);
+    ScreenText(text_color, x_edge_left + 10, 40 , 2, date);
     //ScreenText(text_color, x_edge_left + 10, 120 , tim);
 
     //Sekundenzeiger
@@ -346,7 +346,7 @@ void RMC() { //TIME DATE
       if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
         sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
         moon(hour());
-        ScreenText(text_color, 150, 40 , "sync");
+        ScreenText(text_color, 150, 40 , 2, "sync");
         valid_sync = true;
         //Serial.println(sync_info);
       }
@@ -412,11 +412,11 @@ unsigned long FillScreen(uint16_t color) {
   tft.fillScreen(color);
 }
 
-unsigned long ScreenText(uint16_t color, int xtpos, int ytpos, String text) {
+unsigned long ScreenText(uint16_t color, int xtpos, int ytpos, int text_size , String text) {
   unsigned long start = micros();
   tft.setCursor(xtpos, ytpos);
   tft.setTextColor(color);
-  tft.setTextSize(2);
+  tft.setTextSize(text_size);
   tft.println(text);
   return micros() - start;
 }
@@ -521,10 +521,10 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
     SetFilledRect(BLACK , 210, 81, 230, 20);
 
     if (sunrise_minute < 10) {
-      ScreenText(text_color, x_edge_left + 10, 70 , "Sunrise: " + String(sunrise_hour) + ":0" + String(sunrise_minute));
+      ScreenText(text_color, x_edge_left + 10, 70 , 2, "Sunrise: " + String(sunrise_hour) + ":0" + String(sunrise_minute));
     }
     else {
-      ScreenText(text_color, x_edge_left + 10, 70 , "Sunrise: " + String(sunrise_hour) + ":" + String(sunrise_minute));
+      ScreenText(text_color, x_edge_left + 10, 70 , 2, "Sunrise: " + String(sunrise_hour) + ":" + String(sunrise_minute));
     }
 
     SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
@@ -533,10 +533,10 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
     SetFilledRect(BLACK , 210, 290, 230, 15);
 
     if (sundown_minute < 10) {
-      ScreenText(text_color, x_edge_left + 10, 305 , "Sunset: " + String(sundown_hour) + ":0" + String(sundown_minute));
+      ScreenText(text_color, x_edge_left + 10, 305 , 2, "Sunset: " + String(sundown_hour) + ":0" + String(sundown_minute));
     }
     else {
-      ScreenText(text_color, x_edge_left + 10, 305 , "Sunset: " + String(sundown_hour) + ":" + String(sundown_minute));
+      ScreenText(text_color, x_edge_left + 10, 305 , 2, "Sunset: " + String(sundown_hour) + ":" + String(sundown_minute));
     }
   }
 }
