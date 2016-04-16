@@ -505,22 +505,24 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
     SetLines(YELLOW , 210, 80, 230 , 80);
     SetFilledRect(BLACK , 210, 81, 230, 20);
 
-    char zero_1;
     if (sunrise_minute < 10) {
-      zero_1 = '0';
+      ScreenText(text_color, x_edge_left + 10, 70 , 2, "Sunrise: " + String(sunrise_hour) + ":0"  + String(sunrise_minute));
     }
-    ScreenText(text_color, x_edge_left + 10, 70 , 2, "Sunrise: " + String(sunrise_hour) + ":" + String(zero_1) + String(sunrise_minute));
+    else {
+      ScreenText(text_color, x_edge_left + 10, 70 , 2, "Sunrise: " + String(sunrise_hour) + ":" + String(sunrise_minute));
+    }
 
     SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
     SetFilledCircle(ORANGE , 220, 305, 6);
     SetLines(ORANGE , 210, 305, 230 , 305);
     SetFilledRect(BLACK , 210, 290, 230, 15);
 
-    char zero_2;
     if (sundown_minute < 10) {
-      zero_2 = '0';
+      ScreenText(text_color, x_edge_left + 10, 305 , 2, "Sunset: " + String(sundown_hour) + ":0"  + String(sundown_minute));
     }
-    ScreenText(text_color, x_edge_left + 10, 305 , 2, "Sunset: " + String(sundown_hour) + ":" + String(zero_2) + String(sundown_minute));
+    else {
+      ScreenText(text_color, x_edge_left + 10, 305 , 2, "Sunset: " + String(sundown_hour) + ":"  + String(sundown_minute));
+    }
   }
 }
 //----------------------------------------------
@@ -529,7 +531,6 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
 void moon(int now_hour) {
 
   boolean mooneclipse = false;
-  uint8_t moon_color = WHITE;
 
   for (int i = 0; i < 12 ; i++) {
     if (year() == moon_calender[i][0]) {
@@ -561,15 +562,12 @@ void moon(int now_hour) {
 
         SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, moon_radius); // clear moon icon
         SetFilledRect(BLACK , x_edge_left, moon_y_pos + 17, 40, 30); //clear hours to fullmoon value on display
+        SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
 
-        if (hour_to_next_full_moon < 10) { // indication 10 hours before and after eclipse
-          ScreenText(text_color, moon_x_pos - 12, moon_y_pos + 22, 1 , ("T-" + String(hour_to_next_full_moon) + "h"));
-          if (mooneclipse == true) { // hours to fullmoon
-            moon_color = RED;
-          }
+        if ((mooneclipse == true) && (hour_to_next_full_moon < 10)) { // indication 10 hours before and after eclipse
+          SetFilledCircle(RED , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
         }
 
-        SetFilledCircle(moon_color , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
         SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29), moon_y_pos , (moon_radius - 1));// set silluette
         SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
 
@@ -585,4 +583,4 @@ void moon(int now_hour) {
     }
     break;
   }
-}//problem: blue big moon, leading zero not working sunrise time
+}
