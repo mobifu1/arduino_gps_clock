@@ -352,16 +352,13 @@ void RMC() { //TIME DATE
       }
     }
   }
-
-}//GPRMC
-
-void SerialClear() {
-  while (Serial.available())Serial.read();
 }
 //----------------------------------------------
 //--------------RS232-ROUTINEN------------------
 //----------------------------------------------
-//String Line="";
+void SerialClear() {
+  while (Serial.available())Serial.read();
+}
 
 boolean getline(char *phrase) //HARD POLLING
 { char s[100]; byte b, n; unsigned long t = millis();
@@ -422,38 +419,26 @@ unsigned long ScreenText(uint16_t color, int xtpos, int ytpos, int text_size , S
 }
 
 unsigned long SetLines(uint16_t color , int xl1pos, int yl1pos, int xl2pos, int yl2pos) {
-  unsigned long start, t;
   tft.drawLine(xl1pos, yl1pos, xl2pos, yl2pos, color);
-  return micros() - start;
 }
 
 unsigned long SetPoint(uint16_t color, int xppos, int yppos) {
-  unsigned long start = micros();
   tft.drawPixel(xppos, yppos, color);
-  return micros() - start;
 }
 
 unsigned long SetRect(uint16_t color , int xr1pos, int yr1pos, int xr2width, int yr2hight) {
-  unsigned long start, t;
   tft.drawRect(xr1pos, yr1pos, xr2width, yr2hight, color);
-  return micros() - start;
 }
 
 unsigned long SetFilledRect(uint16_t color , int xr1pos, int yr1pos, int xr2width, int yr2hight) {
-  unsigned long start, t;
   tft.fillRect(xr1pos, yr1pos, xr2width, yr2hight, color);
-  return micros() - start;
 }
 
 unsigned long SetCircle(uint16_t color , int xcpos, int ycpos, int radius) {
-  unsigned long start, t;
   tft.drawCircle(xcpos, ycpos, radius, color);
-  return micros() - start;
 }
 unsigned long SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius) {
-  unsigned long start, t;
   tft.fillCircle(xcpos, ycpos, radius, color);
-  return micros() - start;
 }
 //----------------------------------------------
 //--------------Calculation Sun-Rise------------
@@ -586,7 +571,7 @@ void moon(int now_hour) {
         SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
 
         if (hour_to_next_full_moon == 0) {
-          SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, (2));//full moon indicator
+          SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, 2);//full moon indicator
         }
         //day to full moon:
         //day 29,5 = full moon    > 709
