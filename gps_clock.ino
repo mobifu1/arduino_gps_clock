@@ -561,14 +561,16 @@ void moon(int now_hour) {
       if (valid_sync == false) {
 
         SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, moon_radius); // clear moon icon
-        SetFilledRect(BLACK , x_edge_left, moon_y_pos + 17, 40, 30); //clear hours to fullmoon value on display
         SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
 
         if ((mooneclipse == true) && (hour_to_next_full_moon < 10)) { // indication 10 hours before and after eclipse
           SetFilledCircle(RED , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
         }
 
-        SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29), moon_y_pos , (moon_radius - 1));// set silluette
+        //3*(cos(pi*x*0.065)+1) > http://www.walterzorn.de/grapher/grapher.htm
+        const float shadow = (3 * ((cos(3.14 * 0.065 * (hour_to_next_full_moon / 24))) + 1));
+        SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29 - shadow), moon_y_pos , ((moon_radius - 1) + shadow)); // set silluette
+        //SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29), moon_y_pos , (moon_radius - 1));// set silluette
         SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
 
         if (hour_to_next_full_moon == 0) {
