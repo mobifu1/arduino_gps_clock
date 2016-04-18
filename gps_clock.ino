@@ -127,7 +127,7 @@ const int moon_calender[10][17] = {
   {2025,  311, 1023, 1736, 2450, 3163, 3874, 4583, 5290, 5996, 6702, 7406, 8112, 8819, 0, 3, 9},
 };
 const byte moon_x_pos = 20;//moon icon big
-const byte moon_y_pos = 114;
+const byte moon_y_pos = 125;
 const byte moon_radius = 15;
 int copy_moon_point_xpos;// moon small
 int copy_moon_point_ypos;
