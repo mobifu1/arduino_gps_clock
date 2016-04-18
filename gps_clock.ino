@@ -64,8 +64,6 @@ int y_edge_down;
 #define LED A5// Pin of LED
 
 //Clock-Grafik
-#define scale_min_Points 1  // 1 = active  / every 6° a point
-#define scale_hour_Points 1  // 1 = active  / every 30° a point
 const int clock_radius = 90;//global adjustment for the clock, default 90
 const int clock_xoffset = 120;//global adjustment for the clock, default 120
 const int clock_yoffset = 195;//global adjustment for the clock, default 195
@@ -128,9 +126,9 @@ const int moon_calender[10][17] = {
   {2024,  595, 1310, 2024, 2738, 3448, 4155, 4860, 5564, 6268, 6973, 7678, 8386, 9095, 0, 3, 9},
   {2025,  311, 1023, 1736, 2450, 3163, 3874, 4583, 5290, 5996, 6702, 7406, 8112, 8819, 0, 3, 9},
 };
-byte const moon_x_pos = 20;////moon icon big
-byte const moon_y_pos = 114;
-byte const moon_radius = 15;
+const byte moon_x_pos = 20;//moon icon big
+const byte moon_y_pos = 114;
+const byte moon_radius = 15;
 int copy_moon_point_xpos;// moon small
 int copy_moon_point_ypos;
 //------------------------------------
@@ -159,7 +157,7 @@ void setup() {
     identifier = 0x9341;
   }
   tft.begin(identifier);
-  FillScreen(BLACK);
+  tft.fillScreen(BLACK);
   ScreenText(WHITE, x_edge_left, 10 , 2, "V2.5-Beta");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
@@ -180,25 +178,8 @@ void setup() {
   //ScreenText(WHITE, x_edge_left, 40 , wait_gps);
   //Serial.println(wait_gps);
   delay(3000);
-  FillScreen(BLACK);
-
-#if scale_hour_Points//every 30 degrees
-  for (int i = 0; i <= 11; i++) {
-    alfa = 30 * i * (0.017453293);// pi/180=0.017453293
-    point_xpos = (cos(alfa) * clock_radius) + clock_xoffset;
-    point_ypos = (sin(alfa) * clock_radius) + clock_yoffset;
-    SetFilledCircle(CYAN, point_xpos, point_ypos, 2);
-  }
-#endif
-
-#if scale_min_Points//every 6 degrees
-  for (int i = 0; i <= 59; i++) {
-    alfa = 6 * i * (0.017453293);// pi/180=0.017453293
-    point_xpos = (cos(alfa) * clock_radius) + clock_xoffset;
-    point_ypos = (sin(alfa) * clock_radius) + clock_yoffset;
-    SetPoint(CYAN, point_xpos, point_ypos);
-  }
-#endif
+  tft.fillScreen(BLACK);
+  face();
 
   //config gps modul or use u-center
   //Serial.write("");//set baudrate
@@ -346,6 +327,7 @@ void RMC() { //TIME DATE
       if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
         sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
         moon(hour());
+        face();
         ScreenText(text_color, 150, 40 , 2, "sync");
         valid_sync = true;
         //Serial.println(sync_info);
@@ -405,17 +387,11 @@ String getparam(int ix)
 //----------------------------------------------
 //--------------GRAFIK-ROUTINEN-----------------
 //----------------------------------------------
-unsigned long FillScreen(uint16_t color) {
-  tft.fillScreen(color);
-}
-
 unsigned long ScreenText(uint16_t color, int xtpos, int ytpos, int text_size , String text) {
-  unsigned long start = micros();
   tft.setCursor(xtpos, ytpos);
   tft.setTextColor(color);
   tft.setTextSize(text_size);
   tft.println(text);
-  return micros() - start;
 }
 
 unsigned long SetLines(uint16_t color , int xl1pos, int yl1pos, int xl2pos, int yl2pos) {
@@ -439,6 +415,25 @@ unsigned long SetCircle(uint16_t color , int xcpos, int ycpos, int radius) {
 }
 unsigned long SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius) {
   tft.fillCircle(xcpos, ycpos, radius, color);
+}
+//----------------------------------------------
+//--------------Clock-Face----------------------
+//----------------------------------------------
+void face() {
+
+  for (int i = 0; i <= 11; i++) {
+    alfa = 30 * i * (0.017453293);// pi/180=0.017453293
+    point_xpos = (cos(alfa) * clock_radius) + clock_xoffset;
+    point_ypos = (sin(alfa) * clock_radius) + clock_yoffset;
+    SetFilledCircle(CYAN, point_xpos, point_ypos, 2);
+  }
+
+  for (int i = 0; i <= 59; i++) {
+    alfa = 6 * i * (0.017453293);// pi/180=0.017453293
+    point_xpos = (cos(alfa) * clock_radius) + clock_xoffset;
+    point_ypos = (sin(alfa) * clock_radius) + clock_yoffset;
+    SetPoint(CYAN, point_xpos, point_ypos);
+  }
 }
 //----------------------------------------------
 //--------------Calculation Sun-Rise------------
@@ -567,10 +562,9 @@ void moon(int now_hour) {
           SetFilledCircle(RED , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
         }
 
-        //3*(cos(pi*x*0.065)+1) > http://www.walterzorn.de/grapher/grapher.htm
-        const float shadow = (3 * ((cos(3.14 * 0.065 * (hour_to_next_full_moon / 24))) + 1));
-        SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29 - shadow), moon_y_pos , ((moon_radius - 1) + shadow)); // set silluette
-        //SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29), moon_y_pos , (moon_radius - 1));// set silluette
+        //2*(cos(pi*x*0.033)) >  http://www.walterzorn.de/grapher/grapher.htm
+        const float shadow = (-20 * (cos(3.14 * 0.033 * (hour_to_next_full_moon / 24))));
+        SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29 + shadow), moon_y_pos , ((moon_radius - 1) + abs(shadow))); // set silluette
         SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
 
         if (hour_to_next_full_moon == 0) {
