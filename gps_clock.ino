@@ -542,11 +542,11 @@ void moon(int now_hour) {
         }
       }
 
-      //Test for moon position on scale:
-      alfa = (((hour_to_next_full_moon + now_hour) / 2) + 180) * (0.017453293);// pi/180=0.017453293
+      //Test for moon position on face:
+      alfa = (((hour_to_next_full_moon + now_hour) / 1.97778) + 180) * (0.017453293);// pi/180=0.017453293
       //need a solution for the moon elevation???
-      int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa ) * (20)) + clock_xoffset; //0.5 = Gain Factor
-      int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa ) * (20)) + clock_yoffset;
+      int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa ) * (20)) + clock_xoffset; //20 = Gain Factor
+      int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa ) * (20)) + clock_yoffset;// 4.712388 = 270°
       SetFilledCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear moon icon
       SetFilledCircle(WHITE, moon_point_xpos, moon_point_ypos, 2);
       copy_moon_point_xpos = moon_point_xpos;
