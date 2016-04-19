@@ -148,17 +148,17 @@ void setup() {
   pinMode(LED, OUTPUT);
   tft.reset();
   uint16_t identifier = tft.readID();
-  if (identifier == 0x9325) {
-  } else if (identifier == 0x9328) {
-  } else if (identifier == 0x7575) {
-  } else if (identifier == 0x9341) {
-  } else if (identifier == 0x8357) {
-  } else {
-    identifier = 0x9341;
-  }
+  //  if (identifier == 0x9325) {
+  //  } else if (identifier == 0x9328) {
+  //  } else if (identifier == 0x7575) {
+  //  } else if (identifier == 0x9341) {
+  //  } else if (identifier == 0x8357) {
+  //  } else {
+  identifier = 0x9341;
+  //  }
   tft.begin(identifier);
   tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, "V2.5-Beta");
+  ScreenText(WHITE, x_edge_left, 10 , 2, "V2.6-Beta");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -500,24 +500,22 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
     SetLines(YELLOW , 210, 80, 230 , 80);
     SetFilledRect(BLACK , 210, 81, 230, 20);
 
+    String lead_zero = ("");
     if (sunrise_minute < 10) {
-      ScreenText(text_color, x_edge_left + 10, 70 , 2, "Sunrise: " + String(sunrise_hour) + ":0"  + String(sunrise_minute));
+      lead_zero = ("0");
     }
-    else {
-      ScreenText(text_color, x_edge_left + 10, 70 , 2, "Sunrise: " + String(sunrise_hour) + ":" + String(sunrise_minute));
-    }
+    ScreenText(text_color, x_edge_left + 10, 70 , 2, "Sunrise: " + String(sunrise_hour) + ":" + lead_zero + String(sunrise_minute));
 
     SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
     SetFilledCircle(ORANGE , 220, 305, 6);
     SetLines(ORANGE , 210, 305, 230 , 305);
     SetFilledRect(BLACK , 210, 290, 230, 15);
 
+    lead_zero = ("");
     if (sundown_minute < 10) {
-      ScreenText(text_color, x_edge_left + 10, 305 , 2, "Sunset: " + String(sundown_hour) + ":0"  + String(sundown_minute));
+      lead_zero = ("0");
     }
-    else {
-      ScreenText(text_color, x_edge_left + 10, 305 , 2, "Sunset: " + String(sundown_hour) + ":"  + String(sundown_minute));
-    }
+    ScreenText(text_color, x_edge_left + 10, 305 , 2, "Sunset: " + String(sundown_hour) + ":" + lead_zero + String(sundown_minute));
   }
 }
 //----------------------------------------------
@@ -555,20 +553,21 @@ void moon(int now_hour) {
 
       if (valid_sync == false) {
 
-        SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, moon_radius); // clear moon icon
         SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
 
-        if ((mooneclipse == true) && (hour_to_next_full_moon < 10)) { // indication 10 hours before and after eclipse
+        if ((mooneclipse == true) && (hour_to_next_full_moon < 10)) { // indication 10 hours before
           SetFilledCircle(RED , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
         }
 
         //2*(cos(pi*x*0.033)) >  http://www.walterzorn.de/grapher/grapher.htm
         const float shadow = (-20 * (cos(3.14 * 0.033 * (hour_to_next_full_moon / 24))));
         SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29 + shadow), moon_y_pos , ((moon_radius - 1) + abs(shadow))); // set silluette
+        //SetFilledCircle(RED , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29 + shadow), moon_y_pos , ((moon_radius - 1) + abs(shadow))); // set silluette for test
         SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
 
-        if (hour_to_next_full_moon == 0) {
-          SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, 2);//full moon indicator
+        if (hour_to_next_full_moon < 13) {
+          //SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, 2);//full moon indicator
+          ScreenText(BLACK, moon_x_pos - 7, moon_y_pos - 3 , 1, "-" + String(hour_to_next_full_moon)); //full moon indicator
         }
         //day to full moon:
         //day 29,5 = full moon    > 709
