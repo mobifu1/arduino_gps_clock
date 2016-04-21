@@ -158,7 +158,7 @@ void setup() {
   //  }
   tft.begin(identifier);
   tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, "V2.6-Beta");
+  //ScreenText(WHITE, x_edge_left, 10 , 2, "V2.6-Beta");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -541,12 +541,19 @@ void moon(int now_hour) {
       }
 
       //Test for moon position on face:
-      alfa = (((hour_to_next_full_moon + now_hour) / 1.97778) + 180) * (0.017453293);// pi/180=0.017453293
-      //need a solution for the moon elevation???
-      int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa ) * (20)) + clock_xoffset; //20 = Gain Factor
-      int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa ) * (20)) + clock_yoffset;// 4.712388 = 270°
+      alfa = ((hour_to_next_full_moon / 113.79) + 3.141);// 2pi=6.2832   pi=3.141
+      //(cos(x) * -1 * 37) + factor;  default factor = 0  >  http://www.walterzorn.de/grapher/grapher.htm
+      //maximum moon_el_deg change in the year, values can between:18°-54° > factor can between -19 and +19 ; default middle value = 37° ; www.timeanddate.de
+      int moon_el_deg = ((cos(az_rad + alfa)) * -37) + 0;
+      int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
+      int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_yoffset;
       SetFilledCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear moon icon
-      SetFilledCircle(WHITE, moon_point_xpos, moon_point_ypos, 2);
+      if (moon_el_deg < 1) {
+        SetFilledCircle(GRAY, moon_point_xpos, moon_point_ypos, 2);
+      }
+      else {
+        SetFilledCircle(WHITE, moon_point_xpos, moon_point_ypos, 2);
+      }
       copy_moon_point_xpos = moon_point_xpos;
       copy_moon_point_ypos = moon_point_ypos;
       //Test end
