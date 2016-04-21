@@ -147,18 +147,18 @@ void setup() {
 
   pinMode(LED, OUTPUT);
   tft.reset();
-  uint16_t identifier = tft.readID();
+  //uint16_t identifier = tft.readID();
   //  if (identifier == 0x9325) {
   //  } else if (identifier == 0x9328) {
   //  } else if (identifier == 0x7575) {
   //  } else if (identifier == 0x9341) {
   //  } else if (identifier == 0x8357) {
   //  } else {
-  identifier = 0x9341;
+  uint16_t identifier = 0x9341;
   //  }
   tft.begin(identifier);
   tft.fillScreen(BLACK);
-  //ScreenText(WHITE, x_edge_left, 10 , 2, "V2.6-Beta");
+  ScreenText(WHITE, x_edge_left, 10 , 2, "V2.7-Beta");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -543,8 +543,16 @@ void moon(int now_hour) {
       //Test for moon position on face:
       alfa = ((hour_to_next_full_moon / 113.79) + 3.141);// 2pi=6.2832   pi=3.141
       //(cos(x) * -1 * 37) + factor;  default factor = 0  >  http://www.walterzorn.de/grapher/grapher.htm
-      //maximum moon_el_deg change in the year, values can between:18°-54° > factor can between -19 and +19 ; default middle value = 37° ; www.timeanddate.de
-      int moon_el_deg = ((cos(az_rad + alfa)) * -37) + 0;
+      //maximum moon_el_deg change in the year, values can between:18°-54° > factor can between -18.3 and +18.3 ; default middle value = 37° ; www.timeanddate.de
+      //Die Kulminationshöhe unseres Mondes ergibt sich nach der Formel 90° minus geografische Breite des Beobachtungsstandortes plus Deklination des Mondes.
+      //90-lat+5=42
+      //Die höchsten und tiefsten Kulminationshöhen des Mondes sind von Jahr zu Jahr ebenso verschieden wie seine
+      //extremen Morgenweiten (Abstand des Aufgangspunktes vom Ostpunkt am Horizont)
+      //und Abendweiten (Abstand des Untergangspunkts vom Westpunkt am Horizont).
+      //Als Ursache gelten die wechselnden Extremweiten der Monddeklination,
+      //die im Jahr Werte sowohl zwischen +18,3° und -18,3° als auch solche von +28,6° und -28,6° im Jahr annehmen kann.
+      int slide_factor = (cos(day_of_year / 58.0914)) * 18; //Brechnung der Abweichung vom Mittelwert 37°+-18°
+      int moon_el_deg = ((cos(az_rad + alfa)) * -(90 - lat)) + slide_factor;
       int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
       int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_yoffset;
       SetFilledCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear moon icon
