@@ -126,6 +126,18 @@ const int moon_calender[10][17] = {
   {2024,  595, 1310, 2024, 2738, 3448, 4155, 4860, 5564, 6268, 6973, 7678, 8386, 9095, 0, 3, 9},
   {2025,  311, 1023, 1736, 2450, 3163, 3874, 4583, 5290, 5996, 6702, 7406, 8112, 8819, 0, 3, 9},
 };
+const int moon_culmination[10][15] = {
+  {2016, 15, 10, 0, -10, -15, -20, -20, -18, -14, -8, 4, 10, 17, 18}, //max.moon elevation is more or less than 37°  37=90°-latitude
+  {2017, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18},
+  {2018, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18},
+  {2019, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18},
+  {2020, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18},
+  {2021, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18},
+  {2022, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18},
+  {2023, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18},
+  {2024, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18},
+  {2025, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18},
+};
 const byte moon_x_pos = 20;//moon icon big
 const byte moon_y_pos = 125;
 const byte moon_radius = 15;
@@ -524,8 +536,9 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
 void moon(int now_hour) {
 
   boolean mooneclipse = false;
+  int delta_culmination;
 
-  for (int i = 0; i < 12 ; i++) {
+  for (int i = 0; i < 10 ; i++) {
     if (year() == moon_calender[i][0]) {
       int hour_of_year = (((day_of_year - 1) * 24) + (now_hour)); //7.4.2016 11:00 > 2363
       int hour_to_next_full_moon;
@@ -533,6 +546,7 @@ void moon(int now_hour) {
       for (int x = 1; x < 15; x++) {
         if  (hour_of_year <= moon_calender[i][x]) {
           hour_to_next_full_moon = moon_calender[i][x] - hour_of_year ;
+          delta_culmination = moon_culmination[i][x];//load the predefined culmination from table
           if (x == moon_calender[i][15] || x == moon_calender[i][16]) {//max. 2 eclipses per year
             mooneclipse = true;//next fullmoon is a moon eclipse
           }
@@ -545,14 +559,10 @@ void moon(int now_hour) {
       //(cos(x) * -1 * 37) + factor;  default factor = 0  >  http://www.walterzorn.de/grapher/grapher.htm
       //maximum moon_el_deg change in the year, values can between:18°-54° > factor can between -18.3 and +18.3 ; default middle value = 37° ; www.timeanddate.de
       //Die Kulminationshöhe unseres Mondes ergibt sich nach der Formel 90° minus geografische Breite des Beobachtungsstandortes plus Deklination des Mondes.
-      //90-lat+5=42
-      //Die höchsten und tiefsten Kulminationshöhen des Mondes sind von Jahr zu Jahr ebenso verschieden wie seine
-      //extremen Morgenweiten (Abstand des Aufgangspunktes vom Ostpunkt am Horizont)
-      //und Abendweiten (Abstand des Untergangspunkts vom Westpunkt am Horizont).
+      //Die höchsten und tiefsten Kulminationshöhen des Mondes sind von Jahr zu Jahr verschieden.
       //Als Ursache gelten die wechselnden Extremweiten der Monddeklination,
       //die im Jahr Werte sowohl zwischen +18,3° und -18,3° als auch solche von +28,6° und -28,6° im Jahr annehmen kann.
-      int slide_factor = (cos(day_of_year / 58.0914)) * 18; //Brechnung der Abweichung vom Mittelwert 37°+-18°
-      int moon_el_deg = ((cos(az_rad + alfa)) * -(90 - lat)) + slide_factor;
+      int moon_el_deg = ((cos(az_rad + alfa)) * -(90 - lat)) + delta_culmination;//delta_culmination: Berechnung der Abweichung vom Mittelwert 37°+-18°
       int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
       int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_yoffset;
       SetFilledCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear moon icon
