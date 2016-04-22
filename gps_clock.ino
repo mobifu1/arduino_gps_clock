@@ -281,7 +281,7 @@ void loop() {
       valid_sync = false;
     }
 
-    if ((second() == 31) || (second() == 1)) {
+    if ((second() == 1) || (second() == 16) || (second() == 31) || (second() == 46)) {
       if (valid_signal = true) {
         if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
           sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
@@ -570,13 +570,13 @@ void moon(int now_hour) {
       alfa = ((hour_to_next_full_moon / 113.79) + 3.141);// 2pi=6.2832   pi=3.141
       //(cos(x) * -1 * 37) + factor;  default factor = 0  >  http://www.walterzorn.de/grapher/grapher.htm
       delta_culmination = next_culmination - past_culmination;
-      now_culmination = past_culmination + ((delta_culmination / 715) * (715 - hour_to_next_full_moon))) ;
+      now_culmination = (past_culmination + ((delta_culmination / 715) * (715 - hour_to_next_full_moon)));
       int moon_el_deg = ((cos(az_rad + alfa)) * -(90 - lat)) + now_culmination;//now_culmination: Berechnung der Abweichung vom Mittelwert 37°+-18°
       int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
       int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_yoffset;
       SetFilledCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear moon icon
       if (moon_el_deg < 1) {
-      SetFilledCircle(GRAY, moon_point_xpos, moon_point_ypos, 2);
+        SetFilledCircle(GRAY, moon_point_xpos, moon_point_ypos, 2);
       }
       else {
         SetFilledCircle(WHITE, moon_point_xpos, moon_point_ypos, 2);
@@ -587,7 +587,7 @@ void moon(int now_hour) {
 
       if (valid_sync == false) {
 
-      SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
+        SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
 
         if ((mooneclipse == true) && (hour_to_next_full_moon < 10)) { // indication 10 hours before
           SetFilledCircle(RED , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
