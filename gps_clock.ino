@@ -144,6 +144,7 @@ const byte moon_radius = 15;
 int copy_moon_point_xpos;// moon small
 int copy_moon_point_ypos;
 float moon_az_rad;
+int tide_trend;
 //------------------------------------
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
@@ -630,29 +631,37 @@ void tide() {
   //moon_az_rad = (0 * 0.01745);
   //az_rad = (90 * 0.01745);//result 23° länge 76
 
-  int gezeitenreibung = 0; //Grad  20°
+  int gezeitenreibung = 0; //Grad  -20° = +340 = Cuxhaven
   int moon_x = 70 * cos(moon_az_rad); //70% Einfluss  //70
   int moon_y = 70 * sin(moon_az_rad);                 //0
 
   int sun_x = 30 * cos(az_rad ); //30% Einfluss       //0
   int sun_y = 30 * sin(az_rad );                      //29
 
-  //double new_x  = moon_x + sun_x;
-  //double new_y  = moon_y + sun_y;
-
   int tide_strength = sqrt(pow(moon_x + sun_x, 2) + pow(moon_y + sun_y, 2)); // strength  tidehigh
-  int tide_angel = 57.2957 * (moon_az_rad + gezeitenreibung);
+  int tide_angel = 57.2957 * (moon_az_rad + gezeitenreibung);//+- value of gezeitenreibung
 
   tide_angel = tide_angel % 360;
-  int tide_hight = 270 + (14 * cos( (tide_angel * 0.01745) * 2));//+(tide_strength/3);
+  int tide_hight = (14 * cos(tide_angel * 0.01745 * 2));//+(tide_strength/3);
 
   SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
   //ScreenText(WHITE, 0, 210 , 1, String(tide_strength));
   ScreenText(WHITE, 0, 230 , 1, String(tide_angel));
 
   SetFilledRect(BLACK , x_edge_left, 250, 40, 40);
-  SetLines(GRAY, 8 , 270, 33, 270 );
-  SetLines(BLUE, 8 , tide_hight, 33, tide_hight );
-  SetCircle(GRAY , 20, 270, 15);
+  if (tide_trend > tide_hight) {
+    // falling tide
+    SetLines(WHITE, 1 , 270, 5, 270 );
+  }
+  if (tide_trend < tide_hight) {
+    // raising tide
+    SetLines(WHITE, 1 , 270, 5, 270 );
+    SetLines(WHITE, 3 , 268, 3, 272 );
+  }
+  tide_trend = tide_hight;
+
+  SetRect(GRAY , 8, 255, 30, 30);
+  SetLines(GRAY, 8 , 270, 37, 270 );
+  SetLines(BLUE, 11 , 270 - tide_hight, 34, 270 - tide_hight );
   //-----------------------------------------------
 }
