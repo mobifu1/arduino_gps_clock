@@ -630,25 +630,29 @@ void tide() {
   //moon_az_rad = (0 * 0.01745);
   //az_rad = (90 * 0.01745);//result 23° länge 76
 
+  int gezeitenreibung = 0; //Grad  20°
   int moon_x = 70 * cos(moon_az_rad); //70% Einfluss  //70
   int moon_y = 70 * sin(moon_az_rad);                 //0
 
   int sun_x = 30 * cos(az_rad ); //30% Einfluss       //0
   int sun_y = 30 * sin(az_rad );                      //29
 
-  double new_x  = moon_x + sun_x;
-  double new_y  = moon_y + sun_y;
+  //double new_x  = moon_x + sun_x;
+  //double new_y  = moon_y + sun_y;
 
   int tide_strength = sqrt(pow(moon_x + sun_x, 2) + pow(moon_y + sun_y, 2)); // strength  tidehigh
-  int tide_angel = 57.2957 * atan(new_y / new_x); //+ 4.712388 = 180°
+  int tide_angel = 57.2957 * (moon_az_rad + gezeitenreibung);
 
-  //  int tide_hight = 270 ;
+  tide_angel = tide_angel % 360;
+  int tide_hight = 270 + (14 * cos( (tide_angel * 0.01745) * 2));//+(tide_strength/3);
 
-  // ScreenText(WHITE, 0, 210 , 1, String(tide_strength));
-  SetFilledRect(BLACK , x_edge_left, 230, 30, 30);
+  SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
+  //ScreenText(WHITE, 0, 210 , 1, String(tide_strength));
   ScreenText(WHITE, 0, 230 , 1, String(tide_angel));
 
-  //  SetCircle(GRAY , 20, 270, 15);
-  //  SetLines(BLUE, 8 , tide_hight, 33, tide_hight );
+  SetFilledRect(BLACK , x_edge_left, 250, 40, 40);
+  SetLines(GRAY, 8 , 270, 33, 270 );
+  SetLines(BLUE, 8 , tide_hight, 33, tide_hight );
+  SetCircle(GRAY , 20, 270, 15);
   //-----------------------------------------------
 }
