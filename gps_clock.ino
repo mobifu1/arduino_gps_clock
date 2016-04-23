@@ -143,6 +143,7 @@ const byte moon_y_pos = 125;
 const byte moon_radius = 15;
 int copy_moon_point_xpos;// moon small
 int copy_moon_point_ypos;
+float moon_az_rad;
 //------------------------------------
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
@@ -170,7 +171,7 @@ void setup() {
   //  }
   tft.begin(identifier);
   tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, "V2.7-Beta");
+  //ScreenText(WHITE, x_edge_left, 10 , 2, "V2.7-Beta");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -192,6 +193,7 @@ void setup() {
   delay(3000);
   tft.fillScreen(BLACK);
   face();
+  tide();
 
   //config gps modul or use u-center
   //Serial.write("");//set baudrate
@@ -286,6 +288,7 @@ void loop() {
         if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
           sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
           moon(hour());
+          tide();
         }
       }
     }
@@ -339,6 +342,7 @@ void RMC() { //TIME DATE
       if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
         sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
         moon(hour());
+        tide();
         face();
         ScreenText(text_color, 150, 40 , 2, "sync");
         valid_sync = true;
@@ -568,6 +572,7 @@ void moon(int now_hour) {
       //Als Ursache gelten die wechselnden Extremweiten der Monddeklination,
       //die im Jahr Werte sowohl zwischen +18,3° und -18,3° als auch solche von +28,6° und -28,6° im Jahr annehmen kann.
       alfa = ((hour_to_next_full_moon / 113.79) + 3.141);// 2pi=6.2832   pi=3.141
+      moon_az_rad = (az_rad  + alfa);
       //(cos(x) * -1 * 37) + factor;  default factor = 0  >  http://www.walterzorn.de/grapher/grapher.htm
       delta_culmination = next_culmination - past_culmination;
       now_culmination = (past_culmination + ((delta_culmination / 715) * (715 - hour_to_next_full_moon)));
@@ -584,6 +589,9 @@ void moon(int now_hour) {
       copy_moon_point_xpos = moon_point_xpos;
       copy_moon_point_ypos = moon_point_ypos;
       //Test end
+
+
+
 
       if (valid_sync == false) {
 
@@ -612,4 +620,35 @@ void moon(int now_hour) {
     }
     break;
   }
+}
+//-----------------------------------------------
+//----------------Tide---------------------------
+//-----------------------------------------------
+void tide() {
+
+  //moon_az_rad = (az_rad + alfa);
+  //moon_az_rad = (0 * 0.01745);
+  //az_rad = (90 * 0.01745);//result 23° länge 76
+
+  int moon_x = 70 * cos(moon_az_rad); //70% Einfluss  //70
+  int moon_y = 70 * sin(moon_az_rad);                 //0
+
+  int sun_x = 30 * cos(az_rad ); //30% Einfluss       //0
+  int sun_y = 30 * sin(az_rad );                      //29
+
+  double new_x  = moon_x + sun_x;
+  double new_y  = moon_y + sun_y;
+
+  int tide_strength = sqrt(pow(moon_x + sun_x, 2) + pow(moon_y + sun_y, 2)); // strength  tidehigh
+  int tide_angel = 57.2957 * atan(new_y / new_x); //+ 4.712388 = 180°
+
+  //  int tide_hight = 270 ;
+
+  // ScreenText(WHITE, 0, 210 , 1, String(tide_strength));
+  SetFilledRect(BLACK , x_edge_left, 230, 30, 30);
+  ScreenText(WHITE, 0, 230 , 1, String(tide_angel));
+
+  //  SetCircle(GRAY , 20, 270, 15);
+  //  SetLines(BLUE, 8 , tide_hight, 33, tide_hight );
+  //-----------------------------------------------
 }
