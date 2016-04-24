@@ -172,7 +172,7 @@ void setup() {
   //  }
   tft.begin(identifier);
   tft.fillScreen(BLACK);
-  //ScreenText(WHITE, x_edge_left, 10 , 2, "V2.7-Beta");
+  //ScreenText(WHITE, x_edge_left, 10 , 2, "V2.8-Beta");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -627,7 +627,7 @@ void moon(int now_hour) {
 //-----------------------------------------------
 void tide() {
 
-  int gezeitenreibung_rad = 0; //Grad  -20° = +340 = Cuxhaven / Cux +3,5h = Hamburg
+  //Grad  -20° = +340 = Cuxhaven / Anschluss von Cux nach HH > +3,5h = +52.5° = Hamburg
   int moon_x = abs(7 * sin(moon_az_rad)); //70% Einfluss  //7
   int moon_y = abs(7 * cos(moon_az_rad));                 //0
 
@@ -635,14 +635,17 @@ void tide() {
   int sun_y = abs(3 * cos(az_rad));                      //3
 
   int tide_strength = (sqrt(pow(moon_x + sun_x, 2) + pow(moon_y + sun_y, 2))) - 9; // strength  tide high , min.=7.6   max.= 10
-  int tide_angel = 57.2957 * (moon_az_rad + gezeitenreibung_rad);//+- value of gezeitenreibung
+
+  //Grad  -20° = +340° = +5.933 rad = Correction for Cuxhaven / Anschluss von Cux nach HH > +3,5h = +52.5° = +0.9161rad = Hamburg
+  int tide_angel = 57.2957 * (moon_az_rad + 5.933);// +5.933 = value of gezeitenreibung
 
   tide_angel = tide_angel % 360;//Modulo 360
   int tide_hight = (12 * cos(tide_angel * 0.01745 * 2));// + (tide_strength);
 
-  SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
+  //SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
   //ScreenText(WHITE, 0, 210 , 1, String(tide_strength));
-  ScreenText(WHITE, 0, 230 , 1, String(tide_angel));
+  //ScreenText(WHITE, 0, 230 , 1, String(tide_angel));
+  ScreenText(WHITE, 12, 240 , 1, "Cux");
 
   if (tide_last > tide_hight) {
     // falling tide
