@@ -643,9 +643,9 @@ void tide() {
   int tide_hight = (12 * cos(tide_angel * 0.01745 * 2));// + (tide_strength);
 
   //SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
-  //ScreenText(WHITE, 0, 210 , 1, String(tide_strength));
-  //ScreenText(WHITE, 0, 230 , 1, String(tide_angel));
-  ScreenText(WHITE, 12, 240 , 1, "Cux");
+  //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
+  //ScreenText(text_color, 0, 230 , 1, String(tide_angel));
+  ScreenText(text_color, 12, 240 , 1, "Cux");
 
   if (tide_last > tide_hight) {
     // falling tide
