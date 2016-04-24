@@ -591,9 +591,6 @@ void moon(int now_hour) {
       copy_moon_point_ypos = moon_point_ypos;
       //Test end
 
-
-
-
       if (valid_sync == false) {
 
         SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
@@ -623,24 +620,29 @@ void moon(int now_hour) {
   }
 }
 //-----------------------------------------------
-//----------------Tide---------------------------
+//-------------Calculation-Tide------------------
 //-----------------------------------------------
 void tide() {
 
-  //Grad  -20° = +340 = Cuxhaven / Anschluss von Cux nach HH > +3,5h = +52.5° = Hamburg
-  int moon_x = abs(7 * sin(moon_az_rad)); //70% Einfluss  //7
-  int moon_y = abs(7 * cos(moon_az_rad));                 //0
+  // calculation of spring tide by vektor addition, to big!
+  //  int moon_x = abs(7 * sin(moon_az_rad)); // 70% Einfluss  //7
+  //  int moon_y = abs(7 * cos(moon_az_rad));                  //0
+  //  int sun_x = abs(3 * sin(az_rad)); // 30% Einfluss        //0
+  //  int sun_y = abs(3 * cos(az_rad));                        //3
+  //  int tide_strength = ((sqrt(pow(moon_x + sun_x, 2) + pow(moon_y + sun_y, 2))) - 9); // strength  tide high , min.=7.6   max.= 10
 
-  int sun_x = abs(3 * sin(az_rad)); //30% Einfluss       //0
-  int sun_y = abs(3 * cos(az_rad));                      //3
-
-  int tide_strength = (sqrt(pow(moon_x + sun_x, 2) + pow(moon_y + sun_y, 2))) - 9; // strength  tide high , min.=7.6   max.= 10
+  // Test for smaller calculation of spring tide
+  int tide_strength = 0;
+  //  if (round(az_rad) == round(moon_az_rad)) { // value round 2.5rad - 3.4rad = 3;
+  //    tide_strength = 1;
+  //  }
+  // test end
 
   //Grad  -20° = +340° = +5.933 rad = Correction for Cuxhaven / Anschluss von Cux nach HH > +3,5h = +52.5° = +0.9161rad = Hamburg
   int tide_angel = 57.2957 * (moon_az_rad + 5.933);// +5.933 = value of gezeitenreibung
 
   tide_angel = tide_angel % 360;//Modulo 360
-  int tide_hight = (12 * cos(tide_angel * 0.01745 * 2));// + (tide_strength);
+  int tide_hight = (12 + tide_strength) * (cos(tide_angel * 0.01745 * 2)) ;
 
   //SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
   //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
