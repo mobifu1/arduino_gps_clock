@@ -627,18 +627,18 @@ void moon(int now_hour) {
 //-----------------------------------------------
 void tide() {
 
-  int gezeitenreibung_rad = 0; //Grad  -20° = +340 = Cuxhaven
-  int moon_x = 7 * cos(moon_az_rad); //70% Einfluss  //7
-  int moon_y = 7 * sin(moon_az_rad);                 //0
+  int gezeitenreibung_rad = 0; //Grad  -20° = +340 = Cuxhaven / Cux +3,5h = Hamburg
+  int moon_x = abs(7 * sin(moon_az_rad)); //70% Einfluss  //7
+  int moon_y = abs(7 * cos(moon_az_rad));                 //0
 
-  int sun_x = 3 * cos(az_rad ); //30% Einfluss       //0
-  int sun_y = 3 * sin(az_rad );                      //3
+  int sun_x = abs(3 * sin(az_rad)); //30% Einfluss       //0
+  int sun_y = abs(3 * cos(az_rad));                      //3
 
-  int tide_strength = sqrt(pow(moon_x + sun_x, 2) + pow(moon_y + sun_y, 2)); // strength  tide high
+  int tide_strength = (sqrt(pow(moon_x + sun_x, 2) + pow(moon_y + sun_y, 2))) - 9; // strength  tide high , min.=7.6   max.= 10
   int tide_angel = 57.2957 * (moon_az_rad + gezeitenreibung_rad);//+- value of gezeitenreibung
 
   tide_angel = tide_angel % 360;//Modulo 360
-  int tide_hight = (12 * cos(tide_angel * 0.01745 * 2));// + (tide_strength / 4);
+  int tide_hight = (12 * cos(tide_angel * 0.01745 * 2));// + (tide_strength);
 
   SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
   //ScreenText(WHITE, 0, 210 , 1, String(tide_strength));
