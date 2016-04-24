@@ -644,18 +644,20 @@ void tide() {
   //ScreenText(WHITE, 0, 210 , 1, String(tide_strength));
   ScreenText(WHITE, 0, 230 , 1, String(tide_angel));
 
-  SetFilledRect(BLACK , x_edge_left, 250, 40, 40);
   if (tide_last > tide_hight) {
     // falling tide
+    SetFilledRect(BLACK , 0, 267, 7, 7);
     SetLines(WHITE, 1 , 270, 5, 270 );
   }
   if (tide_last < tide_hight) {
     // raising tide
+    SetFilledRect(BLACK , 0, 267, 7, 7);
     SetLines(WHITE, 1 , 270, 5, 270 );
     SetLines(WHITE, 3 , 268, 3, 272 );
   }
   tide_last = tide_hight;
 
+  SetFilledRect(BLACK , 8, 255, 30, 30);
   SetRect(GRAY , 8, 255, 30, 30);
   SetLines(GRAY, 8 , 270, 37, 270 );
 
