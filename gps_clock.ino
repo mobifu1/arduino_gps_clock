@@ -624,19 +624,17 @@ void moon(int now_hour) {
 //-----------------------------------------------
 void tide() {
 
-  // calculation of spring tide by vektor addition, to big!
-  //  int moon_x = abs(7 * sin(moon_az_rad)); // 70% Einfluss  //7
-  //  int moon_y = abs(7 * cos(moon_az_rad));                  //0
-  //  int sun_x = abs(3 * sin(az_rad)); // 30% Einfluss        //0
-  //  int sun_y = abs(3 * cos(az_rad));                        //3
-  //  int tide_strength = ((sqrt(pow(moon_x + sun_x, 2) + pow(moon_y + sun_y, 2))) - 9); // strength  tide high , min.=7.6   max.= 10
-
-  // Test for smaller calculation of spring tide
   int tide_strength = 0;
-  //  if (round(az_rad) == round(moon_az_rad)) { // value round 2.5rad - 3.4rad = 3;
-  //    tide_strength = 1;
-  //  }
-  // test end
+  //calculation of spring tide by vektor addition, to big!
+  //    int moon_x = abs(7 * sin(moon_az_rad)); // 70% Einfluss  //7
+  //    int moon_y = abs(7 * cos(moon_az_rad));                  //0
+  //    int sun_x = abs(3 * sin(az_rad)); // 30% Einfluss        //0
+  //    int sun_y = abs(3 * cos(az_rad));                        //3
+  //tide_strength = round((sqrt(pow(moon_x + sun_x, 2) + pow(moon_y + sun_y, 2))) - 9); // strength of tide , min.=7.6   max.= 10
+
+  //Falscher Pythagoras:Die Länge der längeren Kathete plus die halbe Länge der kürzeren Kathete ist ungefähr die Länge der Hypothenuse.
+  //c ≈ a + (0,5 * b);  b < a
+  //tide_strength = round(((moon_x + sun_x) + 0.5) * (moon_y + sun_y)) - 9; // strength  tide high , min.=7.6   max.= 10
 
   //Grad  -20° = +340° = +5.933 rad = Correction for Cuxhaven / Anschluss von Cux nach HH > +3,5h = +52.5° = +0.9161rad = Hamburg
   int tide_angel = 57.2957 * (moon_az_rad + 5.933);// +5.933 = value of gezeitenreibung
@@ -650,12 +648,12 @@ void tide() {
   ScreenText(text_color, 12, 240 , 1, "Cux");
 
   if (tide_last > tide_hight) {
-    // falling tide
+    // falling tide -
     SetFilledRect(BLACK , 0, 267, 7, 7);
     SetLines(WHITE, 1 , 270, 5, 270 );
   }
   if (tide_last < tide_hight) {
-    // raising tide
+    // raising tide +
     SetFilledRect(BLACK , 0, 267, 7, 7);
     SetLines(WHITE, 1 , 270, 5, 270 );
     SetLines(WHITE, 3 , 268, 3, 272 );
