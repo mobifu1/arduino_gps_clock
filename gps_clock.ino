@@ -637,10 +637,8 @@ void tide() {
   //tide_strength = round(((moon_x + sun_x) + 0.5) * (moon_y + sun_y)) - 9; // strength  tide high , min.=7.6   max.= 10
 
   //Grad  -20° = +340° = +5.933 rad = Correction for Cuxhaven / Anschluss von Cux nach HH > +3,5h = +52.5° = +0.9161rad = Hamburg
-  int tide_angel = 57.2957 * (moon_az_rad + 5.933);// +5.933 = value of gezeitenreibung
-
-  tide_angel = tide_angel % 360;//Modulo 360
-  int tide_hight = (12 + tide_strength) * (cos(tide_angel * 0.01745 * 2)) ;
+  //cos((x*2)+5.933);
+  int tide_hight = (12 + tide_strength) * (cos((moon_az_rad * 2) + 5.933)) ; // +5.933 = value of gezeitenreibung & offset to Cux
 
   //SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
   //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
