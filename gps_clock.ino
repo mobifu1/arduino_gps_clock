@@ -638,25 +638,18 @@ void tide() {
 
   //Grad  -20° = +340° = +5.933 rad = Correction for Cuxhaven / Anschluss von Cux nach HH > +3,5h = +52.5° = +0.9161rad = Hamburg
   //cos((x*2)+5.933);
-  int tide_hight = (12 + tide_strength) * (cos((moon_az_rad * 2) + 5.933)) ; // +5.933 = value of gezeitenreibung & offset to Cux
+  int tide_hight = round((12 + tide_strength) * (cos((moon_az_rad * 2) + 5.933))) ; // +5.933 = value of gezeitenreibung & offset to Cux
 
   //SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
   //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
   //ScreenText(text_color, 0, 230 , 1, String(tide_angel));
   ScreenText(text_color, 12, 240 , 1, "Cux");
 
-  if (tide_last > tide_hight) {
-    // falling tide -
-    SetFilledRect(BLACK , 0, 267, 7, 7);
-    SetLines(WHITE, 1 , 270, 5, 270 );
-  }
-  if (tide_last < tide_hight) {
-    // raising tide +
-    SetFilledRect(BLACK , 0, 267, 7, 7);
-    SetLines(WHITE, 1 , 270, 5, 270 );
-    SetLines(WHITE, 3 , 268, 3, 272 );
-  }
-  tide_last = tide_hight;
+  //-sin(2*x); > 1.Ableitung von cos(2*x)
+  int tide_steigung = round(15 * (-sin((moon_az_rad * 2) + 5.933))); //Anstieg der Tide
+  SetFilledRect(BLACK , 0, 255, 8, 30);
+  SetLines(WHITE, 0 , 270, 6, 270 - tide_steigung );
+  SetFilledCircle(RED , 6 , 270 - tide_steigung , 1);
 
   SetFilledRect(BLACK , 8, 255, 30, 30);
   SetRect(GRAY , 8, 255, 30, 30);
