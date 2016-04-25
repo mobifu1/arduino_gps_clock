@@ -645,21 +645,18 @@ void tide() {
   //ScreenText(text_color, 0, 230 , 1, String(tide_angel));
   ScreenText(text_color, 12, 240 , 1, "Cux");
 
-  //-sin(2*x); > 1.Ableitung von cos(2*x)
-  int tide_steigung = round(15 * (-sin((moon_az_rad * 2) + 5.933))); //Anstieg der Tide
-  SetFilledRect(BLACK , 0, 255, 8, 30);
-  SetLines(WHITE, 0 , 270, 6, 270 - tide_steigung );
-  SetFilledCircle(RED , 6 , 270 - tide_steigung , 1);
-
-  SetFilledRect(BLACK , 8, 255, 30, 30);
-  SetRect(GRAY , 8, 255, 30, 30);
-  SetLines(GRAY, 8 , 270, 37, 270 );
+  SetFilledRect(BLACK , 5, 252, 30, 36);
+  SetRect(GRAY , 5, 255, 30, 30);
+  SetLines(GRAY, 5 , 270, 34, 270 ); //x-3
 
   if (tide_hight > 12 || tide_hight < -12) {
-    SetLines(RED, 10 , 270 - tide_hight, 35, 270 - tide_hight );
+    SetLines(RED, 7 , 270 - tide_hight, 33, 270 - tide_hight );
   }
   else {
-    SetLines(BLUE, 10 , 270 - tide_hight, 35, 270 - tide_hight );
+    SetLines(BLUE, 7 , 270 - tide_hight, 33, 270 - tide_hight );
   }
+  //-sin(2*x); > 1.Ableitung von cos(2*x)
+  int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + 5.933))); //Anstieg der Tide
+  SetFilledCircle(RED , 7 , 270 - tide_steigung , 1);
   //-----------------------------------------------
 }
