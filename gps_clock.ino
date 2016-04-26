@@ -172,7 +172,7 @@ void setup() {
   //  }
   tft.begin(identifier);
   tft.fillScreen(BLACK);
-  //ScreenText(WHITE, x_edge_left, 10 , 2, "V2.8-Beta");
+  //ScreenText(WHITE, x_edge_left, 10 , 2, "V2.9-Beta");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -624,21 +624,17 @@ void moon(int now_hour) {
 //-----------------------------------------------
 void tide() {
 
-  int tide_strength = 0;
-  //calculation of spring tide by vektor addition, to big!
-  //    int moon_x = abs(7 * sin(moon_az_rad)); // 70% Einfluss  //7
-  //    int moon_y = abs(7 * cos(moon_az_rad));                  //0
-  //    int sun_x = abs(3 * sin(az_rad)); // 30% Einfluss        //0
-  //    int sun_y = abs(3 * cos(az_rad));                        //3
-  //tide_strength = round((sqrt(pow(moon_x + sun_x, 2) + pow(moon_y + sun_y, 2))) - 9); // strength of tide , min.=7.6   max.= 10
+  uint16_t tide_color = BLUE;
 
-  //Falscher Pythagoras:Die Länge der längeren Kathete plus die halbe Länge der kürzeren Kathete ist ungefähr die Länge der Hypothenuse.
-  //c ≈ a + (0,5 * b);  b < a
-  //tide_strength = round(((moon_x + sun_x) + 0.5) * (moon_y + sun_y)) - 9; // strength  tide high , min.=7.6   max.= 10
+  // small calculation for springtide:
+  int tide_strength = 10 * cos((az_rad - moon_az_rad) * 2);
+  if (tide_strength > 7) {
+    tide_color = RED;
+  }
 
   //Grad  -20° = +340° = +5.933 rad = Correction for Cuxhaven / Anschluss von Cux nach HH > +3,5h = +52.5° = +0.9161rad = Hamburg
   //cos((x*2)+5.933);
-  int tide_hight = round((12 + tide_strength) * (cos((moon_az_rad * 2) + 5.933))) ; // +5.933 = value of gezeitenreibung & offset to Cux
+  int tide_hight = round(12 * (cos((moon_az_rad * 2) + 5.933))) ; // +5.933 = value of gezeitenreibung & offset to Cux
 
   //SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
   //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
@@ -647,16 +643,11 @@ void tide() {
 
   SetFilledRect(BLACK , 5, 252, 30, 36);
   SetRect(GRAY , 5, 255, 30, 30);
-  SetLines(GRAY, 5 , 270, 34, 270 ); //x-3
+  SetLines(GRAY, 5 , 270, 34, 270 );
+  SetLines(tide_color, 7 , 270 - tide_hight, 32, 270 - tide_hight );
 
-  if (tide_hight > 12 || tide_hight < -12) {
-    SetLines(RED, 7 , 270 - tide_hight, 33, 270 - tide_hight );
-  }
-  else {
-    SetLines(BLUE, 7 , 270 - tide_hight, 33, 270 - tide_hight );
-  }
   //-sin(2*x); > 1.Ableitung von cos(2*x)
-  int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + 5.933))); //Anstieg der Tide
+  int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + 5.933))); //Anstieg der Tide > Steigung der cos-funktion
   SetFilledCircle(RED , 7 , 270 - tide_steigung , 1);
   //-----------------------------------------------
 }
