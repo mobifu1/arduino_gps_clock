@@ -168,10 +168,11 @@ void setup() {
   //  } else if (identifier == 0x9341) {
   //  } else if (identifier == 0x8357) {
   //  } else {
-  uint16_t identifier = 0x9341;
+  //uint16_t identifier = 0x9341;
   //  }
-  tft.begin(identifier);
-  tft.fillScreen(BLACK);
+  //tft.begin(identifier);
+  tft.begin(0x9341);
+  //tft.fillScreen(BLACK);
   //ScreenText(WHITE, x_edge_left, 10 , 2, "V2.9-Beta");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
@@ -648,6 +649,7 @@ void tide() {
 
   //-sin(2*x); > 1.Ableitung von cos(2*x)
   int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + 5.933))); //Anstieg der Tide > Steigung der cos-funktion
-  SetFilledCircle(RED , 7 , 270 - tide_steigung , 1);
+  SetFilledRect(RED , 6, 269 - tide_steigung, 3, 3);
+  //SetFilledCircle(RED , 5 , 270 - tide_steigung , 1);
   //-----------------------------------------------
 }
