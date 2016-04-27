@@ -10,7 +10,7 @@ switch to day & night color by sun phases
 
 show the rotation of sun & moon on a imitation horizon at the display
 
-display tide calculation for the location
+tidal level calculation for your predefined location
 
 ![Steampunk Clock](https://github.com/mobifu1/arduino_gps_clock/blob/master/steampunk%20clock-1.jpg "Steampunk Clock")
 
