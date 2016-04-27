@@ -10,6 +10,8 @@ switch to day & night color by sun phases
 
 show the rotation of sun & moon on a imitation horizon at the display
 
+display tide calculation for the location
+
 ![Steampunk Clock](https://github.com/mobifu1/arduino_gps_clock/blob/master/steampunk%20clock-1.jpg "Steampunk Clock")
 
 the code is designed for the uno board and serial connected (TX/RX) to a standard gps-modul.
