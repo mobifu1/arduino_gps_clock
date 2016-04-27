@@ -632,13 +632,13 @@ void tide() {
   if (tide_strength > 7) {
     tide_color = RED;
   }
-
-  //Grad  -10° = -0.1745 rad = Correction for Cuxhaven / Anschluss von Cux nach HH > -3,5h = -52.5° = -0.916rad = Hamburg
+  // 30min = 7.5° = 0.1308/2rad = 0.0654rad;
+  //Grad  -20°/2 = -10° = -0.1745 rad = Correction for Cuxhaven / Anschluss von Cux nach HH > -3,5h = -52.5° = -0.916rad/2 = -0.458rad = Hamburg
   //Cux = -0.1745 rad
-  //HH  = (-0.1745 rad) + (-0.916rad) = -1.0905 rad
+  //HH  = (-0.1745 rad) + (-0.458rad) = -0.6325 rad
   //cos(2*(x -0.1745));
-  //int tide_hight = round(12 * (cos((moon_az_rad - 0.1745) * 2))); // -0.349 = value of gezeitenreibung & offset to Cux
-  int tide_hight = round(12 * (cos((moon_az_rad - 1.0905) * 2))); // -1.0905 = value of gezeitenreibung & offset to Cux + HH
+  //int tide_hight = round(12 * (cos((moon_az_rad - 0.1745) * 2))); // -0.1745 = value of gezeitenreibung & offset to Cux
+  int tide_hight = round(12 * (cos((moon_az_rad - 0.6325) * 2))); // -0.6326 = value of gezeitenreibung & offset to Cux + HH
 
   //SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
   //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
@@ -653,7 +653,7 @@ void tide() {
 
   //-sin(2*x); > 1.Ableitung von cos(2*x)
   //int tide_steigung = round(12 * (-sin((moon_az_rad - 0.1745) * 2))); //Anstieg der Tide > Steigung der cos-funktion , Cux
-  int tide_steigung = round(12 * (-sin((moon_az_rad - 1.0905) * 2))); //Anstieg der Tide > Steigung der cos-funktion, HH
+  int tide_steigung = round(12 * (-sin((moon_az_rad - 0.6325) * 2))); //Anstieg der Tide > Steigung der cos-funktion, HH
   SetFilledRect(RED , 6, 269 - tide_steigung, 3, 3);
   //SetFilledCircle(RED , 5 , 270 - tide_steigung , 1);
   //-----------------------------------------------
