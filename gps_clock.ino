@@ -145,8 +145,8 @@ int copy_moon_point_xpos;// moon small
 int copy_moon_point_ypos;
 float moon_az_rad;
 int tide_last = 0;
-const float cux_offset = -0.349;//reference point
-const float ham_offset = -2.107;
+const float cux_offset = -0.349;
+const float ham_offset = -1.000;
 //------------------------------------
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
@@ -634,19 +634,17 @@ void tide() {
   if (tide_strength > 7) {
     tide_color = RED;
   }
-  // 30min = 7.5° = 0.1308/2rad = 0.0654rad;
-  //Grad  -20° = -0.349 rad = Offset for Cuxhaven
   //2pi = 12h 27min
-  //Anschlusstide von Cux nach HH > +3,5h;
-  //-1.758 = Hamburg
+  //30min = 0.2512;
   //Cux = -0.349 rad
-  //HH  = (-0.349rad) + (-1.758rad) = -2.107rad
-  //cos((2*x) -0.349);
-  int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset))); // -0.1745 = value of gezeitenreibung & offset to Cux
+  //HH  = -1.000 rad
+  //cos((x*2)+Ham_offset);
+  int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset)));
 
   //SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
+  //ScreenText(text_color, 0, 230 , 1, String(tide_hight));
   //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
-  //ScreenText(text_color, 0, 230 , 1, String(tide_angel));
+  //ScreenText(text_color, 0, 230 , 1, String(tide_steigung));
   //ScreenText(text_color, 12, 240 , 1, "Cux");
   ScreenText(text_color, 12, 240 , 1, "HH");
 
