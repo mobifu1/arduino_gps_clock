@@ -55,9 +55,9 @@ char *Tag[7] = {"SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREI
 String Line = "";    // a string to hold incoming data
 
 //Display Edges calculate
-int x_edge_left = 0;
+const int x_edge_left = 0;
 int x_edge_right;
-int y_edge_up = 0;
+const int y_edge_up = 0;
 int y_edge_down;
 
 //Pin
@@ -111,7 +111,7 @@ int daylightsavingtime = 1; // add hour 1=winter  2=sommer
 int copy_sun_point_xpos;
 int copy_sun_point_ypos;
 boolean daylight;
-float az_rad;
+float sun_az_rad;
 
 //Moon Phase Calender 10 years
 const int moon_calender[10][17] = {
@@ -145,8 +145,9 @@ int copy_moon_point_xpos;// moon small
 int copy_moon_point_ypos;
 float moon_az_rad;
 int tide_last = 0;
-const float cux_offset = -0.349;
-const float ham_offset = -1.000;
+const float zero_offset = 0;
+const float cux_offset = -0.349;//rad
+const float ham_offset = -1.228;//rad
 //------------------------------------
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
@@ -175,17 +176,19 @@ void setup() {
   //tft.begin(identifier);
   tft.begin(0x9341);
   //tft.fillScreen(BLACK);
-  //ScreenText(WHITE, x_edge_left, 10 , 2, "V3.0-R");
+  ScreenText(WHITE, x_edge_left, 10 , 2, "V3.0-R");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
-  int  width = tft.width(), height = tft.height();
+  //int  width = tft.width(), height = tft.height();
   //ScreenText(WHITE, x_edge_left, 70 , (String(width) + "px" + String(height) + "px")); //240x320
   //Serial.println(String(width) + "x" + String(height) + "px");
   //ScreenText(WHITE, x_edge_left, 100 , (edges));
   //Serial.println(edges);
-  x_edge_right = width - 1; //set display edges
-  y_edge_down =  height - 1; //set display edges
+  //x_edge_right = width - 1; //set display edges
+  x_edge_right = 239; //set display edges
+  //y_edge_down =  height - 1; //set display edges
+  y_edge_down =  319; //set display edges
   //ScreenText(WHITE, x_edge_left, 130 , ("X:" + String(x_edge_left) + "-" + String(x_edge_right) + " Y:" + String(y_edge_up) + "-" + String(y_edge_down)));
   //Serial.println("X:" + String(x_edge_left) + "-" + String(x_edge_right) + " Y:" + String(y_edge_up) + "-" + String(y_edge_down));
   //delay(3000);
@@ -287,7 +290,7 @@ void loop() {
       valid_sync = false;
     }
 
-    if ((second() == 1) || (second() == 16) || (second() == 31) || (second() == 46)) {
+    if ((second() == 1) || (second() == 31)) {
       if (valid_signal = true) {
         if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
           sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
@@ -441,18 +444,14 @@ unsigned long SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius)
 //----------------------------------------------
 void face() {
 
-  for (int i = 0; i <= 11; i++) {
-    alfa = 30 * i * (0.017453293);// pi/180=0.017453293
-    point_xpos = (cos(alfa) * clock_radius) + clock_xoffset;
-    point_ypos = (sin(alfa) * clock_radius) + clock_yoffset;
-    SetFilledCircle(CYAN, point_xpos, point_ypos, 2);
-  }
-
   for (int i = 0; i <= 59; i++) {
     alfa = 6 * i * (0.017453293);// pi/180=0.017453293
     point_xpos = (cos(alfa) * clock_radius) + clock_xoffset;
     point_ypos = (sin(alfa) * clock_radius) + clock_yoffset;
     SetPoint(CYAN, point_xpos, point_ypos);
+    if ((i % 5) == 0) {
+      SetFilledCircle(CYAN, point_xpos, point_ypos, 2);
+    }
   }
 }
 //----------------------------------------------
@@ -469,29 +468,29 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
 
   day_of_year = sun.day_of_year();
 
-  //float el_rad=sun.elevation_rad();                        //store sun's elevation in rads
-  float el_deg = sun.elevation_deg();                      //store sun's elevation in degrees
+  float sun_el_rad = sun.elevation_rad();                    //store sun's elevation in rads
+  //float sun_el_deg = sun.elevation_deg();                  //store sun's elevation in degrees
   //Serial.println(String(el_deg) + "Elevation");
 
-  az_rad = sun.azimuth_rad();                        //store sun's azimuth in rads
+  sun_az_rad = sun.azimuth_rad();                            //store sun's azimuth in rads
   //float az_deg = sun.azimuth_deg();                        //store sun's azimuth in degrees
   //Serial.println(String(az_deg) + "Azimuth");
 
-  float sunrise = sun.sunrise_time();                      //store sunrise time in decimal form
+  float sunrise = sun.sunrise_time();                        //store sunrise time in decimal form
   //Serial.println(String(sunrise) + "Sunrise");
   //sunrise = (sunrise - 0.141666667); //correction factor -8,5 min > Sundata.h calculates unexact
   sunrise_hour = int(sunrise);
   sunrise_minute = int((sunrise - sunrise_hour) * 60);
 
-  float sunset = sun.sunset_time();                        //store sunset time in decimal form
+  float sunset = sun.sunset_time();                          //store sunset time in decimal form
   //Serial.println(String(sunset) + "Sunset");
   //sunset = (sunset + 0.1625); //correction factor +9,75 min > Sundata.h calculates unexact
   sundown_hour = int(sunset);
   sundown_minute = int((sunset - sundown_hour) * 60);
 
   //sun position on the clock scale
-  int sun_point_xpos = int(cos(az_rad + 4.712388) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
-  int sun_point_ypos = int(sin(az_rad + 4.712388) * ((clock_radius / 2) + (el_deg * 0.5))) + clock_yoffset;
+  int sun_point_xpos = int(cos(sun_az_rad + 4.712388) * ((clock_radius / 2) + (sun_el_rad * 28.65))) + clock_xoffset; //0.5 = Gain Factor
+  int sun_point_ypos = int(sin(sun_az_rad + 4.712388) * ((clock_radius / 2) + (sun_el_rad * 28.65))) + clock_yoffset;
 
   SetFilledCircle(BLACK, copy_sun_point_xpos, copy_sun_point_ypos, 2);//clear sun icon
   SetCircle(GRAY, clock_xoffset, clock_yoffset, clock_radius / 2); //horizon
@@ -500,7 +499,7 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
   SetPoint(CYAN, clock_xoffset, clock_yoffset + (clock_radius / 2) + ((90 - latitude - 23.45) * 0.5)); //Scale highest Winter elevation, 90 - lat -23.45
 
   if (daylight == true) {
-    if (el_deg < 4) {
+    if ((sun_el_rad * 57.3) < 4) {
       SetFilledCircle(ORANGE, sun_point_xpos, sun_point_ypos, 2);// Day color 1
     }
     else {
@@ -574,15 +573,15 @@ void moon(int now_hour) {
       //Die Kulminationshöhe unseres Mondes ergibt sich nach der Formel 90° minus geografische Breite des Beobachtungsstandortes plus Deklination des Mondes.
       //Die höchsten und tiefsten Kulminationshöhen des Mondes sind von Jahr zu Jahr verschieden.
       //Als Ursache gelten die wechselnden Extremweiten der Monddeklination,
-      //die im Jahr Werte sowohl zwischen +18,3° und -18,3° als auch solche von +28,6° und -28,6° im Jahr annehmen kann.
-      alfa = ((hour_to_next_full_moon / 113.79) + 3.141);// 2pi=6.2832   pi=3.141
-      moon_az_rad = (az_rad  + alfa);
+      //die im Jahr, Werte sowohl zwischen +18,3° und -18,3° als auch solche von +28,6° und -28,6° im Jahr annehmen kann.
+      alfa = ((hour_to_next_full_moon / 112.840) + 3.141);// 2pi=6.2832   pi=3.141
+      moon_az_rad = (sun_az_rad  + alfa);
       //(cos(x) * -1 * 37) + factor;  default factor = 0  >  http://www.walterzorn.de/grapher/grapher.htm
       delta_culmination = next_culmination - past_culmination;
       now_culmination = (past_culmination + ((delta_culmination / 715) * (715 - hour_to_next_full_moon)));
-      int moon_el_deg = ((cos(az_rad + alfa)) * -(90 - lat)) + now_culmination;//now_culmination: Berechnung der Abweichung vom Mittelwert 37°+-18°
-      int moon_point_xpos = int(cos(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
-      int moon_point_ypos = int(sin(az_rad + 4.712388 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_yoffset;
+      int moon_el_deg = ((cos(sun_az_rad + alfa)) * -(90 - lat)) + now_culmination;//now_culmination: Berechnung der Abweichung vom Mittelwert 37°+-18°
+      int moon_point_xpos = int(cos(sun_az_rad - 1.5707 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
+      int moon_point_ypos = int(sin(sun_az_rad - 1.5707 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_yoffset;
       SetFilledCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear moon icon
       if (moon_el_deg < 1) {
         SetFilledCircle(GRAY, moon_point_xpos, moon_point_ypos, 2);
@@ -630,31 +629,38 @@ void tide() {
   uint16_t tide_color = BLUE;
 
   // small calculation for springtide:
-  int tide_strength = 10 * cos((az_rad - moon_az_rad) * 2);
+  int tide_strength = 10 * cos((sun_az_rad - moon_az_rad) * 2);
   if (tide_strength > 7) {
     tide_color = RED;
   }
-  //2pi = 12h 27min
+  //2pi = 12h 25min
   //30min = 0.2512;
   //Cux = -0.349 rad
-  //HH  = -1.000 rad
-  //cos((x*2)+Ham_offset);
-  int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset)));
+  //HH  = -1.228 rad
+  //cos((x*2)+Cux_offset);
+  int tide_hight = round(12 * (cos((moon_az_rad * 2) + cux_offset)));
+
+  //Test Tide in Flusslandschaft
+  //cos(2*(x+(-0.4*(abs(sin(x)))))); //langsamer Ablauf, schneller Auflauf ;verzögerung des Niedrigwasser um 1 Stunde
+  //int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset + (-0.4 * (abs(sin(moon_az_rad)))))));
 
   //SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
+  //int moon_az_deg = moon_az_rad * 57.306;
+  //moon_az_deg = moon_az_deg % 360;
+  //ScreenText(text_color, 0, 230 , 1, String(moon_az_deg));
   //ScreenText(text_color, 0, 230 , 1, String(tide_hight));
   //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
   //ScreenText(text_color, 0, 230 , 1, String(tide_steigung));
-  //ScreenText(text_color, 12, 240 , 1, "Cux");
-  ScreenText(text_color, 12, 240 , 1, "HH");
+  ScreenText(text_color, 12, 240 , 1, "Cux");
+  //ScreenText(text_color, 12, 240 , 1, "HH");
 
   SetFilledRect(BLACK , 5, 252, 30, 36);
   SetRect(GRAY , 5, 255, 30, 30);
-  SetLines(GRAY, 5 , 270, 34, 270 );
+  SetLines(GRAY, 5, 255, 30, 255 );
   SetLines(tide_color, 7 , 270 - tide_hight, 32, 270 - tide_hight );
 
   //-sin(2*x) = 1.Ableitung von cos(2*x)
-  int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + ham_offset))); //Anstieg der Tide > Steigung der cos-funktion , Cux
+  int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + cux_offset))); //Anstieg der Tide > Steigung der cos-funktion , Cux
   SetFilledRect(RED , 6, 269 - tide_steigung, 3, 3);
   //SetFilledCircle(RED , 5 , 270 - tide_steigung , 1);
   //-----------------------------------------------
