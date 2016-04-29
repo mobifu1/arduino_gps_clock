@@ -141,13 +141,13 @@ const int moon_culmination[10][15] = {
 const byte moon_x_pos = 20;//moon icon big
 const byte moon_y_pos = 125;
 const byte moon_radius = 15;
-int copy_moon_point_xpos;// moon small
+int copy_moon_point_xpos;// moon small icon
 int copy_moon_point_ypos;
 float moon_az_rad;
 int tide_last = 0;
 const float zero_offset = 0;
-const float cux_offset = -0.349;//rad
-const float ham_offset = -1.228;//rad
+const float cux_offset = -0.100;//default 0.349rad
+const float ham_offset = -1.000;//rad
 //------------------------------------
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
