@@ -176,7 +176,7 @@ void setup() {
   //tft.begin(identifier);
   tft.begin(0x9341);
   //tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, "V3.0-R");
+  ScreenText(WHITE, x_edge_left, 10 , 2, "V3.1-Beta");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -656,7 +656,7 @@ void tide() {
 
   SetFilledRect(BLACK , 5, 252, 30, 36);
   SetRect(GRAY , 5, 255, 30, 30);
-  SetLines(GRAY, 5, 255, 30, 255 );
+  SetLines(GRAY, 5, 270, 33, 270 );
   SetLines(tide_color, 7 , 270 - tide_hight, 32, 270 - tide_hight );
 
   //-sin(2*x) = 1.Ableitung von cos(2*x)
