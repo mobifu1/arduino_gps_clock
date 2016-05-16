@@ -176,7 +176,7 @@ void setup() {
   //tft.begin(identifier);
   tft.begin(0x9341);
   //tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, "V3.1-Beta");
+  ScreenText(WHITE, x_edge_left, 10 , 2, "V3.2-Beta");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -576,12 +576,14 @@ void moon(int now_hour) {
       //die im Jahr, Werte sowohl zwischen +18,3° und -18,3° als auch solche von +28,6° und -28,6° im Jahr annehmen kann.
       alfa = ((hour_to_next_full_moon / 112.840) + 3.141);// 2pi=6.2832   pi=3.141
       moon_az_rad = (sun_az_rad  + alfa);
-      //(cos(x) * -1 * 37) + factor;  default factor = 0  >  http://www.walterzorn.de/grapher/grapher.htm
-      delta_culmination = next_culmination - past_culmination;
-      now_culmination = (past_culmination + ((delta_culmination / 715) * (715 - hour_to_next_full_moon)));
-      int moon_el_deg = ((cos(sun_az_rad + alfa)) * -(90 - lat)) + now_culmination;//now_culmination: Berechnung der Abweichung vom Mittelwert 37°+-18°
-      int moon_point_xpos = int(cos(sun_az_rad - 1.5707 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
-      int moon_point_ypos = int(sin(sun_az_rad - 1.5707 + alfa) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_yoffset;
+      //(cos(x) * -1 * 37) * factor;  default factor = 0  >  http://www.walterzorn.de/grapher/grapher.htm
+      delta_culmination = next_culmination - (past_culmination);
+      now_culmination = int(past_culmination + ((float(delta_culmination) / 715) * (715 - hour_to_next_full_moon)));//-14
+      int moon_el_deg = (cos(sun_az_rad + alfa)) * -(90 - lat);
+      //now_culmination: Berechnung der Abweichung vom Mittelwert 37°+-18°
+      int moon_point_xpos = int(cos(sun_az_rad - 1.5707 + alfa) * (1 + (now_culmination * 0.0112)) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
+      int moon_point_ypos = int(sin(sun_az_rad - 1.5707 + alfa) * (1 + (now_culmination * 0.0112)) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_yoffset;
+
       SetFilledCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear moon icon
       if (moon_el_deg < 1) {
         SetFilledCircle(GRAY, moon_point_xpos, moon_point_ypos, 2);
