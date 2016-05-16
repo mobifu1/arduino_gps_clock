@@ -581,8 +581,8 @@ void moon(int now_hour) {
       now_culmination = int(past_culmination + ((float(delta_culmination) / 715) * (715 - hour_to_next_full_moon)));//-14
       int moon_el_deg = (cos(sun_az_rad + alfa)) * -(90 - lat);
       //now_culmination: Berechnung der Abweichung vom Mittelwert 37°+-18°
-      int moon_point_xpos = int(cos(sun_az_rad - 1.5707 + alfa) * (1 + (now_culmination * 0.0112)) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
-      int moon_point_ypos = int(sin(sun_az_rad - 1.5707 + alfa) * (1 + (now_culmination * 0.0112)) * ((clock_radius / 2) + (moon_el_deg * 0.5))) + clock_yoffset;
+      int moon_point_xpos = int(cos(sun_az_rad - 1.5707 + alfa) * (1 + (now_culmination * 0.0056)) * ((clock_radius * 0.5) + (moon_el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
+      int moon_point_ypos = int(sin(sun_az_rad - 1.5707 + alfa) * (1 + (now_culmination * 0.0056)) * ((clock_radius * 0.5) + (moon_el_deg * 0.5))) + clock_yoffset;
 
       SetFilledCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear moon icon
       if (moon_el_deg < 1) {
