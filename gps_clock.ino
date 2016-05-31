@@ -176,7 +176,7 @@ void setup() {
   //tft.begin(identifier);
   tft.begin(0x9341);
   //tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, "V3.2-Beta");
+  ScreenText(WHITE, x_edge_left, 10 , 2, "V3.2-R");
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
