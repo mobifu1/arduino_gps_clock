@@ -546,128 +546,128 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
 //----------------------------------------------
 void moon(int now_hour) {
 
-  //  boolean mooneclipse = false;
-  //  int next_culmination;
-  //  int past_culmination;
-  //  int delta_culmination;
-  //
-  //  for (int i = 0; i < 10 ; i++) {
-  //    if (year() == moon_calender[i][0]) {
-  //      int hour_of_year = (((day_of_year - 1) * 24) + (now_hour)); //7.4.2016 11:00 > 2363
-  //      int hour_to_next_full_moon;
-  //      int now_culmination;
-  //
-  //      for (int x = 1; x < 15; x++) {
-  //        if  (hour_of_year <= moon_calender[i][x]) {
-  //          hour_to_next_full_moon = moon_calender[i][x] - hour_of_year ;
-  //          next_culmination = moon_culmination[i][x];//load the predefined culmination from table
-  //          past_culmination = moon_culmination[i][x - 1]; //load the predefined culmination from table
-  //
-  //          if (x == moon_calender[i][15] || x == moon_calender[i][16]) {//max. 2 eclipses per year
-  //            mooneclipse = true;//next fullmoon is a moon eclipse
-  //          }
-  //          break;
-  //        }
-  //      }
-  //
-  //      //Test for moon position on face:
-  //      //der azimuth der sonne ist bekannt, somit kann über next_full_moon der azimuth für den mond abgeleitet werden.
-  //      //der mond erreicht seinen höhepunkt immer im süden.
-  //      //maximum moon_el_deg change in the year, values can between:18°-54° > factor can between -18.3 and +18.3 ; default middle value = 37° ; www.timeanddate.de
-  //      //Die Kulminationshöhe unseres Mondes ergibt sich nach der Formel 90° minus geografische Breite des Beobachtungsstandortes plus Deklination des Mondes.
-  //      //Die höchsten und tiefsten Kulminationshöhen des Mondes sind von Jahr zu Jahr verschieden.
-  //      //Als Ursache gelten die wechselnden Extremweiten der Monddeklination,
-  //      //die im Jahr, Werte sowohl zwischen +18,3° und -18,3° als auch solche von +28,6° und -28,6° im Jahr annehmen kann.
-  //      alfa = ((hour_to_next_full_moon / 112.840) + 3.141);// 2pi=6.2832   pi=3.141
-  //      moon_az_rad = (sun_az_rad  + alfa);
-  //      //(cos(x) * -1 * 37) * factor;  default factor = 0  >  http://www.walterzorn.de/grapher/grapher.htm
-  //      delta_culmination = next_culmination - (past_culmination);
-  //      now_culmination = int(past_culmination + ((float(delta_culmination) / 715) * (715 - hour_to_next_full_moon)));//-14
-  //      int moon_el_deg = (cos(sun_az_rad + alfa)) * -(90 - lat);
-  //      //now_culmination: Berechnung der Abweichung vom Mittelwert 37°+-18°
-  //      int moon_point_xpos = int(cos(sun_az_rad - 1.5707 + alfa) * (1 + (now_culmination * 0.0056)) * ((clock_radius * 0.5) + (moon_el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
-  //      int moon_point_ypos = int(sin(sun_az_rad - 1.5707 + alfa) * (1 + (now_culmination * 0.0056)) * ((clock_radius * 0.5) + (moon_el_deg * 0.5))) + clock_yoffset;
-  //
-  //      SetFilledCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear moon icon
-  //      if (moon_el_deg < 1) {
-  //        SetFilledCircle(GRAY, moon_point_xpos, moon_point_ypos, 2);
-  //      }
-  //      else {
-  //        SetFilledCircle(WHITE, moon_point_xpos, moon_point_ypos, 2);
-  //      }
-  //      copy_moon_point_xpos = moon_point_xpos;
-  //      copy_moon_point_ypos = moon_point_ypos;
-  //      //Test end
-  //
-  //      if (valid_sync == false) {
-  //
-  //        SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
-  //
-  //        if ((mooneclipse == true) && (hour_to_next_full_moon < 10)) { // indication 10 hours before
-  //          SetFilledCircle(RED , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
-  //        }
-  //
-  //        //2*(cos(pi*x*0.033)) >  http://www.walterzorn.de/grapher/grapher.htm
-  //        const float shadow = (-20 * (cos(3.14 * 0.033 * (hour_to_next_full_moon / 24))));
-  //        SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29 + shadow), moon_y_pos , ((moon_radius - 1) + abs(shadow))); // set silluette
-  //        //SetFilledCircle(RED , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29 + shadow), moon_y_pos , ((moon_radius - 1) + abs(shadow))); // set silluette for test
-  //        SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
-  //
-  //        if (hour_to_next_full_moon < 13) {
-  //          //SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, 2);//full moon indicator
-  //          ScreenText(BLACK, moon_x_pos - 7, moon_y_pos - 3 , 1, "-" + String(hour_to_next_full_moon)); //full moon indicator
-  //        }
-  //        //day to full moon:
-  //        //day 29,5 = full moon    > 709
-  //        //day 14,9-29,4 = 2. half moon 356-708
-  //        //day 14,8 = new moon     > 355
-  //        //day 0-14,7 = 1. half moon + 0-354
-  //      }
-  //    }
-  //    break;
-  //  }
+  boolean mooneclipse = false;
+  int next_culmination;
+  int past_culmination;
+  int delta_culmination;
+
+  for (int i = 0; i < 10 ; i++) {
+    if (year() == moon_calender[i][0]) {
+      int hour_of_year = (((day_of_year - 1) * 24) + (now_hour)); //7.4.2016 11:00 > 2363
+      int hour_to_next_full_moon;
+      int now_culmination;
+
+      for (int x = 1; x < 15; x++) {
+        if  (hour_of_year <= moon_calender[i][x]) {
+          hour_to_next_full_moon = moon_calender[i][x] - hour_of_year ;
+          next_culmination = moon_culmination[i][x];//load the predefined culmination from table
+          past_culmination = moon_culmination[i][x - 1]; //load the predefined culmination from table
+
+          if (x == moon_calender[i][15] || x == moon_calender[i][16]) {//max. 2 eclipses per year
+            mooneclipse = true;//next fullmoon is a moon eclipse
+          }
+          break;
+        }
+      }
+
+      //Test for moon position on face:
+      //der azimuth der sonne ist bekannt, somit kann über next_full_moon der azimuth für den mond abgeleitet werden.
+      //der mond erreicht seinen höhepunkt immer im süden.
+      //maximum moon_el_deg change in the year, values can between:18°-54° > factor can between -18.3 and +18.3 ; default middle value = 37° ; www.timeanddate.de
+      //Die Kulminationshöhe unseres Mondes ergibt sich nach der Formel 90° minus geografische Breite des Beobachtungsstandortes plus Deklination des Mondes.
+      //Die höchsten und tiefsten Kulminationshöhen des Mondes sind von Jahr zu Jahr verschieden.
+      //Als Ursache gelten die wechselnden Extremweiten der Monddeklination,
+      //die im Jahr, Werte sowohl zwischen +18,3° und -18,3° als auch solche von +28,6° und -28,6° im Jahr annehmen kann.
+      alfa = ((hour_to_next_full_moon / 112.840) + 3.141);// 2pi=6.2832   pi=3.141
+      moon_az_rad = (sun_az_rad  + alfa);
+      //(cos(x) * -1 * 37) * factor;  default factor = 0  >  http://www.walterzorn.de/grapher/grapher.htm
+      delta_culmination = next_culmination - (past_culmination);
+      now_culmination = int(past_culmination + ((float(delta_culmination) / 715) * (715 - hour_to_next_full_moon)));//-14
+      int moon_el_deg = (cos(sun_az_rad + alfa)) * -(90 - lat);
+      //now_culmination: Berechnung der Abweichung vom Mittelwert 37°+-18°
+      int moon_point_xpos = int(cos(sun_az_rad - 1.5707 + alfa) * (1 + (now_culmination * 0.0056)) * ((clock_radius * 0.5) + (moon_el_deg * 0.5))) + clock_xoffset; //0.5 = Gain Factor
+      int moon_point_ypos = int(sin(sun_az_rad - 1.5707 + alfa) * (1 + (now_culmination * 0.0056)) * ((clock_radius * 0.5) + (moon_el_deg * 0.5))) + clock_yoffset;
+
+      SetFilledCircle(BLACK, copy_moon_point_xpos, copy_moon_point_ypos, 2);//clear moon icon
+      if (moon_el_deg < 1) {
+        SetFilledCircle(GRAY, moon_point_xpos, moon_point_ypos, 2);
+      }
+      else {
+        SetFilledCircle(WHITE, moon_point_xpos, moon_point_ypos, 2);
+      }
+      copy_moon_point_xpos = moon_point_xpos;
+      copy_moon_point_ypos = moon_point_ypos;
+      //Test end
+
+      if (valid_sync == false) {
+
+        SetFilledCircle(WHITE , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
+
+        if ((mooneclipse == true) && (hour_to_next_full_moon < 10)) { // indication 10 hours before
+          SetFilledCircle(RED , moon_x_pos, moon_y_pos, (moon_radius - 1));//Set moon
+        }
+
+        //2*(cos(pi*x*0.033)) >  http://www.walterzorn.de/grapher/grapher.htm
+        const float shadow = (-20 * (cos(3.14 * 0.033 * (hour_to_next_full_moon / 24))));
+        SetFilledCircle(BLACK , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29 + shadow), moon_y_pos , ((moon_radius - 1) + abs(shadow))); // set silluette
+        //SetFilledCircle(RED , (moon_x_pos + (round(hour_to_next_full_moon / 12)) - 29 + shadow), moon_y_pos , ((moon_radius - 1) + abs(shadow))); // set silluette for test
+        SetCircle(GRAY , moon_x_pos, moon_y_pos, moon_radius);
+
+        if (hour_to_next_full_moon < 13) {
+          //SetFilledCircle(BLACK , moon_x_pos, moon_y_pos, 2);//full moon indicator
+          ScreenText(BLACK, moon_x_pos - 7, moon_y_pos - 3 , 1, "-" + String(hour_to_next_full_moon)); //full moon indicator
+        }
+        //day to full moon:
+        //day 29,5 = full moon    > 709
+        //day 14,9-29,4 = 2. half moon 356-708
+        //day 14,8 = new moon     > 355
+        //day 0-14,7 = 1. half moon + 0-354
+      }
+    }
+    break;
+  }
 }
 //-----------------------------------------------
 //-------------Calculation-Tide------------------
 //-----------------------------------------------
 void tide() {
 
-  //  uint16_t tide_color = BLUE;
-  //
-  //  // small calculation for springtide:
-  //  int tide_strength = 10 * cos((sun_az_rad - moon_az_rad) * 2);
-  //  if (tide_strength > 7) {
-  //    tide_color = RED;
-  //  }
-  //  //2pi = 12h 25min
-  //  //30min = 0.2512;
-  //  //Cux = -0.349 rad
-  //  //HH  = -1.228 rad
-  //  //cos((x*2)+Cux_offset);
-  //  int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset)));
-  //
-  //  //Test Tide in Flusslandschaft
-  //  //cos(2*(x+(-0.4*(abs(sin(x)))))); //langsamer Ablauf, schneller Auflauf ;verzögerung des Niedrigwasser um 1 Stunde
-  //  //int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset + (-0.4 * (abs(sin(moon_az_rad)))))));
-  //
-  //  //SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
-  //  //int moon_az_deg = moon_az_rad * 57.306;
-  //  //moon_az_deg = moon_az_deg % 360;
-  //  //ScreenText(text_color, 0, 230 , 1, String(moon_az_deg));
-  //  //ScreenText(text_color, 0, 230 , 1, String(tide_hight));
-  //  //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
-  //  //ScreenText(text_color, 0, 230 , 1, String(tide_steigung));
-  //  //ScreenText(text_color, 12, 240 , 1, "Cux");
-  //  ScreenText(text_color, 12, 240 , 1, "HH");
-  //
-  //  SetFilledRect(BLACK , 5, 252, 30, 36);
-  //  SetRect(GRAY , 5, 255, 30, 30);
-  //  SetLines(GRAY, 5, 270, 33, 270 );
-  //  SetLines(tide_color, 7 , 270 - tide_hight, 32, 270 - tide_hight );
-  //
-  //  //-sin(2*x) = 1.Ableitung von cos(2*x)
-  //  int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + cux_offset))); //Anstieg der Tide > Steigung der cos-funktion , Cux
-  //  SetFilledRect(RED , 6, 269 - tide_steigung, 3, 3);
-  //  //SetFilledCircle(RED , 5 , 270 - tide_steigung , 1);
-  //  //-----------------------------------------------
+  uint16_t tide_color = BLUE;
+
+  // small calculation for springtide:
+  int tide_strength = 10 * cos((sun_az_rad - moon_az_rad) * 2);
+  if (tide_strength > 7) {
+    tide_color = RED;
+  }
+  //2pi = 12h 25min
+  //30min = 0.2512;
+  //Cux = -0.349 rad
+  //HH  = -1.228 rad
+  //cos((x*2)+Cux_offset);
+  int tide_hight = round(12 * (cos((moon_az_rad * 2) + cux_offset)));
+
+  //Test Tide in Flusslandschaft
+  //cos(2*(x+(-0.4*(abs(sin(x)))))); //langsamer Ablauf, schneller Auflauf ;verzögerung des Niedrigwasser um 1 Stunde
+  //int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset + (-0.4 * (abs(sin(moon_az_rad)))))));
+
+  //SetFilledRect(BLACK , x_edge_left, 210, 30, 50);
+  //int moon_az_deg = moon_az_rad * 57.306;
+  //moon_az_deg = moon_az_deg % 360;
+  //ScreenText(text_color, 0, 230 , 1, String(moon_az_deg));
+  //ScreenText(text_color, 0, 230 , 1, String(tide_hight));
+  //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
+  //ScreenText(text_color, 0, 230 , 1, String(tide_steigung));
+  ScreenText(text_color, 12, 240 , 1, "Cux");
+  //ScreenText(text_color, 12, 240 , 1, "HH");
+
+  SetFilledRect(BLACK , 5, 252, 30, 36);
+  SetRect(GRAY , 5, 255, 30, 30);
+  SetLines(GRAY, 5, 270, 33, 270 );
+  SetLines(tide_color, 7 , 270 - tide_hight, 32, 270 - tide_hight );
+
+  //-sin(2*x) = 1.Ableitung von cos(2*x)
+  int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + cux_offset))); //Anstieg der Tide > Steigung der cos-funktion , Cux
+  SetFilledRect(RED , 6, 269 - tide_steigung, 3, 3);
+  //SetFilledCircle(RED , 5 , 270 - tide_steigung , 1);
+  //-----------------------------------------------
 }
