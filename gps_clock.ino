@@ -49,7 +49,7 @@ TimeChangeRule CEST = {"", Last, Sun, Mar, 2, 120};
 TimeChangeRule CET = {"", Last, Sun, Oct, 3, 60};
 Timezone CE(CEST, CET);
 TimeChangeRule *tcr;
-//String Tag[7] = {"SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SONNABEND"};
+
 String Tag[7] = {"SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SONNABEND"};
 //String Tag[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 String Line = "";    // a string to hold incoming data
@@ -360,16 +360,23 @@ void RMC() { //TIME DATE
 void SerialClear() {
   while (Serial.available())Serial.read();
 }
-
+//----------------------------------------------
 boolean getline(String phrase) { //HARD POLLING
 
-  char s[100]; byte b, n; unsigned long t = millis();
-  for (int i = 0; i < sizeof(s); i++)s[i] = 0;
+  char s[100];
+  byte b, n;
+  unsigned long t = millis();
+
+  for (int i = 0; i < sizeof(s); i++) {
+    s[i] = 0;
+  }
   Line = "";
-  do
-  { b = Serial.read();
+  do {
+    b = Serial.read();
     if (millis() > (t + 100))return false;
-  } while (b != '$');
+  }
+  while (b != '$');
+
   s[0] = b;
   n = Serial.readBytesUntil('\n', &s[1], 90);
   s[n] = 0;
@@ -388,7 +395,7 @@ boolean getline(String phrase) { //HARD POLLING
 }
 
 #define hex(i)  ((i<=9) ? ('0'+i): ('A'- 10 + i))
-
+//----------------------------------------------
 boolean checksum()
 { byte b = 0; int e;
   e = Line.indexOf('*');
@@ -399,7 +406,7 @@ boolean checksum()
   }
   return false;
 }
-
+//----------------------------------------------
 String getparam(int ix)
 { int c, cc = 0;
   if (checksum())
