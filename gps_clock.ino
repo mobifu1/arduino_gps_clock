@@ -147,7 +147,7 @@ float moon_az_rad;
 int tide_last = 0;
 const float zero_offset = 0;
 const float cux_offset = -0.100;//default 0.349rad
-const float ham_offset = -1.000;//rad
+//const float ham_offset = -1.000;//rad
 //------------------------------------
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
@@ -652,6 +652,7 @@ void tide() {
   //HH  = -1.228 rad
   //cos((x*2)+Cux_offset);
   int tide_hight = round(12 * (cos((moon_az_rad * 2) + cux_offset)));
+  //int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset)));
 
   //Test Tide in Flusslandschaft
   //cos(2*(x+(-0.4*(abs(sin(x)))))); //langsamer Ablauf, schneller Auflauf ;verzögerung des Niedrigwasser um 1 Stunde
@@ -674,6 +675,7 @@ void tide() {
 
   //-sin(2*x) = 1.Ableitung von cos(2*x)
   int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + cux_offset))); //Anstieg der Tide > Steigung der cos-funktion , Cux
+  //int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + ham_offset))); //Anstieg der Tide > Steigung der cos-funktion , HH
   SetFilledRect(RED , 6, 269 - tide_steigung, 3, 3);
   //SetFilledCircle(RED , 5 , 270 - tide_steigung , 1);
   //-----------------------------------------------
