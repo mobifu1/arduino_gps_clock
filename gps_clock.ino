@@ -386,9 +386,9 @@ boolean getline(String phrase) { //HARD POLLING
   }
   //Serial.println(Line);
   int index = Line.indexOf(phrase);
-  //Serial.println("index:" + String(index));
   if (index > -1) {
     //Serial.println("found:" + phrase);
+    //Serial.println(Line);
     return true;
   }
   return false;
