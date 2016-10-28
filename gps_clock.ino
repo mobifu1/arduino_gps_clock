@@ -176,7 +176,7 @@ void setup() {
   //tft.begin(identifier);
   tft.begin(0x9341);
   //tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, "V3.3-Beta");// Arduino IDE 1.6.11
+  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.3-Beta"));// Arduino IDE 1.6.11
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -211,7 +211,7 @@ void loop() {
 
   static int os = -1;
 
-  if (!(os % 4))if (getline("$GPRMC"))RMC();
+  if (!(os % 4))if (getline(F("$GPRMC")))RMC();
   SerialClear();
 
   if (second() != os) { //every second
@@ -347,7 +347,7 @@ void RMC() { //TIME DATE
         moon(hour());
         tide();
         face();
-        ScreenText(text_color, 150, 40 , 2, "sync");
+        ScreenText(text_color, 150, 40 , 2, F("sync"));
         valid_sync = true;
         //Serial.println(sync_info);
       }
@@ -396,8 +396,8 @@ boolean getline(String phrase) { //HARD POLLING
 
 #define hex(i)  ((i<=9) ? ('0'+i): ('A'- 10 + i))
 //----------------------------------------------
-boolean checksum()
-{ byte b = 0; int e;
+boolean checksum() {
+  byte b = 0; int e;
   e = Line.indexOf('*');
   if (e > 10)
   { for (int i = 1; i < e; i++)b ^= Line[i];
@@ -407,8 +407,8 @@ boolean checksum()
   return false;
 }
 //----------------------------------------------
-String getparam(int ix)
-{ int c, cc = 0;
+String getparam(int ix) {
+  int c, cc = 0;
   if (checksum())
   { do
     { c = Line.indexOf(',', cc);
@@ -416,7 +416,7 @@ String getparam(int ix)
     } while (--ix);
     return (Line.substring(c + 1, Line.indexOf(',', c + 1)));
   }
-  return "xx"; //debug
+  return F("xx"); //debug
 }
 //----------------------------------------------
 //--------------GRAFIK-ROUTINEN-----------------
@@ -664,7 +664,7 @@ void tide() {
   //ScreenText(text_color, 0, 230 , 1, String(tide_hight));
   //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
   //ScreenText(text_color, 0, 230 , 1, String(tide_steigung));
-  ScreenText(text_color, 12, 240 , 1, "Cux");
+  ScreenText(text_color, 12, 240 , 1, F("Cux"));
   //ScreenText(text_color, 12, 240 , 1, "HH");
 
   SetFilledRect(BLACK , 5, 252, 30, 36);
