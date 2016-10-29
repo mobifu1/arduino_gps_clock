@@ -145,10 +145,10 @@ int copy_moon_point_xpos;// moon small icon
 int copy_moon_point_ypos;
 float moon_az_rad;
 int tide_last = 0;
-const float zero_offset = 0;
+//const float zero_offset = 0;
 //change location:
-const float cux_offset = -0.600;//default 0.349rad / 1hour = 0.261rad
-//const float ham_offset = -1.600;//rad
+//const float cux_offset = -0.800;//default 0.349rad / 1hour = 0.261rad
+const float ham_offset = -1.800;//rad
 //------------------------------------
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
@@ -533,9 +533,11 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
 
     String lead_zero = ("");
     if (sunrise_minute < 10) {
-      lead_zero = ("0");
+      lead_zero = (F("0"));
     }
-    ScreenText(text_color, x_edge_left + 10, 70 , 2, "Sunrise: " + String(sunrise_hour) + ":" + lead_zero + String(sunrise_minute));
+    String text = F("Sunrise: ");
+    text += String(sunrise_hour) + ":" + lead_zero + String(sunrise_minute);
+    ScreenText(text_color, x_edge_left + 10, 70 , 2, text );
 
     SetFilledRect(BLACK , x_edge_left, 300, x_edge_right, 19); //clear sunset value on display
     SetFilledCircle(ORANGE , 220, 305, 6);
@@ -544,9 +546,12 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
 
     lead_zero = ("");
     if (sundown_minute < 10) {
-      lead_zero = ("0");
+      lead_zero = (F("0"));
     }
-    ScreenText(text_color, x_edge_left + 10, 305 , 2, "Sunset: " + String(sundown_hour) + ":" + lead_zero + String(sundown_minute));
+    text = "";
+    text = F("Sunset: ");
+    text += String(sundown_hour) + ":" + lead_zero + String(sundown_minute);
+    ScreenText(text_color, x_edge_left + 10, 305 , 2, text );
   }
 }
 //----------------------------------------------
@@ -555,14 +560,14 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
 void moon(int now_hour) {
 
   boolean mooneclipse = false;
-  int next_culmination;
-  int past_culmination;
-  int delta_culmination;
+  int next_culmination = 0;
+  int past_culmination = 0;
+  int delta_culmination = 0;
 
   for (int i = 0; i < 10 ; i++) {
     if (year() == moon_calender[i][0]) {
       int hour_of_year = (((day_of_year - 1) * 24) + (now_hour)); //7.4.2016 11:00 > 2363
-      int hour_to_next_full_moon;
+      int hour_to_next_full_moon = 0;
       int now_culmination;
 
       for (int x = 1; x < 15; x++) {
@@ -652,8 +657,10 @@ void tide() {
   //Cux = -0.349 rad
   //HH  = -1.228 rad
   //cos((x*2)+Cux_offset);
-  int tide_hight = round(12 * (cos((moon_az_rad * 2) + cux_offset))); //change location
-  //int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset)));
+
+  //change location:
+  //int tide_hight = round(12 * (cos((moon_az_rad * 2) + cux_offset)));
+  int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset)));
 
   //Test Tide in Flusslandschaft
   //cos(2*(x+(-0.4*(abs(sin(x)))))); //langsamer Ablauf, schneller Auflauf ;verzögerung des Niedrigwasser um 1 Stunde
@@ -667,8 +674,9 @@ void tide() {
   //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
   //ScreenText(text_color, 0, 230 , 1, String(tide_steigung));
 
-  ScreenText(text_color, 12, 240 , 1, F("Cux")); //change location
-  //ScreenText(text_color, 12, 240 , 1, F("HH"));
+  //change location:
+  //ScreenText(text_color, 12, 240 , 1, F("Cux"));
+  ScreenText(text_color, 12, 240 , 1, F("HH"));
 
   SetFilledRect(BLACK , 5, 252, 30, 36);
   SetRect(GRAY , 5, 255, 30, 30);
@@ -676,8 +684,10 @@ void tide() {
   SetLines(tide_color, 7 , 270 - tide_hight, 32, 270 - tide_hight );
 
   //-sin(2*x) = 1.Ableitung von cos(2*x)
-  int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + cux_offset))); //Anstieg der Tide > Steigung der cos-funktion , Cux //change location
-  //int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + ham_offset))); //Anstieg der Tide > Steigung der cos-funktion , HH
+
+  //change location:
+  //int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + cux_offset))); //Anstieg der Tide > Steigung der cos-funktion , Cux
+  int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + ham_offset))); //Anstieg der Tide > Steigung der cos-funktion , HH
   SetFilledRect(RED , 6, 269 - tide_steigung, 3, 3);
   //SetFilledCircle(RED , 5 , 270 - tide_steigung , 1);
   //-----------------------------------------------
