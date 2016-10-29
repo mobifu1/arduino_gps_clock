@@ -146,8 +146,8 @@ int copy_moon_point_ypos;
 float moon_az_rad;
 int tide_last = 0;
 const float zero_offset = 0;
-const float cux_offset = -0.100;//default 0.349rad
-//const float ham_offset = -1.000;//rad
+//const float cux_offset = -0.100;//default 0.349rad
+const float ham_offset = -1.000;//rad
 //------------------------------------
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
@@ -287,7 +287,7 @@ void loop() {
     }
 
     if ((second() == 1) || (second() == 31)) {
-      if (valid_signal = true) {
+      if (valid_signal == true) {
         if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
           sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
           moon(hour());
@@ -337,7 +337,7 @@ void RMC() { //TIME DATE
 
   if (valid_sync == false) {
     SetFilledRect(BLACK , 150, 40, 89, 29); //clear sync on display
-    if (valid_signal = true) {
+    if (valid_signal == true) {
       lat = getparam(3).substring(0, 2).toInt();
       lon = getparam(5).substring(0, 3).toInt();
       minute_lat = getparam(3).substring(2, 4).toInt();//minute value
@@ -367,7 +367,7 @@ boolean getline(String phrase) { //HARD POLLING
   byte b, n;
   unsigned long t = millis();
 
-  for (int i = 0; i < sizeof(s); i++) {
+  for (unsigned int i = 0; i < sizeof(s); i++) {
     s[i] = 0;
   }
   Line = "";
@@ -421,33 +421,33 @@ String getparam(int ix) {
 //----------------------------------------------
 //--------------GRAFIK-ROUTINEN-----------------
 //----------------------------------------------
-unsigned long ScreenText(uint16_t color, int xtpos, int ytpos, int text_size , String text) {
+void ScreenText(uint16_t color, int xtpos, int ytpos, int text_size , String text) {
   tft.setCursor(xtpos, ytpos);
   tft.setTextColor(color);
   tft.setTextSize(text_size);
   tft.println(text);
 }
 
-unsigned long SetLines(uint16_t color , int xl1pos, int yl1pos, int xl2pos, int yl2pos) {
+void SetLines(uint16_t color , int xl1pos, int yl1pos, int xl2pos, int yl2pos) {
   tft.drawLine(xl1pos, yl1pos, xl2pos, yl2pos, color);
 }
 
-unsigned long SetPoint(uint16_t color, int xppos, int yppos) {
+void SetPoint(uint16_t color, int xppos, int yppos) {
   tft.drawPixel(xppos, yppos, color);
 }
 
-unsigned long SetRect(uint16_t color , int xr1pos, int yr1pos, int xr2width, int yr2hight) {
+void SetRect(uint16_t color , int xr1pos, int yr1pos, int xr2width, int yr2hight) {
   tft.drawRect(xr1pos, yr1pos, xr2width, yr2hight, color);
 }
 
-unsigned long SetFilledRect(uint16_t color , int xr1pos, int yr1pos, int xr2width, int yr2hight) {
+void SetFilledRect(uint16_t color , int xr1pos, int yr1pos, int xr2width, int yr2hight) {
   tft.fillRect(xr1pos, yr1pos, xr2width, yr2hight, color);
 }
 
-unsigned long SetCircle(uint16_t color , int xcpos, int ycpos, int radius) {
+void SetCircle(uint16_t color , int xcpos, int ycpos, int radius) {
   tft.drawCircle(xcpos, ycpos, radius, color);
 }
-unsigned long SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius) {
+void SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius) {
   tft.fillCircle(xcpos, ycpos, radius, color);
 }
 //----------------------------------------------
@@ -651,8 +651,8 @@ void tide() {
   //Cux = -0.349 rad
   //HH  = -1.228 rad
   //cos((x*2)+Cux_offset);
-  int tide_hight = round(12 * (cos((moon_az_rad * 2) + cux_offset)));
-  //int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset)));
+  //int tide_hight = round(12 * (cos((moon_az_rad * 2) + cux_offset)));
+  int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset)));
 
   //Test Tide in Flusslandschaft
   //cos(2*(x+(-0.4*(abs(sin(x)))))); //langsamer Ablauf, schneller Auflauf ;verzögerung des Niedrigwasser um 1 Stunde
@@ -665,8 +665,8 @@ void tide() {
   //ScreenText(text_color, 0, 230 , 1, String(tide_hight));
   //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
   //ScreenText(text_color, 0, 230 , 1, String(tide_steigung));
-  ScreenText(text_color, 12, 240 , 1, F("Cux"));
-  //ScreenText(text_color, 12, 240 , 1, "HH");
+  //ScreenText(text_color, 12, 240 , 1, F("Cux"));
+  ScreenText(text_color, 12, 240 , 1, "HH");
 
   SetFilledRect(BLACK , 5, 252, 30, 36);
   SetRect(GRAY , 5, 255, 30, 30);
@@ -674,8 +674,8 @@ void tide() {
   SetLines(tide_color, 7 , 270 - tide_hight, 32, 270 - tide_hight );
 
   //-sin(2*x) = 1.Ableitung von cos(2*x)
-  int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + cux_offset))); //Anstieg der Tide > Steigung der cos-funktion , Cux
-  //int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + ham_offset))); //Anstieg der Tide > Steigung der cos-funktion , HH
+  //int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + cux_offset))); //Anstieg der Tide > Steigung der cos-funktion , Cux
+  int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + ham_offset))); //Anstieg der Tide > Steigung der cos-funktion , HH
   SetFilledRect(RED , 6, 269 - tide_steigung, 3, 3);
   //SetFilledCircle(RED , 5 , 270 - tide_steigung , 1);
   //-----------------------------------------------
