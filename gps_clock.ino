@@ -148,7 +148,7 @@ int tide_last = 0;
 //const float zero_offset = 0;
 //change location:
 //const float cux_offset = -0.800;//default 0.349rad / 1hour = 0.261rad
-const float ham_offset = -1.800;//rad
+const float ham_offset = -2.200;//rad
 //------------------------------------
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
@@ -676,7 +676,7 @@ void tide() {
 
   //change location:
   //ScreenText(text_color, 12, 240 , 1, F("Cux"));
-  ScreenText(text_color, 12, 240 , 1, F("HH"));
+  ScreenText(text_color, 12, 240 , 1, F("Ham"));
 
   SetFilledRect(BLACK , 5, 252, 30, 36);
   SetRect(GRAY , 5, 255, 30, 30);
