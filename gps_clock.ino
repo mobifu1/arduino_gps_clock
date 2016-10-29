@@ -146,8 +146,9 @@ int copy_moon_point_ypos;
 float moon_az_rad;
 int tide_last = 0;
 const float zero_offset = 0;
-//const float cux_offset = -0.100;//default 0.349rad
-const float ham_offset = -1.000;//rad
+//change location:
+const float cux_offset = -0.600;//default 0.349rad / 1hour = 0.261rad
+//const float ham_offset = -1.600;//rad
 //------------------------------------
 //const String chip = "Chip:";
 //const String edges = "Set Display Edges:";
@@ -651,8 +652,8 @@ void tide() {
   //Cux = -0.349 rad
   //HH  = -1.228 rad
   //cos((x*2)+Cux_offset);
-  //int tide_hight = round(12 * (cos((moon_az_rad * 2) + cux_offset)));
-  int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset)));
+  int tide_hight = round(12 * (cos((moon_az_rad * 2) + cux_offset))); //change location
+  //int tide_hight = round(12 * (cos((moon_az_rad * 2) + ham_offset)));
 
   //Test Tide in Flusslandschaft
   //cos(2*(x+(-0.4*(abs(sin(x)))))); //langsamer Ablauf, schneller Auflauf ;verzögerung des Niedrigwasser um 1 Stunde
@@ -665,8 +666,9 @@ void tide() {
   //ScreenText(text_color, 0, 230 , 1, String(tide_hight));
   //ScreenText(text_color, 0, 210 , 1, String(tide_strength));
   //ScreenText(text_color, 0, 230 , 1, String(tide_steigung));
-  //ScreenText(text_color, 12, 240 , 1, F("Cux"));
-  ScreenText(text_color, 12, 240 , 1, "HH");
+
+  ScreenText(text_color, 12, 240 , 1, F("Cux")); //change location
+  //ScreenText(text_color, 12, 240 , 1, F("HH"));
 
   SetFilledRect(BLACK , 5, 252, 30, 36);
   SetRect(GRAY , 5, 255, 30, 30);
@@ -674,8 +676,8 @@ void tide() {
   SetLines(tide_color, 7 , 270 - tide_hight, 32, 270 - tide_hight );
 
   //-sin(2*x) = 1.Ableitung von cos(2*x)
-  //int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + cux_offset))); //Anstieg der Tide > Steigung der cos-funktion , Cux
-  int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + ham_offset))); //Anstieg der Tide > Steigung der cos-funktion , HH
+  int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + cux_offset))); //Anstieg der Tide > Steigung der cos-funktion , Cux //change location
+  //int tide_steigung = round(12 * (-sin((moon_az_rad * 2) + ham_offset))); //Anstieg der Tide > Steigung der cos-funktion , HH
   SetFilledRect(RED , 6, 269 - tide_steigung, 3, 3);
   //SetFilledCircle(RED , 5 , 270 - tide_steigung , 1);
   //-----------------------------------------------
