@@ -565,7 +565,8 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
       now_day_length = ((sundown_hour * 60) + sundown_minute) - ((sunrise_hour * 60) + sunrise_minute);
     }
     if (last_day_length > 0) {
-      ScreenText(text_color, 210, 110 , 1, String(last_day_length - now_day_length));
+      SetFilledRect(BLACK , 200, 108, 39, 12);
+      ScreenText(text_color, 202, 110 , 1, String(last_day_length - now_day_length) + "min");
     }
   }
 }
