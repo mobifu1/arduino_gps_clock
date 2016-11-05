@@ -3,7 +3,7 @@
 // IMPORTANT: Adafruit_TFTLCD LIBRARY MUST BE SPECIFICALLY
 // CONFIGURED FOR EITHER THE TFT SHIELD OR THE BREAKOUT BOARD.
 // SEE RELEVANT COMMENTS IN Adafruit_TFTLCD.h FOR SETUP.
-#include <Adafruit_GFX.h>    // Core graphics library
+//#include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_TFTLCD.h> // Hardware-specific library
 // The control pins for the LCD can be assigned to any digital or
 // analog pins...but we'll use the analog pins as this allows us to
@@ -110,6 +110,9 @@ int sundown_minute = 0;
 int daylightsavingtime = 1; // add hour 1=winter  2=sommer
 int copy_sun_point_xpos;
 int copy_sun_point_ypos;
+int now_day_length = 0; //minutes
+int last_day_length = 0; //minutes
+int last_day = 0;//day number
 boolean daylight;
 float sun_az_rad;
 
@@ -177,7 +180,7 @@ void setup() {
   //tft.begin(identifier);
   tft.begin(0x9341);
   //tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.3-Beta"));// Arduino IDE 1.6.11
+  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.3-RC1"));// Arduino IDE 1.6.11
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -552,6 +555,18 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
     text = F("Sunset: ");
     text += String(sundown_hour) + ":" + lead_zero + String(sundown_minute);
     ScreenText(text_color, x_edge_left + 10, 305 , 2, text );
+
+    //calculate day_Length and the delta:
+    if (day() != last_day) {
+      last_day = day();
+      last_day_length = now_day_length;
+    }
+    else {
+      now_day_length = ((sundown_hour * 60) + sundown_minute) - ((sunrise_hour * 60) + sunrise_minute);
+    }
+    if (last_day_length > 0) {
+      ScreenText(text_color, 210, 110 , 1, String(last_day_length - now_day_length));
+    }
   }
 }
 //----------------------------------------------
