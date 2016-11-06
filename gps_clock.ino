@@ -557,16 +557,16 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
     ScreenText(text_color, x_edge_left + 10, 305 , 2, text );
 
     //calculate day_Length and the delta:
+    if (now_day_length == 0 || day() == last_day) { //when the software startup
+      now_day_length = ((sundown_hour * 60) + sundown_minute) - ((sunrise_hour * 60) + sunrise_minute);
+    }
     if (day() != last_day) {
       last_day = day();
       last_day_length = now_day_length;
     }
-    else {
-      now_day_length = ((sundown_hour * 60) + sundown_minute) - ((sunrise_hour * 60) + sunrise_minute);
-    }
     if (last_day_length > 0) {
       SetFilledRect(BLACK , 200, 108, 39, 12);
-      ScreenText(text_color, 202, 110 , 1, String(last_day_length - now_day_length) + "min");
+      ScreenText(text_color, 202, 110 , 1, String(now_day_length - last_day_length) + "min");
     }
   }
 }
