@@ -367,7 +367,7 @@ void SerialClear() {
 //----------------------------------------------
 boolean getline(String phrase) { //HARD POLLING
 
-  char s[100];
+  char s[100];//simu: $GPRMC,121033,A,5335.5634,N,01039.3538,E,0.0,0.0,020117,0.4,E,A*19
   byte b, n;
   unsigned long t = millis();
 
@@ -652,8 +652,8 @@ void moon(int now_hour) {
         //day 14,8 = new moon     > 355
         //day 0-14,7 = 1. half moon + 0-354
       }
+      break;
     }
-    break;
   }
 }
 //-----------------------------------------------
