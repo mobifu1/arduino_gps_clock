@@ -180,7 +180,7 @@ void setup() {
   //tft.begin(identifier);
   tft.begin(0x9341);
   //tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.3-RC1"));// Arduino IDE 1.6.11
+  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.4-RC1"));// Arduino IDE 1.6.11
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
