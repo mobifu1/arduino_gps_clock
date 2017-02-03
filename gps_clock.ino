@@ -112,6 +112,7 @@ int copy_sun_point_xpos;
 int copy_sun_point_ypos;
 int now_day_length = 0; //minutes
 int last_day_length = 0; //minutes
+int delta_day_length = 0;
 int last_day = 0;//day number
 boolean daylight;
 float sun_az_rad;
@@ -180,7 +181,7 @@ void setup() {
   //tft.begin(identifier);
   tft.begin(0x9341);
   //tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.4-RC1"));// Arduino IDE 1.6.11
+  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.5-RC1"));// Arduino IDE 1.6.11
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -460,13 +461,13 @@ void SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius) {
 void face() {
 
   for (int i = 0; i <= 59; i++) {
-    alfa = 6 * i * (0.017453293);// pi/180=0.017453293
+    alfa = 6 * i * 0.017453293; // pi/180=0.017453293
     point_xpos = (cos(alfa) * clock_radius) + clock_xoffset;
     point_ypos = (sin(alfa) * clock_radius) + clock_yoffset;
     SetPoint(CYAN, point_xpos, point_ypos);
-    if ((i % 5) == 0) {
-      SetFilledCircle(CYAN, point_xpos, point_ypos, 2);
-    }
+    if ((i % 5) == 0) SetFilledCircle(CYAN, point_xpos, point_ypos, 2);
+    if (i == delta_day_length + 45 && delta_day_length > 0)SetFilledCircle(GREEN, point_xpos, point_ypos, 2); // set green dot for day_length
+    if (i == delta_day_length + 45 && delta_day_length < 0)SetFilledCircle(RED, point_xpos, point_ypos, 2); // set red dot for day_length
   }
 }
 //----------------------------------------------
@@ -565,8 +566,10 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
       last_day_length = now_day_length;
     }
     if (last_day_length > 0) {
-      SetFilledRect(BLACK , 200, 108, 39, 12);
-      ScreenText(text_color, 202, 110 , 1, String(now_day_length - last_day_length) + "min");
+      delta_day_length = now_day_length - last_day_length;
+      SetFilledRect(BLACK , 195, 108, 44, 12);
+      if (delta_day_length > 0) ScreenText(text_color, 200, 110 , 1, "+" + String(delta_day_length) + "min");
+      if (delta_day_length <= 0) ScreenText(text_color, 200, 110 , 1, String(delta_day_length) + "min");
     }
   }
 }
