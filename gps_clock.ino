@@ -181,7 +181,7 @@ void setup() {
   //tft.begin(identifier);
   tft.begin(0x9341);
   //tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.5-RC2"));// Arduino IDE 1.6.11
+  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.5-RC3"));// Arduino IDE 1.6.11
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -466,7 +466,6 @@ void face() {
     point_ypos = (sin(alfa) * clock_radius) + clock_yoffset;
     SetPoint(CYAN, point_xpos, point_ypos);
     if ((i % 5) == 0) SetFilledCircle(CYAN, point_xpos, point_ypos, 2);
-    if (i == delta_day_length + 45)SetFilledCircle(RED, point_xpos, point_ypos, 2); // set dot for day_length
   }
 }
 //----------------------------------------------
