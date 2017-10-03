@@ -50,7 +50,7 @@ TimeChangeRule CET = {"", Last, Sun, Oct, 3, 60};
 Timezone CE(CEST, CET);
 TimeChangeRule *tcr;
 
-String Tag[7] = {"SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SONNABEND"};
+String Tag[7] = {"SONNTAG", "MONTAG", "DIENSTAG", "MITTWOCH", "DONNERSTAG", "FREITAG", "SAMSTAG"};
 //String Tag[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 String Line = "";    // a string to hold incoming data
 
@@ -181,7 +181,7 @@ void setup() {
   //tft.begin(identifier);
   tft.begin(0x9341);
   //tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.5-RC3"));// Arduino IDE 1.6.11
+  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.6-RC"));// Arduino IDE 1.6.11
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -475,10 +475,27 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
 
   latitude = latitude + (minute_latitude / 60);
   longitude = longitude + (minute_longitude / 60);
+  sundata sun = sundata(latitude, longitude, daylightsavingtime); //creat object with latitude and longtitude declared in degrees and time difference from Greenwhich
 
-  sundata sun = sundata(latitude, longitude, daylightsavingtime);//creat object with latitude and longtitude declared in degrees and time difference from Greenwhich
-  sun.time( year(), month(), day(), hour(), minute(), second());//insert year, month, day, hour, minutes and seconds
-  sun.calculations();                                           //update calculations for last inserted time
+  //Show relevants points & horizon:
+  SetCircle(GRAY, clock_xoffset, clock_yoffset, clock_radius / 2);                                     //horizon
+  SetPoint(CYAN, clock_xoffset, clock_yoffset + (clock_radius / 2) + ((90 - latitude + 23.45) * 0.5)); //Scale highest sommer elevation, 90 - lat +23.45
+  SetPoint(CYAN, clock_xoffset, clock_yoffset + (clock_radius / 2) + ((90 - latitude) * 0.5));         //Scale Spring Point elevation, 90 - lat
+  SetPoint(CYAN, clock_xoffset, clock_yoffset + (clock_radius / 2) + ((90 - latitude - 23.45) * 0.5)); //Scale highest Winter elevation, 90 - lat -23.45
+
+  //sun track of the day:
+  for (int t = 0; t < 24; t++) {
+    sun.time( year(), month(), day(), t, 0, 0);     //insert year, month, day, hour, minutes and seconds
+    sun.calculations();                                           //update calculations for last inserted time
+    float sun_el_rad_track = sun.elevation_rad();                 //store sun's elevation in rads
+    sun_az_rad = sun.azimuth_rad();                               //store sun's azimuth in rads
+    int sun_track_xpos = int(cos(sun_az_rad + 4.712388) * ((clock_radius / 2) + (sun_el_rad_track * 28.65))) + clock_xoffset; //0.5 = Gain Factor
+    int sun_track_ypos = int(sin(sun_az_rad + 4.712388) * ((clock_radius / 2) + (sun_el_rad_track * 28.65))) + clock_yoffset;
+    SetPoint(GRAY, sun_track_xpos, sun_track_ypos);//track of sun around earth
+  }
+
+  sun.time( year(), month(), day(), hour(), minute(), second());  //insert year, month, day, hour, minutes and seconds
+  sun.calculations();                                             //update calculations for last inserted time
 
   day_of_year = sun.day_of_year();
 
@@ -502,15 +519,11 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
   sundown_hour = int(sunset);
   sundown_minute = int((sunset - sundown_hour) * 60);
 
-  //sun position on the clock scale
+  //sun position on the clock scale:
   int sun_point_xpos = int(cos(sun_az_rad + 4.712388) * ((clock_radius / 2) + (sun_el_rad * 28.65))) + clock_xoffset; //0.5 = Gain Factor
   int sun_point_ypos = int(sin(sun_az_rad + 4.712388) * ((clock_radius / 2) + (sun_el_rad * 28.65))) + clock_yoffset;
 
   SetFilledCircle(BLACK, copy_sun_point_xpos, copy_sun_point_ypos, 2);//clear sun icon
-  SetCircle(GRAY, clock_xoffset, clock_yoffset, clock_radius / 2); //horizon
-  SetPoint(CYAN, clock_xoffset, clock_yoffset + (clock_radius / 2) + ((90 - latitude + 23.45) * 0.5)); //Scale highest sommer elevation, 90 - lat +23.45
-  SetPoint(CYAN, clock_xoffset, clock_yoffset + (clock_radius / 2) + ((90 - latitude) * 0.5));         //Scale Spring Point elevation, 90 - lat
-  SetPoint(CYAN, clock_xoffset, clock_yoffset + (clock_radius / 2) + ((90 - latitude - 23.45) * 0.5)); //Scale highest Winter elevation, 90 - lat -23.45
 
   if (daylight == true) {
     if ((sun_el_rad * 57.3) < 4) {
@@ -521,7 +534,7 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
     }
   }
   else {
-    SetFilledCircle(BLUE, sun_point_xpos, sun_point_ypos, 2);//Night color
+    SetFilledCircle(BLUE, sun_point_xpos, sun_point_ypos, 2);// Night color
   }
   copy_sun_point_xpos = sun_point_xpos;
   copy_sun_point_ypos = sun_point_ypos;
