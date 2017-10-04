@@ -181,7 +181,7 @@ void setup() {
   //tft.begin(identifier);
   tft.begin(0x9341);
   //tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.6-RC"));// Arduino IDE 1.6.11
+  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.6-R"));// Arduino IDE 1.6.11
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -485,7 +485,7 @@ void sunrise( float latitude , float minute_latitude, float longitude , float mi
 
   //sun track of the day:
   for (int t = 0; t < 24; t++) {
-    sun.time( year(), month(), day(), t, 0, 0);     //insert year, month, day, hour, minutes and seconds
+    sun.time( year(), month(), day(), t, 30, 0);     //insert year, month, day, hour, minutes and seconds
     sun.calculations();                                           //update calculations for last inserted time
     float sun_el_rad_track = sun.elevation_rad();                 //store sun's elevation in rads
     sun_az_rad = sun.azimuth_rad();                               //store sun's azimuth in rads
