@@ -181,7 +181,7 @@ void setup() {
   //tft.begin(identifier);
   tft.begin(0x9341);
   //tft.fillScreen(BLACK);
-  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.6-R"));// Arduino IDE 1.6.11
+  ScreenText(WHITE, x_edge_left, 10 , 2, F("V3.7-Beta"));// Arduino IDE 1.8.5
   //Serial.println(sw_version);
   //ScreenText(WHITE, x_edge_left, 40 , chip + String(identifier, HEX));
   //Serial.println(chip + text);
@@ -293,7 +293,7 @@ void loop() {
 
     if ((second() == 1) || (second() == 31)) {
       if (valid_signal == true) {
-        if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
+        if (lat >= -90 &&  lat <= 90 && lon >= -180 && lon <= 180) {
           sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
           moon(hour());
           tide();
@@ -309,12 +309,12 @@ void RMC() { //TIME DATE
 
   //$GPRMC,121000,A,4735.5634,N,00739.3538,E,0.0,0.0,060416,0.4,E,A*19
   //setTime(12, 10, 0, 6, 4, 16);
-  setTime(getparam(1).substring(0, 0 + 2).toInt(),
-          getparam(1).substring(2, 2 + 2).toInt(),
-          getparam(1).substring(4, 4 + 2).toInt(),
-          getparam(9).substring(0, 0 + 2).toInt(),
-          getparam(9).substring(2, 2 + 2).toInt(),
-          getparam(9).substring(4, 4 + 2).toInt());
+  setTime(getparam(1).substring(0, 2).toInt(),
+          getparam(1).substring(2, 4).toInt(),
+          getparam(1).substring(4, 6).toInt(),
+          getparam(9).substring(0, 2).toInt(),
+          getparam(9).substring(2, 4).toInt(),
+          getparam(9).substring(4, 6).toInt());
   time_t cet = CE.toLocal(now(), &tcr);
   setTime(cet);
 
@@ -343,11 +343,19 @@ void RMC() { //TIME DATE
   if (valid_sync == false) {
     SetFilledRect(BLACK , 150, 40, 89, 29); //clear sync on display
     if (valid_signal == true) {
+
+      String north_or_south = getparam(4).substring(0, 1);
+      String east_or_west = getparam(6).substring(0, 1);
+
       lat = getparam(3).substring(0, 2).toInt();
       lon = getparam(5).substring(0, 3).toInt();
       minute_lat = getparam(3).substring(2, 4).toInt();//minute value
       minute_lon = getparam(5).substring(3, 5).toInt();//minute value
-      if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
+
+      if (north_or_south == "S") lat *= -1;
+      if (east_or_west == "W") lon *= -1;
+
+      if (lat >= -90 &&  lat <= 90 && lon >= -180 && lon <= 180) {
         sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
         moon(hour());
         tide();
