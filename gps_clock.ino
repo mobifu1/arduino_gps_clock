@@ -344,16 +344,20 @@ void RMC() { //TIME DATE
     SetFilledRect(BLACK , 150, 40, 89, 29); //clear sync on display
     if (valid_signal == true) {
 
-      String north_or_south = getparam(4).substring(0, 1);
-      String east_or_west = getparam(6).substring(0, 1);
-
       lat = getparam(3).substring(0, 2).toInt();
       lon = getparam(5).substring(0, 3).toInt();
       minute_lat = getparam(3).substring(2, 4).toInt();//minute value
       minute_lon = getparam(5).substring(3, 5).toInt();//minute value
 
-      if (north_or_south == "S") lat *= -1;
-      if (east_or_west == "W") lon *= -1;
+      // this is a correction for the southern & western hemisphere
+      if (getparam(4).substring(0, 1) == "S") { // value can give "N" or "S" for north or sourh in GPRMS String
+        lat *= -1;
+        minute_lat *= -1;
+      }
+      if (getparam(6).substring(0, 1) == "W") { // value can give "E" or "W" for east or west in GPRMS String
+        lon *= -1;
+        minute_lon *= -1;
+      }
 
       if (lat >= -90 &&  lat <= 90 && lon >= -180 && lon <= 180) {
         sunrise (lat, minute_lat, lon, minute_lon, daylightsavingtime);//Hamburg 53,5° 10,0°
